@@ -1,0 +1,78 @@
+
+:root {
+	font-size: 16px;
+	font-family: 'Lato', sans-serif;
+}
+
+/* https://www.realtimecolors.com/?colors=0f0f0f-f0f0f0-ce5f27-efc0a9-df6020&fonts=Inter-Inter */
+
+:root.light-theme, :root:not(.dark-theme) {
+  --text: #0f0f0f;
+  --background: #f0f0f0;
+  --background-50: #f2f2f2;
+  --background-100: #e6e6e6;
+  --background-200: #cccccc;
+  --background-300: #b3b3b3;
+  --background-400: #999999;
+  --background-500: #808080;
+  --background-600: #666666;
+  --background-700: #4d4d4d;
+  --background-800: #333333;
+  --background-900: #1a1a1a;
+  --background-950: #0d0d0d;
+  --primary: #ce5f27;
+  --secondary: #efc0a9;
+  --accent: #df6020;
+}
+:root.dark-theme {
+  --text: #f0f0f0;
+  --background: #0f0f0f;
+  --background-50: #0d0d0d;
+  --background-100: #1a1a1a;
+  --background-200: #333333;
+  --background-300: #4d4d4d;
+  --background-400: #666666;
+  --background-500: #808080;
+  --background-600: #999999;
+  --background-700: #b3b3b3;
+  --background-800: #cccccc;
+  --background-900: #e6e6e6;
+  --background-950: #f2f2f2;
+  --primary: #d86931;
+  --secondary: #562710;
+  --accent: #df6020;
+}
+
+
+*, *::before, *::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: none;
+	color: inherit;
+	font: inherit;
+	box-sizing: border-box;
+	-webkit-tap-highlight-color: transparent;
+}
+
+body {
+	background-color: var(--background);
+	color: var(--text);
+	font-family: 'Lato', sans-serif;
+	line-height: 1.5;
+	overflow-x: hidden;
+}
+
+text {
+	font-family: 'Lato', sans-serif;
+	fill: var(--text);
+}
+
+line, path {
+	stroke: var(--text);
+}
+
+button {
+	user-select: none;
+}
