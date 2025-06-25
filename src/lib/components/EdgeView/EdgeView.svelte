@@ -1,0 +1,36 @@
+<script lang="ts">
+	import type { GraphEdge, GraphPage } from "$lib/components/datamodel/datamodel.svelte";
+    import { getContext } from "svelte";
+
+	interface Props {
+		edge: GraphEdge;
+	}
+	const { edge }: Props = $props();
+
+	const page = getContext("graph-page") as GraphPage;
+
+	const startNode = $derived(page.nodes.get(edge.startNodeId));
+	const endNode = $derived(page.nodes.get(edge.endNodeId));
+
+	const startPos = $derived(startNode?.getAbsolutePosition(page));
+	const endPos = $derived(endNode?.getAbsolutePosition(page));
+
+	$effect(() => {
+		if (!startNode || !endNode) {
+			console.warn("EdgeView: Edge has nodes that do not exist in the page", $state.snapshot(edge));
+		}
+	});
+</script>
+
+{#if startPos && endPos}
+	<line
+		class="edge-view"
+		x1={startPos.x}
+		x2={endPos.x}
+		y1={startPos.y}
+		y2={endPos.y}
+		stroke="var(--background-600)"
+		stroke-width="2"
+		stroke-linecap="round"
+	/>
+{/if}

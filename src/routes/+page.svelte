@@ -1,84 +1,56 @@
 
 <script lang="ts">
     import GraphPageView from "$lib/components/GraphPageView.svelte";
-    import { AppState, GraphNode, GraphPage, GraphEdge } from "$lib/datamodel.svelte";
+    import { AppState, GraphNode, GraphPage, GraphEdge, type GraphNodeResourceJointProperties } from "$lib/components/datamodel/datamodel.svelte";
     import { localStorageState } from "$lib/localStorageState.svelte";
     import { onMount, setContext } from "svelte";
 
-	const darkTheme = localStorageState("dark-theme", false);
+	const darkTheme = localStorageState("dark-theme", true);
 	onMount(() => {
-		if ($darkTheme) {
-			document.documentElement.classList.add("dark-theme");
-		} else {
-			document.documentElement.classList.add("light-theme");
-		}
-		darkTheme.subscribe((value) => {
-			if (value) {
+		const applyTheme = (isDark: boolean) => {
+			if (isDark) {
 				document.documentElement.classList.add("dark-theme");
 				document.documentElement.classList.remove("light-theme");
 			} else {
 				document.documentElement.classList.add("light-theme");
 				document.documentElement.classList.remove("dark-theme");
 			}
-		});
+		};
+		applyTheme($darkTheme);
+		darkTheme.subscribe(applyTheme);
 	})
 
 
 	const app = AppState.newDefault();
 	setContext("app-state", app);
 	const currentPageId = $derived(app.currentPage.id);
-	app.addPage(GraphPage.newDefault(app.nextId()));
-	app.pages[1].name = "Second Page";
+	app.addPage(GraphPage.newDefault(app.idGen));
+	app.pages[1].name = `Page ${app.pages.length}`;
 	const page = app.pages[0];
-	const node1 = new GraphNode(
-		app.nextId(),
-		"none",
-		[100, 100],
+	const {parent: parent1, children: children1} = GraphNode.makeRecipeNode(
+		app.idGen,
+		{x: 300, y: 300},
 		[],
-		{text: "Node 1"},
+		"Recipe_ModularFrameHeavy_C",
 	);
-	const node2 = new GraphNode(
-		app.nextId(),
-		"none",
-		[300, 100],
+	page.addNodes(parent1, ...children1);
+	page.addChildrenToNode(parent1, ...children1);
+	const {parent: parent2, children: children2} = GraphNode.makeRecipeNode(
+		app.idGen,
+		{x: 600, y: 500},
 		[],
-		{text: "Node 2"},
+		"Recipe_UnpackageAlumina_C",
 	);
-	const node3 = new GraphNode(
-		app.nextId(),
-		"none",
-		[200, 250],
+	page.addNodes(parent2, ...children2);
+	page.addChildrenToNode(parent2, ...children2);
+	const {parent: parent3, children: children3} = GraphNode.makeRecipeNode(
+		app.idGen,
+		{x: 900, y: 300},
 		[],
-		{text: "Node 3"},
+		"Recipe_PackagedAlumina_C",
 	);
-	page.addNode(node1);
-	page.addNode(node2);
-	page.addNode(node3);
-
-	const edge1 = new GraphEdge(
-		app.nextId(),
-		"straight",
-		node1.id,
-		node2.id,
-		[],
-	);
-	const edge2 = new GraphEdge(
-		app.nextId(),
-		"straight",
-		node2.id,
-		node3.id,
-		[],
-	);
-	const edge3 = new GraphEdge(
-		app.nextId(),
-		"straight",
-		node3.id,
-		node1.id,
-		[],
-	);
-	page.addEdgeBetweenNodes(edge1, node1, node2);
-	page.addEdgeBetweenNodes(edge2, node2, node3);
-	page.addEdgeBetweenNodes(edge3, node3, node1);
+	page.addNodes(parent3, ...children3);
+	page.addChildrenToNode(parent3, ...children3);
 </script>
 
 <div class="home">
@@ -97,23 +69,30 @@
 		{/each}
 		<button
 			class="page-button"
-			onclick={() => app.addPage(GraphPage.newDefault(app.nextId(), `Page ${app.pages.length + 1}`))}
+			onclick={() => app.addPage(GraphPage.newDefault(app.idGen, `Page ${app.pages.length + 1}`))}
 		>
 			➕ Add Page
 		</button>
 		<div class="spacer"></div>
-		<button class=theme-button onclick={() => $darkTheme = !$darkTheme}>
+		<button class=toggle-button onclick={() => app.currentPage.view.enableGridSnap = !app.currentPage.view.enableGridSnap} class:active={app.currentPage.view.enableGridSnap}>
+			{app.currentPage.view.enableGridSnap ? "Disable Grid Snap" : "Enable Grid Snap"}
+		</button>
+		<button class=toggle-button onclick={() => $darkTheme = !$darkTheme}>
 			{$darkTheme ? "☀️ Light Theme" : "🌙 Dark Theme"}
 		</button>
 	</div>
 </div>
 
 <style lang="scss">
+	:global(:root) {
+		overscroll-behavior: none;
+	}
+
 	.home {
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-		height: 100vh;
+		height: 100dvh;
 	}
 
 	.page-view {
@@ -127,12 +106,12 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		gap: 10px;
 		padding: 10px;
 		border-top: 1px solid var(--background-300);
 	}
 
 	.page-button {
-		margin: 0 5px;
 		padding: 5px 10px;
 		background-color: var(--background-200);
 		border: none;
@@ -157,8 +136,7 @@
 		flex-grow: 1;
 	}
 
-	.theme-button {
-		margin-left: auto;
+	.toggle-button {
 		padding: 5px 10px;
 		background-color: var(--background-200);
 		border: none;
@@ -170,6 +148,11 @@
 
 		&:active {
 			background-color: var(--background-400);
+		}
+
+		&:global(.active) {
+			background-color: var(--primary);
+			color: white;
 		}
 	}
 </style>

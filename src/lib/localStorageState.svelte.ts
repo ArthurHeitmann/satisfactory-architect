@@ -7,8 +7,8 @@ function loadFormLocalStorage<T>(key: string, defaultValue: T) {
 	try {
 		const prefs = storage["preferences"] || "{}";
 		const stored = JSON.parse(prefs)[key];
-		if (stored) {
-			return JSON.parse(stored) as T;
+		if (stored !== undefined) {
+			return stored as T;
 		}
 	} catch (e) {
 		console.error(e);
@@ -25,7 +25,7 @@ export function localStorageState<T>(key: string, defaultValue: T): Writable<T> 
 		} catch (e) {
 			console.error(e);
 		}
-		prefs[key] = JSON.stringify(value);
+		prefs[key] = value;
 		storage["preferences"] = JSON.stringify(prefs);
 	});
 	return store;

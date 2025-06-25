@@ -69,10 +69,11 @@ text {
 	fill: var(--text);
 }
 
-line, path {
-	stroke: var(--text);
-}
 
 button {
 	user-select: none;
+}
+
+:focus {
+	outline: none;
 }
