@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { ContextMenuItem, EventStream, ShowContextMenuEvent } from "$lib/EventStream.svelte";
+	import type { ContextMenuItem, EventStream, ShowContextMenuEvent } from "$lib/EventStream.svelte";
 
 	interface Props {
 		event: ShowContextMenuEvent;
@@ -51,7 +51,6 @@
 	{#each event.items as item}
 		<button class="context-menu-item" onclick={() => handleItemClick(item)}>
 			{#if item.icon}
-				<!-- svelte-ignore a11y_missing_attribute -->
 				<img class="icon" src={item.icon} />
 			{:else if reserveIconSpace}
 				<div class="icon-placeholder"></div>
@@ -69,9 +68,10 @@
 		position: absolute;
 		top: var(--y);
 		left: var(--x);
-		background: var(--background-200);
+		background: var(--context-menu-background-color);
 		padding: 4px;
-		border-radius: 4px;
+		border-radius: var(--rounded-border-radius);
+		border: var(--rounded-border-width) solid var(--context-menu-border-color);
 		width: max-content;
 		display: flex;
 		flex-direction: column;
@@ -93,15 +93,15 @@
 		height: 30px;
 		line-height: 30px;
 		padding: 0 8px;
-		background: transparent;
-		border-radius: 4px;
+		background: var(--context-menu-item-color);
+		border-radius: var(--rounded-border-radius);
 		
 		&:hover {
-			background: var(--background-300);
+			background: var(--context-menu-item-hover-color);
 		}
 
 		&:active {
-			background: var(--background-400);
+			background: var(--context-menu-item-active-color);
 		}
 
 		.hint {

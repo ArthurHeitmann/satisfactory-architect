@@ -1,12 +1,18 @@
 <script lang="ts">
-    import { GraphNode, type GraphNodeRecipeProperties, type GraphPage } from "$lib/components/datamodel/datamodel.svelte";
-    import { setContext } from "svelte";
-    import EdgeView from "./EdgeView/EdgeView.svelte";
-    import NodeView from "./NodeView/NodeView.svelte";
-    import DragEvents, { type ClickEvent } from "./UserEvents.svelte";
-    import OverlayLayer from "./OverlayLayer/OverlayLayer.svelte";
-    import type { ShowContextMenuEvent, ShowRecipeSelectorEvent } from "$lib/EventStream.svelte";
-    import { gridSize } from "./datamodel/layoutConstants";
+	import { setContext } from "svelte";
+	import EdgeView from "./EdgeView/EdgeView.svelte";
+	import NodeView from "./NodeView/NodeView.svelte";
+	import UserEvents, { type CursorEvent } from "./UserEvents.svelte";
+	import OverlayLayer from "./OverlayLayer/OverlayLayer.svelte";
+	import { gridSize } from "./datamodel/constants";
+	import { globals } from "./datamodel/globals.svelte";
+	import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
+	import type { GraphPage } from "./datamodel/GraphPage.svelte";
+    import { EventStream } from "$lib/EventStream.svelte";
+    import type { IVector2D } from "./datamodel/GraphView.svelte";
+    import type { Id } from "./datamodel/IdGen";
+    import { assertUnreachable } from "$lib/utilties";
+    import { isNodeSelectable } from "./datamodel/nodeTypeProperties.svelte";
 
 	interface Props {
 		page: GraphPage;
@@ -26,6 +32,29 @@
 
 	setContext("graph-page", page);
 
+	const eventStream = new EventStream();
+
+	interface BBox {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	}
+	let dragType: "select" | "move" = $state("select");
+	let selectionAreaRaw: BBox|null = $state(null);
+	let selectionArea: BBox|null = $derived.by(() => {
+		if (!selectionAreaRaw) {
+			return null;
+		}
+		return {
+			x: selectionAreaRaw.width < 0 ? selectionAreaRaw.x + selectionAreaRaw.width : selectionAreaRaw.x,
+			y: selectionAreaRaw.height < 0 ? selectionAreaRaw.y + selectionAreaRaw.height : selectionAreaRaw.y,
+			width: Math.abs(selectionAreaRaw.width),
+			height: Math.abs(selectionAreaRaw.height)
+		};
+	});
+	const initiallySelectedNodeIds = new Set<Id>();
+
 	function onKeyDown(key: string, event: KeyboardEvent) {
 		if (event.ctrlKey && key === "z") {
 			page.history.undo();
@@ -36,7 +65,7 @@
 		}
 	}
 
-	function onClick(event: ClickEvent) {
+	function onClick(event: CursorEvent) {
 		if (!event.hasPrimaryButton) {
 			return;
 		}
@@ -51,19 +80,32 @@
 			return;
 		}
 		event.preventDefault();
-		page.eventStream.emit(<ShowContextMenuEvent>{
+		eventStream.emit({
 			type: "showContextMenu",
 			x: event.clientX,
 			y: event.clientY,
 			items: [
 				{
 					label: "Add Node",
-					onClick: () => page.eventStream.emit(<ShowRecipeSelectorEvent>{
-						type: "showRecipeSelector",
+					onClick: () => eventStream.emit({
+						type: "showProductionSelector",
 						x: event.clientX,
 						y: event.clientY,
+						onSelect: (details) => addNewProductionNode(details, event),
 					})
-				}
+				},
+				{
+					label: globals.debugConsoleLog ? "Disable Debug Log" : "Enable Debug Log",
+					onClick: () => globals.debugConsoleLog = !globals.debugConsoleLog
+				},
+				{
+					label: globals.debugShowNodeIds ? "Hide Node IDs" : "Show Node IDs",
+					onClick: () => globals.debugShowNodeIds = !globals.debugShowNodeIds
+				},
+				{
+					label: globals.debugShowEdgeIds ? "Hide Edge IDs" : "Show Edge IDs",
+					onClick: () => globals.debugShowEdgeIds = !globals.debugShowEdgeIds
+				},
 			]
 		});
 	}
@@ -72,31 +114,118 @@
 		if (event.target !== svg && event.target !== svgTopGroup) {
 			return;
 		}
-		page.eventStream.emit(<ShowRecipeSelectorEvent>{
-			type: "showRecipeSelector",
+		eventStream.emit({
+			type: "showProductionSelector",
 			x: event.clientX,
 			y: event.clientY,
 			autofocus: !isTouchEvent,
-			onSelect: (recipe: string) => {
-				const point = page.screenToGraphCoords({x: event.clientX, y: event.clientY});
-				page.makeRecipeNode(recipe, { x: point.x, y: point.y });
-			},
+			onSelect: (details) => addNewProductionNode(details, event),
 		});
 	}
 
-	// $effect(() => {
-	// 	console.log($state.snapshot(page));
-	// })
+	function addNewProductionNode(productionDetails: NewNodeDetails, event: MouseEvent) {
+		const point = page.screenToGraphCoords({x: event.clientX, y: event.clientY});
+		page.makeProductionNode(productionDetails, { x: point.x, y: point.y });
+	}
+
+	function updateSelectedNodes() {
+		if (!selectionAreaRaw) {
+			return;
+		}
+		const selectedNodeIds: Id[] = [];
+		for (const [id, node] of page.nodes.entries()) {
+			if (!isNodeSelectable(node) || node.parentNode !== null) {
+				continue;
+			}
+			const nodePosition = node.position;
+			const nodeSize = node.size;
+			const nodeBBox: BBox = {
+				x: nodePosition.x - nodeSize.x / 2,
+				y: nodePosition.y - nodeSize.y / 2,
+				width: nodeSize.x,
+				height: nodeSize.y
+			};
+			const intersects = (
+				selectionArea!.x < nodeBBox.x + nodeBBox.width &&
+				selectionArea!.x + selectionArea!.width > nodeBBox.x &&
+				selectionArea!.y < nodeBBox.y + nodeBBox.height &&
+				selectionArea!.y + selectionArea!.height > nodeBBox.y
+			);
+			if (intersects) {
+				selectedNodeIds.push(id);
+			}
+		}
+		page.selectedNodes.clear();
+		for (const id of [...initiallySelectedNodeIds, ...selectedNodeIds]) {
+			page.selectedNodes.add(id);
+		}
+	}
+
+	$effect(() => {
+		if (globals.debugConsoleLog) {
+			console.log($state.snapshot(page));
+			for (const edge of page.edges.values()) {
+				const startNode = page.nodes.get(edge.startNodeId);
+				const endNode = page.nodes.get(edge.endNodeId);
+				if (!startNode || !endNode) {
+					console.warn("EdgeView: Edge references invalid node", $state.snapshot(edge));
+				} else {
+					for (const n of [startNode, endNode]) {
+						if (!n.edges.has(edge.id)) {
+							console.warn("EdgeView: missing double link in", $state.snapshot(edge), "to", $state.snapshot(n));
+						}
+					}
+				}
+			}
+		}
+	})
 </script>
 
-<OverlayLayer eventStream={page.eventStream}>
-	<DragEvents
+<OverlayLayer eventStream={eventStream}>
+	<UserEvents
+		onDragStart={(e) => {
+			dragType = e.cursorEvent.isMiddleButton || e.cursorEvent.isTouchEvent ? "move" : "select";
+			if (dragType === "select") {
+				const svgRect = svg.getBoundingClientRect();
+				const cursor = {
+					x: e.cursorEvent.clientX - svgRect.left,
+					y: e.cursorEvent.clientY - svgRect.top
+				};
+				const point = page.screenToGraphCoords(cursor);
+				selectionAreaRaw = {
+					x: point.x,
+					y: point.y,
+					width: 0,
+					height: 0
+				};
+				initiallySelectedNodeIds.clear();
+				if (e.cursorEvent.hasShiftKey) {
+					for (const node of page.selectedNodes) {
+						initiallySelectedNodeIds.add(node);
+					}
+				} else {
+					page.selectedNodes.clear();
+				}
+			}
+		}}
 		onDrag={(e) => {
 			if (isNaN(e.deltaX) || isNaN(e.deltaY)) {
 				return;
 			}
-			page.view.offset.x += e.deltaX;
-			page.view.offset.y += e.deltaY;
+			if (dragType === "move") {
+				page.view.offset.x += e.deltaX;
+				page.view.offset.y += e.deltaY;
+			} else if (dragType === "select") {
+				const scale = page.view.scale;
+				selectionAreaRaw!.width += e.deltaX / scale;
+				selectionAreaRaw!.height += e.deltaY / scale;
+				updateSelectedNodes();
+			} else {
+				assertUnreachable(dragType);
+			}
+		}}
+		onDragEnd={() => {
+			selectionAreaRaw = null;
 		}}
 		onZoom={(deltaFactor, cursorX, cursorY) => {
 			if (isNaN(deltaFactor) || isNaN(cursorX) || isNaN(cursorY) || deltaFactor === 0) {
@@ -118,12 +247,13 @@
 			page.view.offset.y += point.y * scaleDelta;
 			page.view.scale = newScale;
 		}}
-		onClick={onClick}
+		onClick={onClick}	
 		onContextMenu={onContextMenu}
 		onDoubleClick={onDoubleClick}
 		onKeyDown={onKeyDown}
 		allowMiddleClickDrag={true}
 		allowMultiTouchDrag={true}
+		debugKey="Page {page.id}"
 	>
 		{#snippet children({ listeners })}
 			<svg
@@ -138,6 +268,21 @@
 				bind:this={svg}
 				{...listeners}
 			>
+				<defs>
+					<!-- A marker to be used as an arrowhead -->
+					<marker
+						id="arrow"
+						viewBox="0 0 10 10"
+						refX="1"
+						refY="5"
+						markerWidth="6"
+						markerHeight="6"
+						orient="auto-start-reverse"
+						fill="var(--edge-stroke-color)"
+					>
+						<path d="M 0 0 L 10 5 L 0 10 z" />
+					</marker>
+				</defs>
 				<g
 					transform={
 						`translate(${page.view.offset.x}, ${page.view.offset.y}) ` +
@@ -151,14 +296,25 @@
 					{#each sortedNodes as [id, node] (id)}
 						<NodeView {node} />
 					{/each}
+
+					{#if selectionAreaRaw}
+						<rect
+							class="selection-area"
+							x={selectionArea!.x}
+							y={selectionArea!.y}
+							width={selectionArea!.width}
+							height={selectionArea!.height}
+						/>
+					{/if}
 				</g>
 			</svg>
 		{/snippet}
-	</DragEvents>
+	</UserEvents>
 </OverlayLayer>
 
 <style lang="scss">
 	.graph-page-view {
+		background-color: var(--grid-background-color);
 		background-position: var(--offset-x) var(--offset-y);
 		background-size: var(--square-size) var(--square-size);
 		background-repeat: repeat;
@@ -174,5 +330,12 @@
 
 	svg {
 		user-select: none;
+	}
+
+	.selection-area {
+		fill: var(--selection-area-background-color);
+		stroke: var(--selection-area-border-color);
+		stroke-width: 1;
+		pointer-events: none;
 	}
 </style>

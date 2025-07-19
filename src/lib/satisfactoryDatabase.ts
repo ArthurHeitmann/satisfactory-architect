@@ -3,113 +3,36 @@ import type { SatisfactoryDatabase } from "./satisfactoryDatabaseTypes";
 
 export const satisfactoryDatabase: SatisfactoryDatabase = {
 	recipes: {
-		Recipe_SpaceElevatorPart_1_C: {
-			className: "Recipe_SpaceElevatorPart_1_C",
-			recipeDisplayName: "Smart Plating",
+		Recipe_SpaceElevatorPart_5_C: {
+			className: "Recipe_SpaceElevatorPart_5_C",
+			recipeDisplayName: "Adaptive Control Unit",
 			inputs: [
 				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 2
-				},
-				{
-					itemClass: "Desc_Rotor_C",
-					amountPerMinute: 2
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_1_C",
-					amountPerMinute: 2
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/SpaceElevator",
-			priority: 0
-		},
-		Recipe_Alternate_PlasticSmartPlating_C: {
-			className: "Recipe_Alternate_PlasticSmartPlating_C",
-			recipeDisplayName: "Alternate: Plastic Smart Plating",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 2.5
-				},
-				{
-					itemClass: "Desc_Rotor_C",
-					amountPerMinute: 2.5
-				},
-				{
-					itemClass: "Desc_Plastic_C",
-					amountPerMinute: 7.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_1_C",
+					itemClass: "Desc_SpaceElevatorPart_3_C",
 					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/SpaceElevator",
-			priority: 0
-		},
-		Recipe_SpaceElevatorPart_10_C: {
-			className: "Recipe_SpaceElevatorPart_10_C",
-			recipeDisplayName: "Biochemical Sculptor",
-			inputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_7_C",
-					amountPerMinute: 0.5
 				},
 				{
-					itemClass: "Desc_FicsiteMesh_C",
-					amountPerMinute: 40
+					itemClass: "Desc_CircuitBoard_C",
+					amountPerMinute: 5
 				},
 				{
-					itemClass: "Desc_Water_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_10_C",
-					amountPerMinute: 2
-				}
-			],
-			producedIn: "Build_Blender_C",
-			category: "Categories/SpaceElevator",
-			priority: 0
-		},
-		Recipe_SpaceElevatorPart_11_C: {
-			className: "Recipe_SpaceElevatorPart_11_C",
-			recipeDisplayName: "Ballistic Warp Drive",
-			inputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_8_C",
+					itemClass: "Desc_ModularFrameHeavy_C",
 					amountPerMinute: 1
 				},
 				{
-					itemClass: "Desc_SingularityCell_C",
-					amountPerMinute: 5
-				},
-				{
-					itemClass: "Desc_QuantumOscillator_C",
+					itemClass: "Desc_Computer_C",
 					amountPerMinute: 2
-				},
-				{
-					itemClass: "Desc_DarkMatter_C",
-					amountPerMinute: 40
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_SpaceElevatorPart_11_C",
+					itemClass: "Desc_SpaceElevatorPart_5_C",
 					amountPerMinute: 1
 				}
 			],
 			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/SpaceElevator",
-			priority: 7
+			priority: 4
 		},
 		Recipe_SpaceElevatorPart_12_C: {
 			className: "Recipe_SpaceElevatorPart_12_C",
@@ -146,55 +69,28 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/SpaceElevator",
 			priority: 0
 		},
-		Recipe_SpaceElevatorPart_2_C: {
-			className: "Recipe_SpaceElevatorPart_2_C",
-			recipeDisplayName: "Versatile Framework",
+		Recipe_SpaceElevatorPart_7_C: {
+			className: "Recipe_SpaceElevatorPart_7_C",
+			recipeDisplayName: "Assembly Director System",
 			inputs: [
 				{
-					itemClass: "Desc_ModularFrame_C",
-					amountPerMinute: 2.5
+					itemClass: "Desc_SpaceElevatorPart_5_C",
+					amountPerMinute: 1.5
 				},
 				{
-					itemClass: "Desc_SteelPlate_C",
-					amountPerMinute: 30
+					itemClass: "Desc_ComputerSuper_C",
+					amountPerMinute: 0.75
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_SpaceElevatorPart_2_C",
-					amountPerMinute: 5
+					itemClass: "Desc_SpaceElevatorPart_7_C",
+					amountPerMinute: 0.75
 				}
 			],
 			producedIn: "Build_AssemblerMk1_C",
 			category: "Categories/SpaceElevator",
-			priority: 1
-		},
-		Recipe_Alternate_FlexibleFramework_C: {
-			className: "Recipe_Alternate_FlexibleFramework_C",
-			recipeDisplayName: "Alternate: Flexible Framework",
-			inputs: [
-				{
-					itemClass: "Desc_ModularFrame_C",
-					amountPerMinute: 3.75
-				},
-				{
-					itemClass: "Desc_SteelPlate_C",
-					amountPerMinute: 22.5
-				},
-				{
-					itemClass: "Desc_Rubber_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_2_C",
-					amountPerMinute: 7.5
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/SpaceElevator",
-			priority: 1
+			priority: 3
 		},
 		Recipe_SpaceElevatorPart_3_C: {
 			className: "Recipe_SpaceElevatorPart_3_C",
@@ -246,6 +142,87 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/SpaceElevator",
 			priority: 2
 		},
+		Recipe_SpaceElevatorPart_11_C: {
+			className: "Recipe_SpaceElevatorPart_11_C",
+			recipeDisplayName: "Ballistic Warp Drive",
+			inputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_8_C",
+					amountPerMinute: 1
+				},
+				{
+					itemClass: "Desc_SingularityCell_C",
+					amountPerMinute: 5
+				},
+				{
+					itemClass: "Desc_QuantumOscillator_C",
+					amountPerMinute: 2
+				},
+				{
+					itemClass: "Desc_DarkMatter_C",
+					amountPerMinute: 40
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_11_C",
+					amountPerMinute: 1
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/SpaceElevator",
+			priority: 7
+		},
+		Recipe_SpaceElevatorPart_10_C: {
+			className: "Recipe_SpaceElevatorPart_10_C",
+			recipeDisplayName: "Biochemical Sculptor",
+			inputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_7_C",
+					amountPerMinute: 0.5
+				},
+				{
+					itemClass: "Desc_FicsiteMesh_C",
+					amountPerMinute: 40
+				},
+				{
+					itemClass: "Desc_Water_C",
+					amountPerMinute: 10
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_10_C",
+					amountPerMinute: 2
+				}
+			],
+			producedIn: "Build_Blender_C",
+			category: "Categories/SpaceElevator",
+			priority: 0
+		},
+		Recipe_SpaceElevatorPart_6_C: {
+			className: "Recipe_SpaceElevatorPart_6_C",
+			recipeDisplayName: "Magnetic Field Generator",
+			inputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_2_C",
+					amountPerMinute: 2.5
+				},
+				{
+					itemClass: "Desc_ElectromagneticControlRod_C",
+					amountPerMinute: 1
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_6_C",
+					amountPerMinute: 1
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/SpaceElevator",
+			priority: 5
+		},
 		Recipe_SpaceElevatorPart_4_C: {
 			className: "Recipe_SpaceElevatorPart_4_C",
 			recipeDisplayName: "Modular Engine",
@@ -273,82 +250,78 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/SpaceElevator",
 			priority: 3
 		},
-		Recipe_SpaceElevatorPart_5_C: {
-			className: "Recipe_SpaceElevatorPart_5_C",
-			recipeDisplayName: "Adaptive Control Unit",
+		Recipe_SpaceElevatorPart_9_C: {
+			className: "Recipe_SpaceElevatorPart_9_C",
+			recipeDisplayName: "Nuclear Pasta",
 			inputs: [
 				{
-					itemClass: "Desc_SpaceElevatorPart_3_C",
-					amountPerMinute: 5
+					itemClass: "Desc_CopperDust_C",
+					amountPerMinute: 100
 				},
 				{
-					itemClass: "Desc_CircuitBoard_C",
-					amountPerMinute: 5
+					itemClass: "Desc_PressureConversionCube_C",
+					amountPerMinute: 0.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_9_C",
+					amountPerMinute: 0.5
+				}
+			],
+			producedIn: "Build_HadronCollider_C",
+			category: "Categories/SpaceElevator",
+			priority: 0
+		},
+		Recipe_SpaceElevatorPart_1_C: {
+			className: "Recipe_SpaceElevatorPart_1_C",
+			recipeDisplayName: "Smart Plating",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 2
 				},
 				{
-					itemClass: "Desc_ModularFrameHeavy_C",
-					amountPerMinute: 1
-				},
-				{
-					itemClass: "Desc_Computer_C",
+					itemClass: "Desc_Rotor_C",
 					amountPerMinute: 2
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_SpaceElevatorPart_5_C",
-					amountPerMinute: 1
+					itemClass: "Desc_SpaceElevatorPart_1_C",
+					amountPerMinute: 2
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/SpaceElevator",
+			priority: 0
+		},
+		Recipe_Alternate_PlasticSmartPlating_C: {
+			className: "Recipe_Alternate_PlasticSmartPlating_C",
+			recipeDisplayName: "Alternate: Plastic Smart Plating",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 2.5
+				},
+				{
+					itemClass: "Desc_Rotor_C",
+					amountPerMinute: 2.5
+				},
+				{
+					itemClass: "Desc_Plastic_C",
+					amountPerMinute: 7.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_1_C",
+					amountPerMinute: 5
 				}
 			],
 			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/SpaceElevator",
-			priority: 4
-		},
-		Recipe_SpaceElevatorPart_6_C: {
-			className: "Recipe_SpaceElevatorPart_6_C",
-			recipeDisplayName: "Magnetic Field Generator",
-			inputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_2_C",
-					amountPerMinute: 2.5
-				},
-				{
-					itemClass: "Desc_ElectromagneticControlRod_C",
-					amountPerMinute: 1
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_6_C",
-					amountPerMinute: 1
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/SpaceElevator",
-			priority: 5
-		},
-		Recipe_SpaceElevatorPart_7_C: {
-			className: "Recipe_SpaceElevatorPart_7_C",
-			recipeDisplayName: "Assembly Director System",
-			inputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_5_C",
-					amountPerMinute: 1.5
-				},
-				{
-					itemClass: "Desc_ComputerSuper_C",
-					amountPerMinute: 0.75
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SpaceElevatorPart_7_C",
-					amountPerMinute: 0.75
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/SpaceElevator",
-			priority: 3
+			priority: 0
 		},
 		Recipe_SpaceElevatorPart_8_C: {
 			className: "Recipe_SpaceElevatorPart_8_C",
@@ -381,28 +354,55 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/SpaceElevator",
 			priority: 6
 		},
-		Recipe_SpaceElevatorPart_9_C: {
-			className: "Recipe_SpaceElevatorPart_9_C",
-			recipeDisplayName: "Nuclear Pasta",
+		Recipe_SpaceElevatorPart_2_C: {
+			className: "Recipe_SpaceElevatorPart_2_C",
+			recipeDisplayName: "Versatile Framework",
 			inputs: [
 				{
-					itemClass: "Desc_CopperDust_C",
-					amountPerMinute: 100
+					itemClass: "Desc_ModularFrame_C",
+					amountPerMinute: 2.5
 				},
 				{
-					itemClass: "Desc_PressureConversionCube_C",
-					amountPerMinute: 0.5
+					itemClass: "Desc_SteelPlate_C",
+					amountPerMinute: 30
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_SpaceElevatorPart_9_C",
-					amountPerMinute: 0.5
+					itemClass: "Desc_SpaceElevatorPart_2_C",
+					amountPerMinute: 5
 				}
 			],
-			producedIn: "Build_HadronCollider_C",
+			producedIn: "Build_AssemblerMk1_C",
 			category: "Categories/SpaceElevator",
-			priority: 0
+			priority: 1
+		},
+		Recipe_Alternate_FlexibleFramework_C: {
+			className: "Recipe_Alternate_FlexibleFramework_C",
+			recipeDisplayName: "Alternate: Flexible Framework",
+			inputs: [
+				{
+					itemClass: "Desc_ModularFrame_C",
+					amountPerMinute: 3.75
+				},
+				{
+					itemClass: "Desc_SteelPlate_C",
+					amountPerMinute: 22.5
+				},
+				{
+					itemClass: "Desc_Rubber_C",
+					amountPerMinute: 30
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SpaceElevatorPart_2_C",
+					amountPerMinute: 7.5
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/SpaceElevator",
+			priority: 1
 		},
 		Recipe_IngotAluminum_C: {
 			className: "Recipe_IngotAluminum_C",
@@ -445,6 +445,94 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_SmelterMk1_C",
 			category: "Categories/Ingots",
 			priority: 6
+		},
+		Recipe_IngotCaterium_C: {
+			className: "Recipe_IngotCaterium_C",
+			recipeDisplayName: "Caterium Ingot",
+			inputs: [
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 45
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_GoldIngot_C",
+					amountPerMinute: 15
+				}
+			],
+			producedIn: "Build_SmelterMk1_C",
+			category: "Categories/Ingots",
+			priority: 5
+		},
+		Recipe_Alternate_CateriumIngot_Leached_C: {
+			className: "Recipe_Alternate_CateriumIngot_Leached_C",
+			recipeDisplayName: "Alternate: Leached Caterium Ingot",
+			inputs: [
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 54
+				},
+				{
+					itemClass: "Desc_SulfuricAcid_C",
+					amountPerMinute: 30
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_GoldIngot_C",
+					amountPerMinute: 36
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Ingots",
+			priority: 5
+		},
+		Recipe_Alternate_PureCateriumIngot_C: {
+			className: "Recipe_Alternate_PureCateriumIngot_C",
+			recipeDisplayName: "Alternate: Pure Caterium Ingot",
+			inputs: [
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 24
+				},
+				{
+					itemClass: "Desc_Water_C",
+					amountPerMinute: 24
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_GoldIngot_C",
+					amountPerMinute: 12
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Ingots",
+			priority: 4
+		},
+		Recipe_Alternate_CateriumIngot_Tempered_C: {
+			className: "Recipe_Alternate_CateriumIngot_Tempered_C",
+			recipeDisplayName: "Alternate: Tempered Caterium Ingot",
+			inputs: [
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 45
+				},
+				{
+					itemClass: "Desc_PetroleumCoke_C",
+					amountPerMinute: 15
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_GoldIngot_C",
+					amountPerMinute: 22.5
+				}
+			],
+			producedIn: "Build_FoundryMk1_C",
+			category: "Categories/Ingots",
+			priority: 8
 		},
 		Recipe_IngotCopper_C: {
 			className: "Recipe_IngotCopper_C",
@@ -625,94 +713,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_Converter_C",
 			category: "Categories/Ingots",
 			priority: 0
-		},
-		Recipe_IngotCaterium_C: {
-			className: "Recipe_IngotCaterium_C",
-			recipeDisplayName: "Caterium Ingot",
-			inputs: [
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 45
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_GoldIngot_C",
-					amountPerMinute: 15
-				}
-			],
-			producedIn: "Build_SmelterMk1_C",
-			category: "Categories/Ingots",
-			priority: 5
-		},
-		Recipe_Alternate_CateriumIngot_Leached_C: {
-			className: "Recipe_Alternate_CateriumIngot_Leached_C",
-			recipeDisplayName: "Alternate: Leached Caterium Ingot",
-			inputs: [
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 54
-				},
-				{
-					itemClass: "Desc_SulfuricAcid_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_GoldIngot_C",
-					amountPerMinute: 36
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Ingots",
-			priority: 5
-		},
-		Recipe_Alternate_PureCateriumIngot_C: {
-			className: "Recipe_Alternate_PureCateriumIngot_C",
-			recipeDisplayName: "Alternate: Pure Caterium Ingot",
-			inputs: [
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 24
-				},
-				{
-					itemClass: "Desc_Water_C",
-					amountPerMinute: 24
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_GoldIngot_C",
-					amountPerMinute: 12
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Ingots",
-			priority: 4
-		},
-		Recipe_Alternate_CateriumIngot_Tempered_C: {
-			className: "Recipe_Alternate_CateriumIngot_Tempered_C",
-			recipeDisplayName: "Alternate: Tempered Caterium Ingot",
-			inputs: [
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 45
-				},
-				{
-					itemClass: "Desc_PetroleumCoke_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_GoldIngot_C",
-					amountPerMinute: 22.5
-				}
-			],
-			producedIn: "Build_FoundryMk1_C",
-			category: "Categories/Ingots",
-			priority: 8
 		},
 		Recipe_IngotIron_C: {
 			className: "Recipe_IngotIron_C",
@@ -917,6 +917,29 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Ingots",
 			priority: 5
 		},
+		Recipe_Alternate_EnrichedCoal_C: {
+			className: "Recipe_Alternate_EnrichedCoal_C",
+			recipeDisplayName: "Alternate: Compacted Coal",
+			inputs: [
+				{
+					itemClass: "Desc_Coal_C",
+					amountPerMinute: 25
+				},
+				{
+					itemClass: "Desc_Sulfur_C",
+					amountPerMinute: 25
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_CompactedCoal_C",
+					amountPerMinute: 25
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Compounds",
+			priority: 2
+		},
 		Recipe_Concrete_C: {
 			className: "Recipe_Concrete_C",
 			recipeDisplayName: "Concrete",
@@ -1004,29 +1027,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_OilRefinery_C",
 			category: "Categories/Compounds",
 			priority: 0
-		},
-		Recipe_Alternate_EnrichedCoal_C: {
-			className: "Recipe_Alternate_EnrichedCoal_C",
-			recipeDisplayName: "Alternate: Compacted Coal",
-			inputs: [
-				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 25
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CompactedCoal_C",
-					amountPerMinute: 25
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Compounds",
-			priority: 2
 		},
 		Recipe_CopperDust_C: {
 			className: "Recipe_CopperDust_C",
@@ -1212,6 +1212,29 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Compounds",
 			priority: 0
 		},
+		Recipe_AluminumSheet_C: {
+			className: "Recipe_AluminumSheet_C",
+			recipeDisplayName: "Alclad Aluminum Sheet",
+			inputs: [
+				{
+					itemClass: "Desc_AluminumIngot_C",
+					amountPerMinute: 30
+				},
+				{
+					itemClass: "Desc_CopperIngot_C",
+					amountPerMinute: 10
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_AluminumPlate_C",
+					amountPerMinute: 30
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 17
+		},
 		Recipe_AluminumCasing_C: {
 			className: "Recipe_AluminumCasing_C",
 			recipeDisplayName: "Aluminum Casing",
@@ -1253,29 +1276,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_AssemblerMk1_C",
 			category: "Categories/StandardParts",
 			priority: 18
-		},
-		Recipe_AluminumSheet_C: {
-			className: "Recipe_AluminumSheet_C",
-			recipeDisplayName: "Alclad Aluminum Sheet",
-			inputs: [
-				{
-					itemClass: "Desc_AluminumIngot_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_CopperIngot_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_AluminumPlate_C",
-					amountPerMinute: 30
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 17
 		},
 		Recipe_CopperSheet_C: {
 			className: "Recipe_CopperSheet_C",
@@ -1319,6 +1319,52 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/StandardParts",
 			priority: 1
 		},
+		Recipe_EncasedIndustrialBeam_C: {
+			className: "Recipe_EncasedIndustrialBeam_C",
+			recipeDisplayName: "Encased Industrial Beam",
+			inputs: [
+				{
+					itemClass: "Desc_SteelPlate_C",
+					amountPerMinute: 18
+				},
+				{
+					itemClass: "Desc_Cement_C",
+					amountPerMinute: 36
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SteelPlateReinforced_C",
+					amountPerMinute: 6
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 15
+		},
+		Recipe_Alternate_EncasedIndustrialBeam_C: {
+			className: "Recipe_Alternate_EncasedIndustrialBeam_C",
+			recipeDisplayName: "Alternate: Encased Industrial Pipe",
+			inputs: [
+				{
+					itemClass: "Desc_SteelPipe_C",
+					amountPerMinute: 24
+				},
+				{
+					itemClass: "Desc_Cement_C",
+					amountPerMinute: 20
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SteelPlateReinforced_C",
+					amountPerMinute: 4
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 16
+		},
 		Recipe_FicsiteMesh_C: {
 			className: "Recipe_FicsiteMesh_C",
 			recipeDisplayName: "Ficsite Trigon",
@@ -1337,346 +1383,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_ConstructorMk1_C",
 			category: "Categories/StandardParts",
 			priority: 19
-		},
-		Recipe_IronPlate_C: {
-			className: "Recipe_IronPlate_C",
-			recipeDisplayName: "Iron Plate",
-			inputs: [
-				{
-					itemClass: "Desc_IronIngot_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 20
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 0
-		},
-		Recipe_Alternate_CoatedIronPlate_C: {
-			className: "Recipe_Alternate_CoatedIronPlate_C",
-			recipeDisplayName: "Alternate: Coated Iron Plate",
-			inputs: [
-				{
-					itemClass: "Desc_IronIngot_C",
-					amountPerMinute: 37.5
-				},
-				{
-					itemClass: "Desc_Plastic_C",
-					amountPerMinute: 7.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 75
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 0
-		},
-		Recipe_Alternate_SteelCastedPlate_C: {
-			className: "Recipe_Alternate_SteelCastedPlate_C",
-			recipeDisplayName: "Alternate: Steel Cast Plate",
-			inputs: [
-				{
-					itemClass: "Desc_IronIngot_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_SteelIngot_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 45
-				}
-			],
-			producedIn: "Build_FoundryMk1_C",
-			category: "Categories/StandardParts",
-			priority: 1
-		},
-		Recipe_IronPlateReinforced_C: {
-			className: "Recipe_IronPlateReinforced_C",
-			recipeDisplayName: "Reinforced Iron Plate",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 6
-		},
-		Recipe_Alternate_AdheredIronPlate_C: {
-			className: "Recipe_Alternate_AdheredIronPlate_C",
-			recipeDisplayName: "Alternate: Adhered Iron Plate",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 11.25
-				},
-				{
-					itemClass: "Desc_Rubber_C",
-					amountPerMinute: 3.75
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 3.75
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 9
-		},
-		Recipe_Alternate_ReinforcedIronPlate_1_C: {
-			className: "Recipe_Alternate_ReinforcedIronPlate_1_C",
-			recipeDisplayName: "Alternate: Bolted Iron Plate",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 90
-				},
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 250
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 15
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 7
-		},
-		Recipe_Alternate_ReinforcedIronPlate_2_C: {
-			className: "Recipe_Alternate_ReinforcedIronPlate_2_C",
-			recipeDisplayName: "Alternate: Stitched Iron Plate",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 18.75
-				},
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 37.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 5.625
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 8
-		},
-		Recipe_IronRod_C: {
-			className: "Recipe_IronRod_C",
-			recipeDisplayName: "Iron Rod",
-			inputs: [
-				{
-					itemClass: "Desc_IronIngot_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 15
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 1
-		},
-		Recipe_Alternate_AluminumRod_C: {
-			className: "Recipe_Alternate_AluminumRod_C",
-			recipeDisplayName: "Alternate: Aluminum Rod",
-			inputs: [
-				{
-					itemClass: "Desc_AluminumIngot_C",
-					amountPerMinute: 7.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 52.5
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 3
-		},
-		Recipe_Alternate_SteelRod_C: {
-			className: "Recipe_Alternate_SteelRod_C",
-			recipeDisplayName: "Alternate: Steel Rod",
-			inputs: [
-				{
-					itemClass: "Desc_SteelIngot_C",
-					amountPerMinute: 12
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 48
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 2
-		},
-		Recipe_Screw_C: {
-			className: "Recipe_Screw_C",
-			recipeDisplayName: "Screws",
-			inputs: [
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 40
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 4
-		},
-		Recipe_Alternate_Screw_C: {
-			className: "Recipe_Alternate_Screw_C",
-			recipeDisplayName: "Alternate: Cast Screws",
-			inputs: [
-				{
-					itemClass: "Desc_IronIngot_C",
-					amountPerMinute: 12.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 50
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 5
-		},
-		Recipe_Alternate_Screw_2_C: {
-			className: "Recipe_Alternate_Screw_2_C",
-			recipeDisplayName: "Alternate: Steel Screws",
-			inputs: [
-				{
-					itemClass: "Desc_SteelPlate_C",
-					amountPerMinute: 5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 260
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 6
-		},
-		Recipe_ModularFrame_C: {
-			className: "Recipe_ModularFrame_C",
-			recipeDisplayName: "Modular Frame",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 3
-				},
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 12
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_ModularFrame_C",
-					amountPerMinute: 2
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 10
-		},
-		Recipe_Alternate_BoltedFrame_C: {
-			className: "Recipe_Alternate_BoltedFrame_C",
-			recipeDisplayName: "Alternate: Bolted Frame",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 7.5
-				},
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 140
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_ModularFrame_C",
-					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 11
-		},
-		Recipe_Alternate_ModularFrame_C: {
-			className: "Recipe_Alternate_ModularFrame_C",
-			recipeDisplayName: "Alternate: Steeled Frame",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 2
-				},
-				{
-					itemClass: "Desc_SteelPipe_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_ModularFrame_C",
-					amountPerMinute: 3
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 12
 		},
 		Recipe_ModularFrameHeavy_C: {
 			className: "Recipe_ModularFrameHeavy_C",
@@ -1771,66 +1477,345 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/StandardParts",
 			priority: 18
 		},
-		Recipe_SteelPipe_C: {
-			className: "Recipe_SteelPipe_C",
-			recipeDisplayName: "Steel Pipe",
+		Recipe_IronPlate_C: {
+			className: "Recipe_IronPlate_C",
+			recipeDisplayName: "Iron Plate",
 			inputs: [
 				{
-					itemClass: "Desc_SteelIngot_C",
+					itemClass: "Desc_IronIngot_C",
 					amountPerMinute: 30
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_SteelPipe_C",
+					itemClass: "Desc_IronPlate_C",
 					amountPerMinute: 20
 				}
 			],
 			producedIn: "Build_ConstructorMk1_C",
 			category: "Categories/StandardParts",
-			priority: 14
+			priority: 0
 		},
-		Recipe_Alternate_SteelPipe_Iron_C: {
-			className: "Recipe_Alternate_SteelPipe_Iron_C",
-			recipeDisplayName: "Alternate: Iron Pipe",
+		Recipe_Alternate_CoatedIronPlate_C: {
+			className: "Recipe_Alternate_CoatedIronPlate_C",
+			recipeDisplayName: "Alternate: Coated Iron Plate",
 			inputs: [
 				{
 					itemClass: "Desc_IronIngot_C",
-					amountPerMinute: 100
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SteelPipe_C",
-					amountPerMinute: 25
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 15
-		},
-		Recipe_Alternate_SteelPipe_Molded_C: {
-			className: "Recipe_Alternate_SteelPipe_Molded_C",
-			recipeDisplayName: "Alternate: Molded Steel Pipe",
-			inputs: [
-				{
-					itemClass: "Desc_SteelIngot_C",
-					amountPerMinute: 50
+					amountPerMinute: 37.5
 				},
 				{
-					itemClass: "Desc_Cement_C",
-					amountPerMinute: 30
+					itemClass: "Desc_Plastic_C",
+					amountPerMinute: 7.5
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_SteelPipe_C",
-					amountPerMinute: 50
+					itemClass: "Desc_IronPlate_C",
+					amountPerMinute: 75
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 0
+		},
+		Recipe_Alternate_SteelCastedPlate_C: {
+			className: "Recipe_Alternate_SteelCastedPlate_C",
+			recipeDisplayName: "Alternate: Steel Cast Plate",
+			inputs: [
+				{
+					itemClass: "Desc_IronIngot_C",
+					amountPerMinute: 15
+				},
+				{
+					itemClass: "Desc_SteelIngot_C",
+					amountPerMinute: 15
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronPlate_C",
+					amountPerMinute: 45
 				}
 			],
 			producedIn: "Build_FoundryMk1_C",
 			category: "Categories/StandardParts",
+			priority: 1
+		},
+		Recipe_IronRod_C: {
+			className: "Recipe_IronRod_C",
+			recipeDisplayName: "Iron Rod",
+			inputs: [
+				{
+					itemClass: "Desc_IronIngot_C",
+					amountPerMinute: 15
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronRod_C",
+					amountPerMinute: 15
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
+			priority: 1
+		},
+		Recipe_Alternate_AluminumRod_C: {
+			className: "Recipe_Alternate_AluminumRod_C",
+			recipeDisplayName: "Alternate: Aluminum Rod",
+			inputs: [
+				{
+					itemClass: "Desc_AluminumIngot_C",
+					amountPerMinute: 7.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronRod_C",
+					amountPerMinute: 52.5
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
 			priority: 3
+		},
+		Recipe_Alternate_SteelRod_C: {
+			className: "Recipe_Alternate_SteelRod_C",
+			recipeDisplayName: "Alternate: Steel Rod",
+			inputs: [
+				{
+					itemClass: "Desc_SteelIngot_C",
+					amountPerMinute: 12
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronRod_C",
+					amountPerMinute: 48
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
+			priority: 2
+		},
+		Recipe_ModularFrame_C: {
+			className: "Recipe_ModularFrame_C",
+			recipeDisplayName: "Modular Frame",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 3
+				},
+				{
+					itemClass: "Desc_IronRod_C",
+					amountPerMinute: 12
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_ModularFrame_C",
+					amountPerMinute: 2
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 10
+		},
+		Recipe_Alternate_BoltedFrame_C: {
+			className: "Recipe_Alternate_BoltedFrame_C",
+			recipeDisplayName: "Alternate: Bolted Frame",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 7.5
+				},
+				{
+					itemClass: "Desc_IronScrew_C",
+					amountPerMinute: 140
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_ModularFrame_C",
+					amountPerMinute: 5
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 11
+		},
+		Recipe_Alternate_ModularFrame_C: {
+			className: "Recipe_Alternate_ModularFrame_C",
+			recipeDisplayName: "Alternate: Steeled Frame",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 2
+				},
+				{
+					itemClass: "Desc_SteelPipe_C",
+					amountPerMinute: 10
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_ModularFrame_C",
+					amountPerMinute: 3
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 12
+		},
+		Recipe_IronPlateReinforced_C: {
+			className: "Recipe_IronPlateReinforced_C",
+			recipeDisplayName: "Reinforced Iron Plate",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlate_C",
+					amountPerMinute: 30
+				},
+				{
+					itemClass: "Desc_IronScrew_C",
+					amountPerMinute: 60
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 5
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 6
+		},
+		Recipe_Alternate_AdheredIronPlate_C: {
+			className: "Recipe_Alternate_AdheredIronPlate_C",
+			recipeDisplayName: "Alternate: Adhered Iron Plate",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlate_C",
+					amountPerMinute: 11.25
+				},
+				{
+					itemClass: "Desc_Rubber_C",
+					amountPerMinute: 3.75
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 3.75
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 9
+		},
+		Recipe_Alternate_ReinforcedIronPlate_1_C: {
+			className: "Recipe_Alternate_ReinforcedIronPlate_1_C",
+			recipeDisplayName: "Alternate: Bolted Iron Plate",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlate_C",
+					amountPerMinute: 90
+				},
+				{
+					itemClass: "Desc_IronScrew_C",
+					amountPerMinute: 250
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 15
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 7
+		},
+		Recipe_Alternate_ReinforcedIronPlate_2_C: {
+			className: "Recipe_Alternate_ReinforcedIronPlate_2_C",
+			recipeDisplayName: "Alternate: Stitched Iron Plate",
+			inputs: [
+				{
+					itemClass: "Desc_IronPlate_C",
+					amountPerMinute: 18.75
+				},
+				{
+					itemClass: "Desc_Wire_C",
+					amountPerMinute: 37.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronPlateReinforced_C",
+					amountPerMinute: 5.625
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/StandardParts",
+			priority: 8
+		},
+		Recipe_Screw_C: {
+			className: "Recipe_Screw_C",
+			recipeDisplayName: "Screws",
+			inputs: [
+				{
+					itemClass: "Desc_IronRod_C",
+					amountPerMinute: 10
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronScrew_C",
+					amountPerMinute: 40
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
+			priority: 4
+		},
+		Recipe_Alternate_Screw_C: {
+			className: "Recipe_Alternate_Screw_C",
+			recipeDisplayName: "Alternate: Cast Screws",
+			inputs: [
+				{
+					itemClass: "Desc_IronIngot_C",
+					amountPerMinute: 12.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronScrew_C",
+					amountPerMinute: 50
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
+			priority: 5
+		},
+		Recipe_Alternate_Screw_2_C: {
+			className: "Recipe_Alternate_Screw_2_C",
+			recipeDisplayName: "Alternate: Steel Screws",
+			inputs: [
+				{
+					itemClass: "Desc_SteelPlate_C",
+					amountPerMinute: 5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IronScrew_C",
+					amountPerMinute: 260
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
+			priority: 6
 		},
 		Recipe_SteelBeam_C: {
 			className: "Recipe_SteelBeam_C",
@@ -1893,51 +1878,112 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/StandardParts",
 			priority: 2
 		},
-		Recipe_EncasedIndustrialBeam_C: {
-			className: "Recipe_EncasedIndustrialBeam_C",
-			recipeDisplayName: "Encased Industrial Beam",
+		Recipe_SteelPipe_C: {
+			className: "Recipe_SteelPipe_C",
+			recipeDisplayName: "Steel Pipe",
 			inputs: [
 				{
-					itemClass: "Desc_SteelPlate_C",
-					amountPerMinute: 18
-				},
-				{
-					itemClass: "Desc_Cement_C",
-					amountPerMinute: 36
+					itemClass: "Desc_SteelIngot_C",
+					amountPerMinute: 30
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_SteelPlateReinforced_C",
-					amountPerMinute: 6
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 15
-		},
-		Recipe_Alternate_EncasedIndustrialBeam_C: {
-			className: "Recipe_Alternate_EncasedIndustrialBeam_C",
-			recipeDisplayName: "Alternate: Encased Industrial Pipe",
-			inputs: [
-				{
 					itemClass: "Desc_SteelPipe_C",
-					amountPerMinute: 24
-				},
-				{
-					itemClass: "Desc_Cement_C",
 					amountPerMinute: 20
 				}
 			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
+			priority: 14
+		},
+		Recipe_Alternate_SteelPipe_Iron_C: {
+			className: "Recipe_Alternate_SteelPipe_Iron_C",
+			recipeDisplayName: "Alternate: Iron Pipe",
+			inputs: [
+				{
+					itemClass: "Desc_IronIngot_C",
+					amountPerMinute: 100
+				}
+			],
 			outputs: [
 				{
-					itemClass: "Desc_SteelPlateReinforced_C",
-					amountPerMinute: 4
+					itemClass: "Desc_SteelPipe_C",
+					amountPerMinute: 25
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
+			priority: 15
+		},
+		Recipe_Alternate_SteelPipe_Molded_C: {
+			className: "Recipe_Alternate_SteelPipe_Molded_C",
+			recipeDisplayName: "Alternate: Molded Steel Pipe",
+			inputs: [
+				{
+					itemClass: "Desc_SteelIngot_C",
+					amountPerMinute: 50
+				},
+				{
+					itemClass: "Desc_Cement_C",
+					amountPerMinute: 30
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SteelPipe_C",
+					amountPerMinute: 50
+				}
+			],
+			producedIn: "Build_FoundryMk1_C",
+			category: "Categories/StandardParts",
+			priority: 3
+		},
+		Recipe_AILimiter_C: {
+			className: "Recipe_AILimiter_C",
+			recipeDisplayName: "AI Limiter",
+			inputs: [
+				{
+					itemClass: "Desc_CopperSheet_C",
+					amountPerMinute: 25
+				},
+				{
+					itemClass: "Desc_HighSpeedWire_C",
+					amountPerMinute: 100
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_CircuitBoardHighSpeed_C",
+					amountPerMinute: 5
 				}
 			],
 			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/StandardParts",
-			priority: 16
+			category: "Categories/Electronics",
+			priority: 9
+		},
+		Recipe_Alternate_AILimiter_Plastic_C: {
+			className: "Recipe_Alternate_AILimiter_Plastic_C",
+			recipeDisplayName: "Alternate: Plastic AI Limiter",
+			inputs: [
+				{
+					itemClass: "Desc_HighSpeedWire_C",
+					amountPerMinute: 120
+				},
+				{
+					itemClass: "Desc_Plastic_C",
+					amountPerMinute: 28
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_CircuitBoardHighSpeed_C",
+					amountPerMinute: 8
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Electronics",
+			priority: 10
 		},
 		Recipe_Cable_C: {
 			className: "Recipe_Cable_C",
@@ -2119,52 +2165,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Electronics",
 			priority: 7
 		},
-		Recipe_AILimiter_C: {
-			className: "Recipe_AILimiter_C",
-			recipeDisplayName: "AI Limiter",
-			inputs: [
-				{
-					itemClass: "Desc_CopperSheet_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_HighSpeedWire_C",
-					amountPerMinute: 100
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CircuitBoardHighSpeed_C",
-					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Electronics",
-			priority: 9
-		},
-		Recipe_Alternate_AILimiter_Plastic_C: {
-			className: "Recipe_Alternate_AILimiter_Plastic_C",
-			recipeDisplayName: "Alternate: Plastic AI Limiter",
-			inputs: [
-				{
-					itemClass: "Desc_HighSpeedWire_C",
-					amountPerMinute: 120
-				},
-				{
-					itemClass: "Desc_Plastic_C",
-					amountPerMinute: 28
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CircuitBoardHighSpeed_C",
-					amountPerMinute: 8
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Electronics",
-			priority: 10
-		},
 		Recipe_HighSpeedConnector_C: {
 			className: "Recipe_HighSpeedConnector_C",
 			recipeDisplayName: "High-Speed Connector",
@@ -2261,6 +2261,25 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Electronics",
 			priority: 8
 		},
+		Recipe_IngotSAM_C: {
+			className: "Recipe_IngotSAM_C",
+			recipeDisplayName: "Reanimated SAM",
+			inputs: [
+				{
+					itemClass: "Desc_SAM_C",
+					amountPerMinute: 120
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 30
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/Electronics",
+			priority: 13
+		},
 		Recipe_SAMFluctuator_C: {
 			className: "Recipe_SAMFluctuator_C",
 			recipeDisplayName: "SAM Fluctuator",
@@ -2287,25 +2306,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/Electronics",
 			priority: 14
-		},
-		Recipe_IngotSAM_C: {
-			className: "Recipe_IngotSAM_C",
-			recipeDisplayName: "Reanimated SAM",
-			inputs: [
-				{
-					itemClass: "Desc_SAM_C",
-					amountPerMinute: 120
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 30
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/Electronics",
-			priority: 13
 		},
 		Recipe_SingularityCell_C: {
 			className: "Recipe_SingularityCell_C",
@@ -2495,91 +2495,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Communications",
 			priority: 11
 		},
-		Recipe_ComputerSuper_C: {
-			className: "Recipe_ComputerSuper_C",
-			recipeDisplayName: "Supercomputer",
-			inputs: [
-				{
-					itemClass: "Desc_Computer_C",
-					amountPerMinute: 7.5
-				},
-				{
-					itemClass: "Desc_CircuitBoardHighSpeed_C",
-					amountPerMinute: 3.75
-				},
-				{
-					itemClass: "Desc_HighSpeedConnector_C",
-					amountPerMinute: 5.625
-				},
-				{
-					itemClass: "Desc_Plastic_C",
-					amountPerMinute: 52.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_ComputerSuper_C",
-					amountPerMinute: 1.875
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/Communications",
-			priority: 2
-		},
-		Recipe_Alternate_OCSupercomputer_C: {
-			className: "Recipe_Alternate_OCSupercomputer_C",
-			recipeDisplayName: "Alternate: OC Supercomputer",
-			inputs: [
-				{
-					itemClass: "Desc_ModularFrameLightweight_C",
-					amountPerMinute: 6
-				},
-				{
-					itemClass: "Desc_CoolingSystem_C",
-					amountPerMinute: 6
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_ComputerSuper_C",
-					amountPerMinute: 3
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Communications",
-			priority: 12
-		},
-		Recipe_Alternate_SuperStateComputer_C: {
-			className: "Recipe_Alternate_SuperStateComputer_C",
-			recipeDisplayName: "Alternate: Super-State Computer",
-			inputs: [
-				{
-					itemClass: "Desc_Computer_C",
-					amountPerMinute: 7.2
-				},
-				{
-					itemClass: "Desc_ElectromagneticControlRod_C",
-					amountPerMinute: 2.4
-				},
-				{
-					itemClass: "Desc_Battery_C",
-					amountPerMinute: 24
-				},
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_ComputerSuper_C",
-					amountPerMinute: 2.4
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/Communications",
-			priority: 3
-		},
 		Recipe_CrystalOscillator_C: {
 			className: "Recipe_CrystalOscillator_C",
 			recipeDisplayName: "Crystal Oscillator",
@@ -2718,6 +2633,91 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/Communications",
 			priority: 8
+		},
+		Recipe_ComputerSuper_C: {
+			className: "Recipe_ComputerSuper_C",
+			recipeDisplayName: "Supercomputer",
+			inputs: [
+				{
+					itemClass: "Desc_Computer_C",
+					amountPerMinute: 7.5
+				},
+				{
+					itemClass: "Desc_CircuitBoardHighSpeed_C",
+					amountPerMinute: 3.75
+				},
+				{
+					itemClass: "Desc_HighSpeedConnector_C",
+					amountPerMinute: 5.625
+				},
+				{
+					itemClass: "Desc_Plastic_C",
+					amountPerMinute: 52.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_ComputerSuper_C",
+					amountPerMinute: 1.875
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/Communications",
+			priority: 2
+		},
+		Recipe_Alternate_OCSupercomputer_C: {
+			className: "Recipe_Alternate_OCSupercomputer_C",
+			recipeDisplayName: "Alternate: OC Supercomputer",
+			inputs: [
+				{
+					itemClass: "Desc_ModularFrameLightweight_C",
+					amountPerMinute: 6
+				},
+				{
+					itemClass: "Desc_CoolingSystem_C",
+					amountPerMinute: 6
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_ComputerSuper_C",
+					amountPerMinute: 3
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Communications",
+			priority: 12
+		},
+		Recipe_Alternate_SuperStateComputer_C: {
+			className: "Recipe_Alternate_SuperStateComputer_C",
+			recipeDisplayName: "Alternate: Super-State Computer",
+			inputs: [
+				{
+					itemClass: "Desc_Computer_C",
+					amountPerMinute: 7.2
+				},
+				{
+					itemClass: "Desc_ElectromagneticControlRod_C",
+					amountPerMinute: 2.4
+				},
+				{
+					itemClass: "Desc_Battery_C",
+					amountPerMinute: 24
+				},
+				{
+					itemClass: "Desc_Wire_C",
+					amountPerMinute: 60
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_ComputerSuper_C",
+					amountPerMinute: 2.4
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/Communications",
+			priority: 3
 		},
 		Recipe_PetroleumCoke_C: {
 			className: "Recipe_PetroleumCoke_C",
@@ -3386,6 +3386,29 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Containers",
 			priority: 3
 		},
+		Recipe_PackagedAlumina_C: {
+			className: "Recipe_PackagedAlumina_C",
+			recipeDisplayName: "Packaged Alumina Solution",
+			inputs: [
+				{
+					itemClass: "Desc_AluminaSolution_C",
+					amountPerMinute: 120
+				},
+				{
+					itemClass: "Desc_FluidCanister_C",
+					amountPerMinute: 120
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_PackagedAlumina_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Packager_C",
+			category: "Categories/Packaging",
+			priority: 8
+		},
 		Recipe_Fuel_C: {
 			className: "Recipe_Fuel_C",
 			recipeDisplayName: "Packaged Fuel",
@@ -3432,51 +3455,28 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Packaging",
 			priority: 2
 		},
-		Recipe_PackagedAlumina_C: {
-			className: "Recipe_PackagedAlumina_C",
-			recipeDisplayName: "Packaged Alumina Solution",
+		Recipe_PackagedOilResidue_C: {
+			className: "Recipe_PackagedOilResidue_C",
+			recipeDisplayName: "Packaged Heavy Oil Residue",
 			inputs: [
 				{
-					itemClass: "Desc_AluminaSolution_C",
-					amountPerMinute: 120
+					itemClass: "Desc_HeavyOilResidue_C",
+					amountPerMinute: 30
 				},
 				{
 					itemClass: "Desc_FluidCanister_C",
-					amountPerMinute: 120
+					amountPerMinute: 30
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_PackagedAlumina_C",
-					amountPerMinute: 120
+					itemClass: "Desc_PackagedOilResidue_C",
+					amountPerMinute: 30
 				}
 			],
 			producedIn: "Build_Packager_C",
 			category: "Categories/Packaging",
-			priority: 8
-		},
-		Recipe_PackagedBiofuel_C: {
-			className: "Recipe_PackagedBiofuel_C",
-			recipeDisplayName: "Packaged Liquid Biofuel",
-			inputs: [
-				{
-					itemClass: "Desc_LiquidBiofuel_C",
-					amountPerMinute: 40
-				},
-				{
-					itemClass: "Desc_FluidCanister_C",
-					amountPerMinute: 40
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_PackagedBiofuel_C",
-					amountPerMinute: 40
-				}
-			],
-			producedIn: "Build_Packager_C",
-			category: "Categories/Packaging",
-			priority: 3
+			priority: 2
 		},
 		Recipe_PackagedIonizedFuel_C: {
 			className: "Recipe_PackagedIonizedFuel_C",
@@ -3500,6 +3500,29 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_Packager_C",
 			category: "Categories/Packaging",
 			priority: 7
+		},
+		Recipe_PackagedBiofuel_C: {
+			className: "Recipe_PackagedBiofuel_C",
+			recipeDisplayName: "Packaged Liquid Biofuel",
+			inputs: [
+				{
+					itemClass: "Desc_LiquidBiofuel_C",
+					amountPerMinute: 40
+				},
+				{
+					itemClass: "Desc_FluidCanister_C",
+					amountPerMinute: 40
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_PackagedBiofuel_C",
+					amountPerMinute: 40
+				}
+			],
+			producedIn: "Build_Packager_C",
+			category: "Categories/Packaging",
+			priority: 3
 		},
 		Recipe_PackagedNitricAcid_C: {
 			className: "Recipe_PackagedNitricAcid_C",
@@ -3570,29 +3593,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Packaging",
 			priority: 1
 		},
-		Recipe_PackagedOilResidue_C: {
-			className: "Recipe_PackagedOilResidue_C",
-			recipeDisplayName: "Packaged Heavy Oil Residue",
-			inputs: [
-				{
-					itemClass: "Desc_HeavyOilResidue_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_FluidCanister_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_PackagedOilResidue_C",
-					amountPerMinute: 30
-				}
-			],
-			producedIn: "Build_Packager_C",
-			category: "Categories/Packaging",
-			priority: 2
-		},
 		Recipe_PackagedRocketFuel_C: {
 			className: "Recipe_PackagedRocketFuel_C",
 			recipeDisplayName: "Packaged Rocket Fuel",
@@ -3639,6 +3639,29 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Packaging",
 			priority: 9
 		},
+		Recipe_PackagedTurboFuel_C: {
+			className: "Recipe_PackagedTurboFuel_C",
+			recipeDisplayName: "Packaged Turbofuel",
+			inputs: [
+				{
+					itemClass: "Desc_LiquidTurboFuel_C",
+					amountPerMinute: 20
+				},
+				{
+					itemClass: "Desc_FluidCanister_C",
+					amountPerMinute: 20
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_TurboFuel_C",
+					amountPerMinute: 20
+				}
+			],
+			producedIn: "Build_Packager_C",
+			category: "Categories/Packaging",
+			priority: 5
+		},
 		Recipe_PackagedWater_C: {
 			className: "Recipe_PackagedWater_C",
 			recipeDisplayName: "Packaged Water",
@@ -3662,28 +3685,28 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Packaging",
 			priority: 0
 		},
-		Recipe_PackagedTurboFuel_C: {
-			className: "Recipe_PackagedTurboFuel_C",
-			recipeDisplayName: "Packaged Turbofuel",
+		Recipe_UnpackageOil_C: {
+			className: "Recipe_UnpackageOil_C",
+			recipeDisplayName: "Unpackage Oil",
 			inputs: [
 				{
-					itemClass: "Desc_LiquidTurboFuel_C",
-					amountPerMinute: 20
-				},
-				{
-					itemClass: "Desc_FluidCanister_C",
-					amountPerMinute: 20
+					itemClass: "Desc_PackagedOil_C",
+					amountPerMinute: 60
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_TurboFuel_C",
-					amountPerMinute: 20
+					itemClass: "Desc_LiquidOil_C",
+					amountPerMinute: 60
+				},
+				{
+					itemClass: "Desc_FluidCanister_C",
+					amountPerMinute: 60
 				}
 			],
 			producedIn: "Build_Packager_C",
-			category: "Categories/Packaging",
-			priority: 5
+			category: "Categories/Unpackaging",
+			priority: 1
 		},
 		Recipe_UnpackageOilResidue_C: {
 			className: "Recipe_UnpackageOilResidue_C",
@@ -3730,29 +3753,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_OilRefinery_C",
 			category: "Categories/Unpackaging",
 			priority: 7
-		},
-		Recipe_UnpackageOil_C: {
-			className: "Recipe_UnpackageOil_C",
-			recipeDisplayName: "Unpackage Oil",
-			inputs: [
-				{
-					itemClass: "Desc_PackagedOil_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_LiquidOil_C",
-					amountPerMinute: 60
-				},
-				{
-					itemClass: "Desc_FluidCanister_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_Packager_C",
-			category: "Categories/Unpackaging",
-			priority: 1
 		},
 		Recipe_Nitrogen_Bauxite_C: {
 			className: "Recipe_Nitrogen_Bauxite_C",
@@ -3844,6 +3844,94 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Packager_C",
 			category: "Categories/Unpackaging",
+			priority: 0
+		},
+		Recipe_LiquidFuel_C: {
+			className: "Recipe_LiquidFuel_C",
+			recipeDisplayName: "Fuel",
+			inputs: [
+				{
+					itemClass: "Desc_LiquidOil_C",
+					amountPerMinute: 60
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_LiquidFuel_C",
+					amountPerMinute: 40
+				},
+				{
+					itemClass: "Desc_PolymerResin_C",
+					amountPerMinute: 30
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Fuel",
+			priority: 0
+		},
+		Recipe_ResidualFuel_C: {
+			className: "Recipe_ResidualFuel_C",
+			recipeDisplayName: "Residual Fuel",
+			inputs: [
+				{
+					itemClass: "Desc_HeavyOilResidue_C",
+					amountPerMinute: 60
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_LiquidFuel_C",
+					amountPerMinute: 40
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Fuel",
+			priority: 1
+		},
+		Recipe_UnpackageFuel_C: {
+			className: "Recipe_UnpackageFuel_C",
+			recipeDisplayName: "Unpackage Fuel",
+			inputs: [
+				{
+					itemClass: "Desc_Fuel_C",
+					amountPerMinute: 60
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_LiquidFuel_C",
+					amountPerMinute: 60
+				},
+				{
+					itemClass: "Desc_FluidCanister_C",
+					amountPerMinute: 60
+				}
+			],
+			producedIn: "Build_Packager_C",
+			category: "Categories/Fuel",
+			priority: 4
+		},
+		Recipe_Alternate_DilutedFuel_C: {
+			className: "Recipe_Alternate_DilutedFuel_C",
+			recipeDisplayName: "Alternate: Diluted Fuel",
+			inputs: [
+				{
+					itemClass: "Desc_HeavyOilResidue_C",
+					amountPerMinute: 50
+				},
+				{
+					itemClass: "Desc_Water_C",
+					amountPerMinute: 100
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_LiquidFuel_C",
+					amountPerMinute: 100
+				}
+			],
+			producedIn: "Build_Blender_C",
+			category: "Categories/Fuel",
 			priority: 0
 		},
 		Recipe_IonizedFuel_C: {
@@ -3969,93 +4057,90 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Fuel",
 			priority: 3
 		},
-		Recipe_LiquidFuel_C: {
-			className: "Recipe_LiquidFuel_C",
-			recipeDisplayName: "Fuel",
+		Recipe_RocketFuel_C: {
+			className: "Recipe_RocketFuel_C",
+			recipeDisplayName: "Rocket Fuel",
 			inputs: [
 				{
-					itemClass: "Desc_LiquidOil_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_LiquidFuel_C",
-					amountPerMinute: 40
-				},
-				{
-					itemClass: "Desc_PolymerResin_C",
-					amountPerMinute: 30
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Fuel",
-			priority: 0
-		},
-		Recipe_ResidualFuel_C: {
-			className: "Recipe_ResidualFuel_C",
-			recipeDisplayName: "Residual Fuel",
-			inputs: [
-				{
-					itemClass: "Desc_HeavyOilResidue_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_LiquidFuel_C",
-					amountPerMinute: 40
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Fuel",
-			priority: 1
-		},
-		Recipe_UnpackageFuel_C: {
-			className: "Recipe_UnpackageFuel_C",
-			recipeDisplayName: "Unpackage Fuel",
-			inputs: [
-				{
-					itemClass: "Desc_Fuel_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_LiquidFuel_C",
+					itemClass: "Desc_LiquidTurboFuel_C",
 					amountPerMinute: 60
 				},
 				{
-					itemClass: "Desc_FluidCanister_C",
+					itemClass: "Desc_NitricAcid_C",
+					amountPerMinute: 10
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_RocketFuel_C",
+					amountPerMinute: 100
+				},
+				{
+					itemClass: "Desc_CompactedCoal_C",
+					amountPerMinute: 10
+				}
+			],
+			producedIn: "Build_Blender_C",
+			category: "Categories/Fuel",
+			priority: 2
+		},
+		Recipe_UnpackageRocketFuel_C: {
+			className: "Recipe_UnpackageRocketFuel_C",
+			recipeDisplayName: "Unpackage Rocket Fuel",
+			inputs: [
+				{
+					itemClass: "Desc_PackagedRocketFuel_C",
+					amountPerMinute: 60
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_RocketFuel_C",
+					amountPerMinute: 120
+				},
+				{
+					itemClass: "Desc_GasTank_C",
 					amountPerMinute: 60
 				}
 			],
 			producedIn: "Build_Packager_C",
 			category: "Categories/Fuel",
-			priority: 4
+			priority: 6
 		},
-		Recipe_Alternate_DilutedFuel_C: {
-			className: "Recipe_Alternate_DilutedFuel_C",
-			recipeDisplayName: "Alternate: Diluted Fuel",
+		Recipe_Alternate_RocketFuel_Nitro_C: {
+			className: "Recipe_Alternate_RocketFuel_Nitro_C",
+			recipeDisplayName: "Alternate: Nitro Rocket Fuel",
 			inputs: [
 				{
-					itemClass: "Desc_HeavyOilResidue_C",
-					amountPerMinute: 50
+					itemClass: "Desc_LiquidFuel_C",
+					amountPerMinute: 100
 				},
 				{
-					itemClass: "Desc_Water_C",
+					itemClass: "Desc_NitrogenGas_C",
+					amountPerMinute: 75
+				},
+				{
+					itemClass: "Desc_Sulfur_C",
 					amountPerMinute: 100
+				},
+				{
+					itemClass: "Desc_Coal_C",
+					amountPerMinute: 50
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_LiquidFuel_C",
-					amountPerMinute: 100
+					itemClass: "Desc_RocketFuel_C",
+					amountPerMinute: 150
+				},
+				{
+					itemClass: "Desc_CompactedCoal_C",
+					amountPerMinute: 25
 				}
 			],
 			producedIn: "Build_Blender_C",
 			category: "Categories/Fuel",
-			priority: 0
+			priority: 3
 		},
 		Recipe_Alternate_Turbofuel_C: {
 			className: "Recipe_Alternate_Turbofuel_C",
@@ -4156,137 +4241,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_OilRefinery_C",
 			category: "Categories/Fuel",
 			priority: 5
-		},
-		Recipe_RocketFuel_C: {
-			className: "Recipe_RocketFuel_C",
-			recipeDisplayName: "Rocket Fuel",
-			inputs: [
-				{
-					itemClass: "Desc_LiquidTurboFuel_C",
-					amountPerMinute: 60
-				},
-				{
-					itemClass: "Desc_NitricAcid_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_RocketFuel_C",
-					amountPerMinute: 100
-				},
-				{
-					itemClass: "Desc_CompactedCoal_C",
-					amountPerMinute: 10
-				}
-			],
-			producedIn: "Build_Blender_C",
-			category: "Categories/Fuel",
-			priority: 2
-		},
-		Recipe_UnpackageRocketFuel_C: {
-			className: "Recipe_UnpackageRocketFuel_C",
-			recipeDisplayName: "Unpackage Rocket Fuel",
-			inputs: [
-				{
-					itemClass: "Desc_PackagedRocketFuel_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_RocketFuel_C",
-					amountPerMinute: 120
-				},
-				{
-					itemClass: "Desc_GasTank_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_Packager_C",
-			category: "Categories/Fuel",
-			priority: 6
-		},
-		Recipe_Alternate_RocketFuel_Nitro_C: {
-			className: "Recipe_Alternate_RocketFuel_Nitro_C",
-			recipeDisplayName: "Alternate: Nitro Rocket Fuel",
-			inputs: [
-				{
-					itemClass: "Desc_LiquidFuel_C",
-					amountPerMinute: 100
-				},
-				{
-					itemClass: "Desc_NitrogenGas_C",
-					amountPerMinute: 75
-				},
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 100
-				},
-				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 50
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_RocketFuel_C",
-					amountPerMinute: 150
-				},
-				{
-					itemClass: "Desc_CompactedCoal_C",
-					amountPerMinute: 25
-				}
-			],
-			producedIn: "Build_Blender_C",
-			category: "Categories/Fuel",
-			priority: 3
-		},
-		Recipe_HeatSink_C: {
-			className: "Recipe_HeatSink_C",
-			recipeDisplayName: "Heat Sink",
-			inputs: [
-				{
-					itemClass: "Desc_AluminumPlate_C",
-					amountPerMinute: 37.5
-				},
-				{
-					itemClass: "Desc_CopperSheet_C",
-					amountPerMinute: 22.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_AluminumPlateReinforced_C",
-					amountPerMinute: 7.5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/IndustrialParts",
-			priority: 7
-		},
-		Recipe_Alternate_HeatSink_1_C: {
-			className: "Recipe_Alternate_HeatSink_1_C",
-			recipeDisplayName: "Alternate: Heat Exchanger",
-			inputs: [
-				{
-					itemClass: "Desc_AluminumCasing_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_Rubber_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_AluminumPlateReinforced_C",
-					amountPerMinute: 10
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/IndustrialParts",
-			priority: 8
 		},
 		Recipe_Battery_C: {
 			className: "Recipe_Battery_C",
@@ -4466,6 +4420,52 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/IndustrialParts",
 			priority: 4
 		},
+		Recipe_HeatSink_C: {
+			className: "Recipe_HeatSink_C",
+			recipeDisplayName: "Heat Sink",
+			inputs: [
+				{
+					itemClass: "Desc_AluminumPlate_C",
+					amountPerMinute: 37.5
+				},
+				{
+					itemClass: "Desc_CopperSheet_C",
+					amountPerMinute: 22.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_AluminumPlateReinforced_C",
+					amountPerMinute: 7.5
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/IndustrialParts",
+			priority: 7
+		},
+		Recipe_Alternate_HeatSink_1_C: {
+			className: "Recipe_Alternate_HeatSink_1_C",
+			recipeDisplayName: "Alternate: Heat Exchanger",
+			inputs: [
+				{
+					itemClass: "Desc_AluminumCasing_C",
+					amountPerMinute: 30
+				},
+				{
+					itemClass: "Desc_Rubber_C",
+					amountPerMinute: 30
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_AluminumPlateReinforced_C",
+					amountPerMinute: 10
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/IndustrialParts",
+			priority: 8
+		},
 		Recipe_Motor_C: {
 			className: "Recipe_Motor_C",
 			recipeDisplayName: "Motor",
@@ -4538,99 +4538,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/IndustrialParts",
 			priority: 0
-		},
-		Recipe_MotorTurbo_C: {
-			className: "Recipe_MotorTurbo_C",
-			recipeDisplayName: "Turbo Motor",
-			inputs: [
-				{
-					itemClass: "Desc_CoolingSystem_C",
-					amountPerMinute: 7.5
-				},
-				{
-					itemClass: "Desc_ModularFrameLightweight_C",
-					amountPerMinute: 3.75
-				},
-				{
-					itemClass: "Desc_Motor_C",
-					amountPerMinute: 7.5
-				},
-				{
-					itemClass: "Desc_Rubber_C",
-					amountPerMinute: 45
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_MotorLightweight_C",
-					amountPerMinute: 1.875
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/IndustrialParts",
-			priority: 8
-		},
-		Recipe_Alternate_TurboMotor_1_C: {
-			className: "Recipe_Alternate_TurboMotor_1_C",
-			recipeDisplayName: "Alternate: Turbo Electric Motor",
-			inputs: [
-				{
-					itemClass: "Desc_Motor_C",
-					amountPerMinute: 6.5625
-				},
-				{
-					itemClass: "Desc_ModularFrameLightweight_C",
-					amountPerMinute: 8.4375
-				},
-				{
-					itemClass: "Desc_ElectromagneticControlRod_C",
-					amountPerMinute: 4.6875
-				},
-				{
-					itemClass: "Desc_Rotor_C",
-					amountPerMinute: 6.5625
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_MotorLightweight_C",
-					amountPerMinute: 2.8125
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/IndustrialParts",
-			priority: 9
-		},
-		Recipe_Alternate_TurboPressureMotor_C: {
-			className: "Recipe_Alternate_TurboPressureMotor_C",
-			recipeDisplayName: "Alternate: Turbo Pressure Motor",
-			inputs: [
-				{
-					itemClass: "Desc_Motor_C",
-					amountPerMinute: 7.5
-				},
-				{
-					itemClass: "Desc_PressureConversionCube_C",
-					amountPerMinute: 1.875
-				},
-				{
-					itemClass: "Desc_PackagedNitrogenGas_C",
-					amountPerMinute: 45
-				},
-				{
-					itemClass: "Desc_Stator_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_MotorLightweight_C",
-					amountPerMinute: 3.75
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/IndustrialParts",
-			priority: 10
 		},
 		Recipe_Rotor_C: {
 			className: "Recipe_Rotor_C",
@@ -4747,6 +4654,99 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/IndustrialParts",
 			priority: 4
 		},
+		Recipe_MotorTurbo_C: {
+			className: "Recipe_MotorTurbo_C",
+			recipeDisplayName: "Turbo Motor",
+			inputs: [
+				{
+					itemClass: "Desc_CoolingSystem_C",
+					amountPerMinute: 7.5
+				},
+				{
+					itemClass: "Desc_ModularFrameLightweight_C",
+					amountPerMinute: 3.75
+				},
+				{
+					itemClass: "Desc_Motor_C",
+					amountPerMinute: 7.5
+				},
+				{
+					itemClass: "Desc_Rubber_C",
+					amountPerMinute: 45
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_MotorLightweight_C",
+					amountPerMinute: 1.875
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/IndustrialParts",
+			priority: 8
+		},
+		Recipe_Alternate_TurboMotor_1_C: {
+			className: "Recipe_Alternate_TurboMotor_1_C",
+			recipeDisplayName: "Alternate: Turbo Electric Motor",
+			inputs: [
+				{
+					itemClass: "Desc_Motor_C",
+					amountPerMinute: 6.5625
+				},
+				{
+					itemClass: "Desc_ModularFrameLightweight_C",
+					amountPerMinute: 8.4375
+				},
+				{
+					itemClass: "Desc_ElectromagneticControlRod_C",
+					amountPerMinute: 4.6875
+				},
+				{
+					itemClass: "Desc_Rotor_C",
+					amountPerMinute: 6.5625
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_MotorLightweight_C",
+					amountPerMinute: 2.8125
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/IndustrialParts",
+			priority: 9
+		},
+		Recipe_Alternate_TurboPressureMotor_C: {
+			className: "Recipe_Alternate_TurboPressureMotor_C",
+			recipeDisplayName: "Alternate: Turbo Pressure Motor",
+			inputs: [
+				{
+					itemClass: "Desc_Motor_C",
+					amountPerMinute: 7.5
+				},
+				{
+					itemClass: "Desc_PressureConversionCube_C",
+					amountPerMinute: 1.875
+				},
+				{
+					itemClass: "Desc_PackagedNitrogenGas_C",
+					amountPerMinute: 45
+				},
+				{
+					itemClass: "Desc_Stator_C",
+					amountPerMinute: 15
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_MotorLightweight_C",
+					amountPerMinute: 3.75
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/IndustrialParts",
+			priority: 10
+		},
 		Recipe_ElectromagneticControlRod_C: {
 			className: "Recipe_ElectromagneticControlRod_C",
 			recipeDisplayName: "Electromagnetic Control Rod",
@@ -4792,6 +4792,114 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_AssemblerMk1_C",
 			category: "Categories/Nuclear",
 			priority: 2
+		},
+		Recipe_PlutoniumCell_C: {
+			className: "Recipe_PlutoniumCell_C",
+			recipeDisplayName: "Encased Plutonium Cell",
+			inputs: [
+				{
+					itemClass: "Desc_PlutoniumPellet_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_Cement_C",
+					amountPerMinute: 20
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_PlutoniumCell_C",
+					amountPerMinute: 5
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Nuclear",
+			priority: 2
+		},
+		Recipe_Alternate_InstantPlutoniumCell_C: {
+			className: "Recipe_Alternate_InstantPlutoniumCell_C",
+			recipeDisplayName: "Alternate: Instant Plutonium Cell",
+			inputs: [
+				{
+					itemClass: "Desc_NonFissibleUranium_C",
+					amountPerMinute: 75
+				},
+				{
+					itemClass: "Desc_AluminumCasing_C",
+					amountPerMinute: 10
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_PlutoniumCell_C",
+					amountPerMinute: 10
+				}
+			],
+			producedIn: "Build_HadronCollider_C",
+			category: "Categories/Nuclear",
+			priority: 1
+		},
+		Recipe_UraniumCell_C: {
+			className: "Recipe_UraniumCell_C",
+			recipeDisplayName: "Encased Uranium Cell",
+			inputs: [
+				{
+					itemClass: "Desc_OreUranium_C",
+					amountPerMinute: 50
+				},
+				{
+					itemClass: "Desc_Cement_C",
+					amountPerMinute: 15
+				},
+				{
+					itemClass: "Desc_SulfuricAcid_C",
+					amountPerMinute: 40
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_UraniumCell_C",
+					amountPerMinute: 25
+				},
+				{
+					itemClass: "Desc_SulfuricAcid_C",
+					amountPerMinute: 10
+				}
+			],
+			producedIn: "Build_Blender_C",
+			category: "Categories/Nuclear",
+			priority: 0
+		},
+		Recipe_Alternate_UraniumCell_1_C: {
+			className: "Recipe_Alternate_UraniumCell_1_C",
+			recipeDisplayName: "Alternate: Infused Uranium Cell",
+			inputs: [
+				{
+					itemClass: "Desc_OreUranium_C",
+					amountPerMinute: 25
+				},
+				{
+					itemClass: "Desc_Silica_C",
+					amountPerMinute: 15
+				},
+				{
+					itemClass: "Desc_Sulfur_C",
+					amountPerMinute: 25
+				},
+				{
+					itemClass: "Desc_HighSpeedWire_C",
+					amountPerMinute: 75
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_UraniumCell_C",
+					amountPerMinute: 20
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/Nuclear",
+			priority: 0
 		},
 		Recipe_Ficsonium_C: {
 			className: "Recipe_Ficsonium_C",
@@ -4925,110 +5033,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Nuclear",
 			priority: 3
 		},
-		Recipe_NuclearFuelRod_C: {
-			className: "Recipe_NuclearFuelRod_C",
-			recipeDisplayName: "Uranium Fuel Rod",
-			inputs: [
-				{
-					itemClass: "Desc_UraniumCell_C",
-					amountPerMinute: 20
-				},
-				{
-					itemClass: "Desc_SteelPlateReinforced_C",
-					amountPerMinute: 1.2
-				},
-				{
-					itemClass: "Desc_ElectromagneticControlRod_C",
-					amountPerMinute: 2
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_NuclearFuelRod_C",
-					amountPerMinute: 0.4
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/Nuclear",
-			priority: 1
-		},
-		Recipe_Alternate_NuclearFuelRod_1_C: {
-			className: "Recipe_Alternate_NuclearFuelRod_1_C",
-			recipeDisplayName: "Alternate: Uranium Fuel Unit",
-			inputs: [
-				{
-					itemClass: "Desc_UraniumCell_C",
-					amountPerMinute: 20
-				},
-				{
-					itemClass: "Desc_ElectromagneticControlRod_C",
-					amountPerMinute: 2
-				},
-				{
-					itemClass: "Desc_CrystalOscillator_C",
-					amountPerMinute: 0.6
-				},
-				{
-					itemClass: "Desc_Rotor_C",
-					amountPerMinute: 2
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_NuclearFuelRod_C",
-					amountPerMinute: 0.6
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/Nuclear",
-			priority: 2
-		},
-		Recipe_PlutoniumCell_C: {
-			className: "Recipe_PlutoniumCell_C",
-			recipeDisplayName: "Encased Plutonium Cell",
-			inputs: [
-				{
-					itemClass: "Desc_PlutoniumPellet_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_Cement_C",
-					amountPerMinute: 20
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_PlutoniumCell_C",
-					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Nuclear",
-			priority: 2
-		},
-		Recipe_Alternate_InstantPlutoniumCell_C: {
-			className: "Recipe_Alternate_InstantPlutoniumCell_C",
-			recipeDisplayName: "Alternate: Instant Plutonium Cell",
-			inputs: [
-				{
-					itemClass: "Desc_NonFissibleUranium_C",
-					amountPerMinute: 75
-				},
-				{
-					itemClass: "Desc_AluminumCasing_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_PlutoniumCell_C",
-					amountPerMinute: 10
-				}
-			],
-			producedIn: "Build_HadronCollider_C",
-			category: "Categories/Nuclear",
-			priority: 1
-		},
 		Recipe_PlutoniumFuelRod_C: {
 			className: "Recipe_PlutoniumFuelRod_C",
 			recipeDisplayName: "Plutonium Fuel Rod",
@@ -5106,67 +5110,63 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Nuclear",
 			priority: 0
 		},
-		Recipe_UraniumCell_C: {
-			className: "Recipe_UraniumCell_C",
-			recipeDisplayName: "Encased Uranium Cell",
+		Recipe_NuclearFuelRod_C: {
+			className: "Recipe_NuclearFuelRod_C",
+			recipeDisplayName: "Uranium Fuel Rod",
 			inputs: [
-				{
-					itemClass: "Desc_OreUranium_C",
-					amountPerMinute: 50
-				},
-				{
-					itemClass: "Desc_Cement_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_SulfuricAcid_C",
-					amountPerMinute: 40
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_UraniumCell_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_SulfuricAcid_C",
-					amountPerMinute: 10
-				}
-			],
-			producedIn: "Build_Blender_C",
-			category: "Categories/Nuclear",
-			priority: 0
-		},
-		Recipe_Alternate_UraniumCell_1_C: {
-			className: "Recipe_Alternate_UraniumCell_1_C",
-			recipeDisplayName: "Alternate: Infused Uranium Cell",
-			inputs: [
-				{
-					itemClass: "Desc_OreUranium_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_Silica_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_HighSpeedWire_C",
-					amountPerMinute: 75
-				}
-			],
-			outputs: [
 				{
 					itemClass: "Desc_UraniumCell_C",
 					amountPerMinute: 20
+				},
+				{
+					itemClass: "Desc_SteelPlateReinforced_C",
+					amountPerMinute: 1.2
+				},
+				{
+					itemClass: "Desc_ElectromagneticControlRod_C",
+					amountPerMinute: 2
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_NuclearFuelRod_C",
+					amountPerMinute: 0.4
 				}
 			],
 			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/Nuclear",
-			priority: 0
+			priority: 1
+		},
+		Recipe_Alternate_NuclearFuelRod_1_C: {
+			className: "Recipe_Alternate_NuclearFuelRod_1_C",
+			recipeDisplayName: "Alternate: Uranium Fuel Unit",
+			inputs: [
+				{
+					itemClass: "Desc_UraniumCell_C",
+					amountPerMinute: 20
+				},
+				{
+					itemClass: "Desc_ElectromagneticControlRod_C",
+					amountPerMinute: 2
+				},
+				{
+					itemClass: "Desc_CrystalOscillator_C",
+					amountPerMinute: 0.6
+				},
+				{
+					itemClass: "Desc_Rotor_C",
+					amountPerMinute: 2
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_NuclearFuelRod_C",
+					amountPerMinute: 0.6
+				}
+			],
+			producedIn: "Build_ManufacturerMk1_C",
+			category: "Categories/Nuclear",
+			priority: 2
 		},
 		Recipe_AlienPowerFuel_C: {
 			className: "Recipe_AlienPowerFuel_C",
@@ -5200,25 +5200,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_QuantumEncoder_C",
-			category: "Categories/QuantumTechnology",
-			priority: 2
-		},
-		Recipe_DarkEnergy_C: {
-			className: "Recipe_DarkEnergy_C",
-			recipeDisplayName: "Dark Matter Residue",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 50
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_DarkEnergy_C",
-					amountPerMinute: 100
-				}
-			],
-			producedIn: "Build_Converter_C",
 			category: "Categories/QuantumTechnology",
 			priority: 2
 		},
@@ -5287,40 +5268,24 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/QuantumTechnology",
 			priority: 999
 		},
-		Recipe_SuperpositionOscillator_C: {
-			className: "Recipe_SuperpositionOscillator_C",
-			recipeDisplayName: "Superposition Oscillator",
+		Recipe_DarkEnergy_C: {
+			className: "Recipe_DarkEnergy_C",
+			recipeDisplayName: "Dark Matter Residue",
 			inputs: [
 				{
-					itemClass: "Desc_DarkMatter_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_CrystalOscillator_C",
-					amountPerMinute: 5
-				},
-				{
-					itemClass: "Desc_AluminumPlate_C",
-					amountPerMinute: 45
-				},
-				{
-					itemClass: "Desc_QuantumEnergy_C",
-					amountPerMinute: 125
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 50
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_QuantumOscillator_C",
-					amountPerMinute: 5
-				},
-				{
 					itemClass: "Desc_DarkEnergy_C",
-					amountPerMinute: 125
+					amountPerMinute: 100
 				}
 			],
-			producedIn: "Build_QuantumEncoder_C",
+			producedIn: "Build_Converter_C",
 			category: "Categories/QuantumTechnology",
-			priority: 0
+			priority: 2
 		},
 		Recipe_TemporalProcessor_C: {
 			className: "Recipe_TemporalProcessor_C",
@@ -5357,6 +5322,41 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/QuantumTechnology",
 			priority: 1
 		},
+		Recipe_SuperpositionOscillator_C: {
+			className: "Recipe_SuperpositionOscillator_C",
+			recipeDisplayName: "Superposition Oscillator",
+			inputs: [
+				{
+					itemClass: "Desc_DarkMatter_C",
+					amountPerMinute: 30
+				},
+				{
+					itemClass: "Desc_CrystalOscillator_C",
+					amountPerMinute: 5
+				},
+				{
+					itemClass: "Desc_AluminumPlate_C",
+					amountPerMinute: 45
+				},
+				{
+					itemClass: "Desc_QuantumEnergy_C",
+					amountPerMinute: 125
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_QuantumOscillator_C",
+					amountPerMinute: 5
+				},
+				{
+					itemClass: "Desc_DarkEnergy_C",
+					amountPerMinute: 125
+				}
+			],
+			producedIn: "Build_QuantumEncoder_C",
+			category: "Categories/QuantumTechnology",
+			priority: 0
+		},
 		Recipe_TimeCrystal_C: {
 			className: "Recipe_TimeCrystal_C",
 			recipeDisplayName: "Time Crystal",
@@ -5375,71 +5375,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_Converter_C",
 			category: "Categories/QuantumTechnology",
 			priority: 0
-		},
-		Recipe_Biofuel_C: {
-			className: "Recipe_Biofuel_C",
-			recipeDisplayName: "Solid Biofuel",
-			inputs: [
-				{
-					itemClass: "Desc_GenericBiomass_C",
-					amountPerMinute: 120
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Biofuel_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/Biomass",
-			priority: 5
-		},
-		Recipe_Fabric_C: {
-			className: "Recipe_Fabric_C",
-			recipeDisplayName: "Fabric",
-			inputs: [
-				{
-					itemClass: "Desc_Mycelia_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_GenericBiomass_C",
-					amountPerMinute: 75
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Fabric_C",
-					amountPerMinute: 15
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Biomass",
-			priority: 5
-		},
-		Recipe_Alternate_PolyesterFabric_C: {
-			className: "Recipe_Alternate_PolyesterFabric_C",
-			recipeDisplayName: "Alternate: Polyester Fabric",
-			inputs: [
-				{
-					itemClass: "Desc_PolymerResin_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_Water_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Fabric_C",
-					amountPerMinute: 30
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Biomass",
-			priority: 2
 		},
 		Recipe_Biomass_AlienProtein_C: {
 			className: "Recipe_Biomass_AlienProtein_C",
@@ -5516,6 +5451,71 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_ConstructorMk1_C",
 			category: "Categories/Biomass",
 			priority: 2
+		},
+		Recipe_Fabric_C: {
+			className: "Recipe_Fabric_C",
+			recipeDisplayName: "Fabric",
+			inputs: [
+				{
+					itemClass: "Desc_Mycelia_C",
+					amountPerMinute: 15
+				},
+				{
+					itemClass: "Desc_GenericBiomass_C",
+					amountPerMinute: 75
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Fabric_C",
+					amountPerMinute: 15
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Biomass",
+			priority: 5
+		},
+		Recipe_Alternate_PolyesterFabric_C: {
+			className: "Recipe_Alternate_PolyesterFabric_C",
+			recipeDisplayName: "Alternate: Polyester Fabric",
+			inputs: [
+				{
+					itemClass: "Desc_PolymerResin_C",
+					amountPerMinute: 30
+				},
+				{
+					itemClass: "Desc_Water_C",
+					amountPerMinute: 30
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Fabric_C",
+					amountPerMinute: 30
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Biomass",
+			priority: 2
+		},
+		Recipe_Biofuel_C: {
+			className: "Recipe_Biofuel_C",
+			recipeDisplayName: "Solid Biofuel",
+			inputs: [
+				{
+					itemClass: "Desc_GenericBiomass_C",
+					amountPerMinute: 120
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Biofuel_C",
+					amountPerMinute: 60
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/Biomass",
+			priority: 5
 		},
 		Recipe_AlienDNACapsule_C: {
 			className: "Recipe_AlienDNACapsule_C",
@@ -5704,6 +5704,98 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/PowerShards",
 			priority: 0
 		},
+		Recipe_Bauxite_Caterium_C: {
+			className: "Recipe_Bauxite_Caterium_C",
+			recipeDisplayName: "Bauxite (Caterium)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 150
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreBauxite_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawMaterials",
+			priority: 13
+		},
+		Recipe_Bauxite_Copper_C: {
+			className: "Recipe_Bauxite_Copper_C",
+			recipeDisplayName: "Bauxite (Copper)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreCopper_C",
+					amountPerMinute: 180
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreBauxite_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawMaterials",
+			priority: 12
+		},
+		Recipe_Caterium_Copper_C: {
+			className: "Recipe_Caterium_Copper_C",
+			recipeDisplayName: "Caterium Ore (Copper)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreCopper_C",
+					amountPerMinute: 150
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawMaterials",
+			priority: 8
+		},
+		Recipe_Caterium_Quartz_C: {
+			className: "Recipe_Caterium_Quartz_C",
+			recipeDisplayName: "Caterium Ore (Quartz)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_RawQuartz_C",
+					amountPerMinute: 120
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawMaterials",
+			priority: 9
+		},
 		Recipe_Coal_Iron_C: {
 			className: "Recipe_Coal_Iron_C",
 			recipeDisplayName: "Coal (Iron)",
@@ -5788,52 +5880,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/RawMaterials",
 			priority: 7
 		},
-		Recipe_Bauxite_Caterium_C: {
-			className: "Recipe_Bauxite_Caterium_C",
-			recipeDisplayName: "Bauxite (Caterium)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 150
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 13
-		},
-		Recipe_Bauxite_Copper_C: {
-			className: "Recipe_Bauxite_Copper_C",
-			recipeDisplayName: "Bauxite (Copper)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreCopper_C",
-					amountPerMinute: 180
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 12
-		},
 		Recipe_Copper_Quartz_C: {
 			className: "Recipe_Copper_Quartz_C",
 			recipeDisplayName: "Copper Ore (Quartz)",
@@ -5880,52 +5926,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/RawMaterials",
 			priority: 1
 		},
-		Recipe_Caterium_Copper_C: {
-			className: "Recipe_Caterium_Copper_C",
-			recipeDisplayName: "Caterium Ore (Copper)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreCopper_C",
-					amountPerMinute: 150
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 8
-		},
-		Recipe_Caterium_Quartz_C: {
-			className: "Recipe_Caterium_Quartz_C",
-			recipeDisplayName: "Caterium Ore (Quartz)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_RawQuartz_C",
-					amountPerMinute: 120
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 9
-		},
 		Recipe_Iron_Limestone_C: {
 			className: "Recipe_Iron_Limestone_C",
 			recipeDisplayName: "Iron Ore (Limestone)",
@@ -5949,28 +5949,28 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/RawMaterials",
 			priority: 0
 		},
-		Recipe_Uranium_Bauxite_C: {
-			className: "Recipe_Uranium_Bauxite_C",
-			recipeDisplayName: "Uranium Ore (Bauxite)",
+		Recipe_Limestone_Sulfur_C: {
+			className: "Recipe_Limestone_Sulfur_C",
+			recipeDisplayName: "Limestone (Sulfur)",
 			inputs: [
 				{
 					itemClass: "Desc_SAMIngot_C",
 					amountPerMinute: 10
 				},
 				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 480
+					itemClass: "Desc_Sulfur_C",
+					amountPerMinute: 20
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_OreUranium_C",
+					itemClass: "Desc_Stone_C",
 					amountPerMinute: 120
 				}
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 16
+			priority: 3
 		},
 		Recipe_Quartz_Bauxite_C: {
 			className: "Recipe_Quartz_Bauxite_C",
@@ -6018,29 +6018,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/RawMaterials",
 			priority: 10
 		},
-		Recipe_Limestone_Sulfur_C: {
-			className: "Recipe_Limestone_Sulfur_C",
-			recipeDisplayName: "Limestone (Sulfur)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 20
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Stone_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 3
-		},
 		Recipe_Sulfur_Coal_C: {
 			className: "Recipe_Sulfur_Coal_C",
 			recipeDisplayName: "Sulfur (Coal)",
@@ -6087,86 +6064,28 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/RawMaterials",
 			priority: 6
 		},
-		Recipe_ZipLine_C: {
-			className: "Recipe_ZipLine_C",
-			recipeDisplayName: "Zipline",
+		Recipe_Uranium_Bauxite_C: {
+			className: "Recipe_Uranium_Bauxite_C",
+			recipeDisplayName: "Uranium Ore (Bauxite)",
 			inputs: [
 				{
-					itemClass: "BP_EquipmentDescriptorShockShank_C",
-					amountPerMinute: 1.5
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
 				},
 				{
-					itemClass: "Desc_HighSpeedWire_C",
-					amountPerMinute: 45
-				},
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 4.5
-				},
-				{
-					itemClass: "Desc_Cable_C",
-					amountPerMinute: 15
+					itemClass: "Desc_OreBauxite_C",
+					amountPerMinute: 480
 				}
 			],
 			outputs: [
 				{
-					itemClass: "BP_EqDescZipLine_C",
-					amountPerMinute: 1.5
+					itemClass: "Desc_OreUranium_C",
+					amountPerMinute: 120
 				}
 			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Tools",
-			priority: 0
-		},
-		Recipe_ObjectScanner_C: {
-			className: "Recipe_ObjectScanner_C",
-			recipeDisplayName: "Object Scanner",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 6
-				},
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 75
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorObjectScanner_C",
-					amountPerMinute: 1.5
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Tools",
-			priority: 0
-		},
-		Recipe_PortableMiner_C: {
-			className: "Recipe_PortableMiner_C",
-			recipeDisplayName: "Portable Miner",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 3
-				},
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 6
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_ItemDescriptorPortableMiner_C",
-					amountPerMinute: 1.5
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Tools",
-			priority: 0
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawMaterials",
+			priority: 16
 		},
 		Recipe_Alternate_AutomatedMiner_C: {
 			className: "Recipe_Alternate_AutomatedMiner_C",
@@ -6190,365 +6109,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_AssemblerMk1_C",
 			category: "Categories/Tools",
 			priority: 0
-		},
-		Recipe_Chainsaw_C: {
-			className: "Recipe_Chainsaw_C",
-			recipeDisplayName: "Chainsaw",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 5
-				},
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 160
-				},
-				{
-					itemClass: "Desc_Cable_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Chainsaw_C",
-					amountPerMinute: 1
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Tools",
-			priority: 0
-		},
-		Recipe_FactoryCart_C: {
-			className: "Recipe_FactoryCart_C",
-			recipeDisplayName: "Factory Cart™",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 12
-				},
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 12
-				},
-				{
-					itemClass: "Desc_Rotor_C",
-					amountPerMinute: 6
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_GolfCart_C",
-					amountPerMinute: 3
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Tools",
-			priority: 0
-		},
-		Recipe_GoldenCart_C: {
-			className: "Recipe_GoldenCart_C",
-			recipeDisplayName: "Golden Factory Cart™",
-			inputs: [
-				{
-					itemClass: "Desc_GoldIngot_C",
-					amountPerMinute: 45
-				},
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 12
-				},
-				{
-					itemClass: "Desc_Rotor_C",
-					amountPerMinute: 6
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_GolfCartGold_C",
-					amountPerMinute: 3
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Tools",
-			priority: 0
-		},
-		Recipe_CandyCaneBasher_C: {
-			className: "Recipe_CandyCaneBasher_C",
-			recipeDisplayName: "Candy Cane Basher",
-			inputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorShockShank_C",
-					amountPerMinute: 1.5
-				},
-				{
-					itemClass: "Desc_CandyCane_C",
-					amountPerMinute: 18.75
-				},
-				{
-					itemClass: "Desc_Gift_C",
-					amountPerMinute: 11.25
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorCandyCane_C",
-					amountPerMinute: 0.75
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Weapon",
-			priority: 0
-		},
-		Recipe_NobeliskDetonator_C: {
-			className: "Recipe_NobeliskDetonator_C",
-			recipeDisplayName: "Nobelisk Detonator",
-			inputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorObjectScanner_C",
-					amountPerMinute: 0.75
-				},
-				{
-					itemClass: "Desc_SteelPlate_C",
-					amountPerMinute: 7.5
-				},
-				{
-					itemClass: "Desc_Cable_C",
-					amountPerMinute: 37.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorNobeliskDetonator_C",
-					amountPerMinute: 0.75
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Weapon",
-			priority: 0
-		},
-		Recipe_SpaceRifleMk1_C: {
-			className: "Recipe_SpaceRifleMk1_C",
-			recipeDisplayName: "Rifle",
-			inputs: [
-				{
-					itemClass: "Desc_Motor_C",
-					amountPerMinute: 1
-				},
-				{
-					itemClass: "Desc_Rubber_C",
-					amountPerMinute: 5
-				},
-				{
-					itemClass: "Desc_SteelPipe_C",
-					amountPerMinute: 12.5
-				},
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 125
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorRifle_C",
-					amountPerMinute: 0.5
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Weapon",
-			priority: 0
-		},
-		Recipe_XenoZapper_C: {
-			className: "Recipe_XenoZapper_C",
-			recipeDisplayName: "Xeno-Zapper",
-			inputs: [
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 3
-				},
-				{
-					itemClass: "Desc_Cable_C",
-					amountPerMinute: 22.5
-				},
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 75
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorShockShank_C",
-					amountPerMinute: 1.5
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Weapon",
-			priority: 0
-		},
-		Recipe_XenoBasher_C: {
-			className: "Recipe_XenoBasher_C",
-			recipeDisplayName: "Xeno-Basher",
-			inputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorShockShank_C",
-					amountPerMinute: 1.5
-				},
-				{
-					itemClass: "Desc_ModularFrame_C",
-					amountPerMinute: 3.75
-				},
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 18.75
-				},
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 375
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorStunSpear_C",
-					amountPerMinute: 0.75
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Weapon",
-			priority: 0
-		},
-		Recipe_RebarGun_C: {
-			className: "Recipe_RebarGun_C",
-			recipeDisplayName: "Rebar Gun",
-			inputs: [
-				{
-					itemClass: "Desc_IronPlateReinforced_C",
-					amountPerMinute: 6
-				},
-				{
-					itemClass: "Desc_IronRod_C",
-					amountPerMinute: 16
-				},
-				{
-					itemClass: "Desc_IronScrew_C",
-					amountPerMinute: 100
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_RebarGunProjectile_C",
-					amountPerMinute: 1
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Weapon",
-			priority: 0
-		},
-		Recipe_CartridgeChaos_Packaged_C: {
-			className: "Recipe_CartridgeChaos_Packaged_C",
-			recipeDisplayName: "Turbo Rifle Ammo",
-			inputs: [
-				{
-					itemClass: "Desc_CartridgeStandard_C",
-					amountPerMinute: 125
-				},
-				{
-					itemClass: "Desc_AluminumCasing_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_TurboFuel_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CartridgeChaos_C",
-					amountPerMinute: 250
-				}
-			],
-			producedIn: "Build_ManufacturerMk1_C",
-			category: "Categories/Ammunition",
-			priority: 303
-		},
-		Recipe_CartridgeChaos_C: {
-			className: "Recipe_CartridgeChaos_C",
-			recipeDisplayName: "Turbo Rifle Ammo",
-			inputs: [
-				{
-					itemClass: "Desc_CartridgeStandard_C",
-					amountPerMinute: 125
-				},
-				{
-					itemClass: "Desc_AluminumCasing_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_LiquidTurboFuel_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CartridgeChaos_C",
-					amountPerMinute: 250
-				}
-			],
-			producedIn: "Build_Blender_C",
-			category: "Categories/Ammunition",
-			priority: 303
-		},
-		Recipe_CartridgeSmart_C: {
-			className: "Recipe_CartridgeSmart_C",
-			recipeDisplayName: "Homing Rifle Ammo",
-			inputs: [
-				{
-					itemClass: "Desc_CartridgeStandard_C",
-					amountPerMinute: 50
-				},
-				{
-					itemClass: "Desc_HighSpeedConnector_C",
-					amountPerMinute: 2.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CartridgeSmartProjectile_C",
-					amountPerMinute: 25
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Ammunition",
-			priority: 302
-		},
-		Recipe_Cartridge_C: {
-			className: "Recipe_Cartridge_C",
-			recipeDisplayName: "Rifle Ammo",
-			inputs: [
-				{
-					itemClass: "Desc_CopperSheet_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_GunpowderMK2_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CartridgeStandard_C",
-					amountPerMinute: 75
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Ammunition",
-			priority: 301
 		},
 		Recipe_Gunpowder_C: {
 			className: "Recipe_Gunpowder_C",
@@ -6596,29 +6156,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Ammunition",
 			priority: 1
 		},
-		Recipe_GunpowderMK2_C: {
-			className: "Recipe_GunpowderMK2_C",
-			recipeDisplayName: "Smokeless Powder",
-			inputs: [
-				{
-					itemClass: "Desc_Gunpowder_C",
-					amountPerMinute: 20
-				},
-				{
-					itemClass: "Desc_HeavyOilResidue_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_GunpowderMK2_C",
-					amountPerMinute: 20
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Ammunition",
-			priority: 0
-		},
 		Recipe_NobeliskCluster_C: {
 			className: "Recipe_NobeliskCluster_C",
 			recipeDisplayName: "Cluster Nobelisk",
@@ -6642,28 +6179,32 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Ammunition",
 			priority: 203
 		},
-		Recipe_Nobelisk_C: {
-			className: "Recipe_Nobelisk_C",
-			recipeDisplayName: "Nobelisk",
+		Recipe_Rebar_Explosive_C: {
+			className: "Recipe_Rebar_Explosive_C",
+			recipeDisplayName: "Explosive Rebar",
 			inputs: [
 				{
-					itemClass: "Desc_Gunpowder_C",
-					amountPerMinute: 20
+					itemClass: "Desc_SpikedRebar_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_GunpowderMK2_C",
+					amountPerMinute: 10
 				},
 				{
 					itemClass: "Desc_SteelPipe_C",
-					amountPerMinute: 20
+					amountPerMinute: 10
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_NobeliskExplosive_C",
-					amountPerMinute: 10
+					itemClass: "Desc_Rebar_Explosive_C",
+					amountPerMinute: 5
 				}
 			],
-			producedIn: "Build_AssemblerMk1_C",
+			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/Ammunition",
-			priority: 201
+			priority: 104
 		},
 		Recipe_NobeliskGas_C: {
 			className: "Recipe_NobeliskGas_C",
@@ -6687,6 +6228,71 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_AssemblerMk1_C",
 			category: "Categories/Ammunition",
 			priority: 202
+		},
+		Recipe_CartridgeSmart_C: {
+			className: "Recipe_CartridgeSmart_C",
+			recipeDisplayName: "Homing Rifle Ammo",
+			inputs: [
+				{
+					itemClass: "Desc_CartridgeStandard_C",
+					amountPerMinute: 50
+				},
+				{
+					itemClass: "Desc_HighSpeedConnector_C",
+					amountPerMinute: 2.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_CartridgeSmartProjectile_C",
+					amountPerMinute: 25
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Ammunition",
+			priority: 302
+		},
+		Recipe_SpikedRebar_C: {
+			className: "Recipe_SpikedRebar_C",
+			recipeDisplayName: "Iron Rebar",
+			inputs: [
+				{
+					itemClass: "Desc_IronRod_C",
+					amountPerMinute: 15
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_SpikedRebar_C",
+					amountPerMinute: 15
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/Ammunition",
+			priority: 101
+		},
+		Recipe_Nobelisk_C: {
+			className: "Recipe_Nobelisk_C",
+			recipeDisplayName: "Nobelisk",
+			inputs: [
+				{
+					itemClass: "Desc_Gunpowder_C",
+					amountPerMinute: 20
+				},
+				{
+					itemClass: "Desc_SteelPipe_C",
+					amountPerMinute: 20
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_NobeliskExplosive_C",
+					amountPerMinute: 10
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Ammunition",
+			priority: 201
 		},
 		Recipe_NobeliskNuke_C: {
 			className: "Recipe_NobeliskNuke_C",
@@ -6742,32 +6348,28 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Ammunition",
 			priority: 204
 		},
-		Recipe_Rebar_Explosive_C: {
-			className: "Recipe_Rebar_Explosive_C",
-			recipeDisplayName: "Explosive Rebar",
+		Recipe_Cartridge_C: {
+			className: "Recipe_Cartridge_C",
+			recipeDisplayName: "Rifle Ammo",
 			inputs: [
 				{
-					itemClass: "Desc_SpikedRebar_C",
-					amountPerMinute: 10
+					itemClass: "Desc_CopperSheet_C",
+					amountPerMinute: 15
 				},
 				{
 					itemClass: "Desc_GunpowderMK2_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_SteelPipe_C",
 					amountPerMinute: 10
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_Rebar_Explosive_C",
-					amountPerMinute: 5
+					itemClass: "Desc_CartridgeStandard_C",
+					amountPerMinute: 75
 				}
 			],
-			producedIn: "Build_ManufacturerMk1_C",
+			producedIn: "Build_AssemblerMk1_C",
 			category: "Categories/Ammunition",
-			priority: 104
+			priority: 301
 		},
 		Recipe_Rebar_Spreadshot_C: {
 			className: "Recipe_Rebar_Spreadshot_C",
@@ -6792,6 +6394,29 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Ammunition",
 			priority: 103
 		},
+		Recipe_GunpowderMK2_C: {
+			className: "Recipe_GunpowderMK2_C",
+			recipeDisplayName: "Smokeless Powder",
+			inputs: [
+				{
+					itemClass: "Desc_Gunpowder_C",
+					amountPerMinute: 20
+				},
+				{
+					itemClass: "Desc_HeavyOilResidue_C",
+					amountPerMinute: 10
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_GunpowderMK2_C",
+					amountPerMinute: 20
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Ammunition",
+			priority: 0
+		},
 		Recipe_Rebar_Stunshot_C: {
 			className: "Recipe_Rebar_Stunshot_C",
 			recipeDisplayName: "Stun Rebar",
@@ -6815,194 +6440,59 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Ammunition",
 			priority: 102
 		},
-		Recipe_SpikedRebar_C: {
-			className: "Recipe_SpikedRebar_C",
-			recipeDisplayName: "Iron Rebar",
+		Recipe_CartridgeChaos_Packaged_C: {
+			className: "Recipe_CartridgeChaos_Packaged_C",
+			recipeDisplayName: "Turbo Rifle Ammo",
 			inputs: [
 				{
-					itemClass: "Desc_IronRod_C",
+					itemClass: "Desc_CartridgeStandard_C",
+					amountPerMinute: 125
+				},
+				{
+					itemClass: "Desc_AluminumCasing_C",
+					amountPerMinute: 15
+				},
+				{
+					itemClass: "Desc_TurboFuel_C",
 					amountPerMinute: 15
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_SpikedRebar_C",
-					amountPerMinute: 15
+					itemClass: "Desc_CartridgeChaos_C",
+					amountPerMinute: 250
 				}
 			],
-			producedIn: "Build_ConstructorMk1_C",
+			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/Ammunition",
-			priority: 101
+			priority: 303
 		},
-		Recipe_Gasmask_C: {
-			className: "Recipe_Gasmask_C",
-			recipeDisplayName: "Gas Mask",
+		Recipe_CartridgeChaos_C: {
+			className: "Recipe_CartridgeChaos_C",
+			recipeDisplayName: "Turbo Rifle Ammo",
 			inputs: [
 				{
-					itemClass: "Desc_Fabric_C",
-					amountPerMinute: 50
+					itemClass: "Desc_CartridgeStandard_C",
+					amountPerMinute: 125
 				},
 				{
-					itemClass: "Desc_CopperSheet_C",
-					amountPerMinute: 10
+					itemClass: "Desc_AluminumCasing_C",
+					amountPerMinute: 15
 				},
 				{
-					itemClass: "Desc_SteelPipe_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorGasmask_C",
-					amountPerMinute: 1
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/BodyEquipment",
-			priority: 0
-		},
-		Recipe_HazmatSuit_C: {
-			className: "Recipe_HazmatSuit_C",
-			recipeDisplayName: "Hazmat Suit",
-			inputs: [
-				{
-					itemClass: "Desc_Rubber_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_Plastic_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_AluminumPlate_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_Fabric_C",
-					amountPerMinute: 25
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorHazmatSuit_C",
-					amountPerMinute: 0.5
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/BodyEquipment",
-			priority: 4
-		},
-		Recipe_Hoverpack_C: {
-			className: "Recipe_Hoverpack_C",
-			recipeDisplayName: "Hoverpack",
-			inputs: [
-				{
-					itemClass: "Desc_Motor_C",
-					amountPerMinute: 4
-				},
-				{
-					itemClass: "Desc_ModularFrameHeavy_C",
-					amountPerMinute: 2
-				},
-				{
-					itemClass: "Desc_Computer_C",
-					amountPerMinute: 4
-				},
-				{
-					itemClass: "Desc_AluminumPlate_C",
-					amountPerMinute: 20
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorHoverPack_C",
-					amountPerMinute: 0.5
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/BodyEquipment",
-			priority: 3
-		},
-		Recipe_JetPack_C: {
-			className: "Recipe_JetPack_C",
-			recipeDisplayName: "Jetpack",
-			inputs: [
-				{
-					itemClass: "Desc_Motor_C",
-					amountPerMinute: 5
-				},
-				{
-					itemClass: "Desc_SteelPipe_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_IronPlate_C",
-					amountPerMinute: 25
-				},
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 50
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorJetPack_C",
-					amountPerMinute: 1
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/BodyEquipment",
-			priority: 2
-		},
-		Recipe_BladeRunners_C: {
-			className: "Recipe_BladeRunners_C",
-			recipeDisplayName: "Blade Runners",
-			inputs: [
-				{
-					itemClass: "Desc_Silica_C",
-					amountPerMinute: 20
-				},
-				{
-					itemClass: "Desc_ModularFrame_C",
-					amountPerMinute: 3
-				},
-				{
-					itemClass: "Desc_Rotor_C",
-					amountPerMinute: 3
-				}
-			],
-			outputs: [
-				{
-					itemClass: "BP_EquipmentDescriptorJumpingStilts_C",
-					amountPerMinute: 1
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/BodyEquipment",
-			priority: 5
-		},
-		Recipe_Parachute_C: {
-			className: "Recipe_Parachute_C",
-			recipeDisplayName: "Parachute",
-			inputs: [
-				{
-					itemClass: "Desc_Fabric_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_Cable_C",
+					itemClass: "Desc_LiquidTurboFuel_C",
 					amountPerMinute: 15
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_Parachute_C",
-					amountPerMinute: 1.5
+					itemClass: "Desc_CartridgeChaos_C",
+					amountPerMinute: 250
 				}
 			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/BodyEquipment",
-			priority: 1
+			producedIn: "Build_Blender_C",
+			category: "Categories/Ammunition",
+			priority: 303
 		},
 		Recipe_FilterGasMask_C: {
 			className: "Recipe_FilterGasMask_C",
@@ -7058,105 +6548,24 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Consumables",
 			priority: 1
 		},
-		Recipe_NutritionalInhaler_C: {
-			className: "Recipe_NutritionalInhaler_C",
-			recipeDisplayName: "Nutritional Inhaler",
+		Recipe_XmasBall2_C: {
+			className: "Recipe_XmasBall2_C",
+			recipeDisplayName: "Blue FICSMAS Ornament",
 			inputs: [
 				{
-					itemClass: "Desc_Shroom_C",
-					amountPerMinute: 3
-				},
-				{
-					itemClass: "Desc_Berry_C",
-					amountPerMinute: 6
-				},
-				{
-					itemClass: "Desc_Nut_C",
-					amountPerMinute: 15
+					itemClass: "Desc_Gift_C",
+					amountPerMinute: 5
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_Medkit_C",
-					amountPerMinute: 3
+					itemClass: "Desc_XmasBall2_C",
+					amountPerMinute: 10
 				}
 			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Consumables",
-			priority: 5
-		},
-		Recipe_MedicinalInhalerAlienOrgans_C: {
-			className: "Recipe_MedicinalInhalerAlienOrgans_C",
-			recipeDisplayName: "Protein Inhaler",
-			inputs: [
-				{
-					itemClass: "Desc_AlienProtein_C",
-					amountPerMinute: 3
-				},
-				{
-					itemClass: "Desc_Nut_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Medkit_C",
-					amountPerMinute: 3
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Consumables",
-			priority: 4
-		},
-		Recipe_TherapeuticInhaler_C: {
-			className: "Recipe_TherapeuticInhaler_C",
-			recipeDisplayName: "Therapeutic Inhaler",
-			inputs: [
-				{
-					itemClass: "Desc_Mycelia_C",
-					amountPerMinute: 45
-				},
-				{
-					itemClass: "Desc_AlienProtein_C",
-					amountPerMinute: 3
-				},
-				{
-					itemClass: "Desc_Shroom_C",
-					amountPerMinute: 3
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Medkit_C",
-					amountPerMinute: 3
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Consumables",
-			priority: 7
-		},
-		Recipe_MedicinalInhaler_C: {
-			className: "Recipe_MedicinalInhaler_C",
-			recipeDisplayName: "Vitamin Inhaler",
-			inputs: [
-				{
-					itemClass: "Desc_Mycelia_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_Berry_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Medkit_C",
-					amountPerMinute: 3
-				}
-			],
-			producedIn: "Build_Workshop_C",
-			category: "Categories/Consumables",
-			priority: 6
+			producedIn: "Build_SmelterMk1_C",
+			category: "Categories/FICSMAS",
+			priority: 0
 		},
 		Recipe_CandyCane_C: {
 			className: "Recipe_CandyCane_C",
@@ -7174,151 +6583,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/FICSMAS",
-			priority: 0
-		},
-		Recipe_Fireworks_01_C: {
-			className: "Recipe_Fireworks_01_C",
-			recipeDisplayName: "Sweet Fireworks",
-			inputs: [
-				{
-					itemClass: "Desc_XmasBranch_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_CandyCane_C",
-					amountPerMinute: 7.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Fireworks_Projectile_01_C",
-					amountPerMinute: 2.5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/FICSMAS",
-			priority: 3
-		},
-		Recipe_Fireworks_02_C: {
-			className: "Recipe_Fireworks_02_C",
-			recipeDisplayName: "Fancy Fireworks",
-			inputs: [
-				{
-					itemClass: "Desc_XmasBranch_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_XmasBow_C",
-					amountPerMinute: 7.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Fireworks_Projectile_02_C",
-					amountPerMinute: 2.5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/FICSMAS",
-			priority: 2
-		},
-		Recipe_Fireworks_03_C: {
-			className: "Recipe_Fireworks_03_C",
-			recipeDisplayName: "Sparkly Fireworks",
-			inputs: [
-				{
-					itemClass: "Desc_XmasBranch_C",
-					amountPerMinute: 7.5
-				},
-				{
-					itemClass: "Desc_Snow_C",
-					amountPerMinute: 5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Fireworks_Projectile_03_C",
-					amountPerMinute: 2.5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/FICSMAS",
-			priority: 1
-		},
-		Recipe_Snow_C: {
-			className: "Recipe_Snow_C",
-			recipeDisplayName: "FICSMAS Actual Snow",
-			inputs: [
-				{
-					itemClass: "Desc_Gift_C",
-					amountPerMinute: 25
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Snow_C",
-					amountPerMinute: 10
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/FICSMAS",
-			priority: 0
-		},
-		Recipe_Snowball_C: {
-			className: "Recipe_Snowball_C",
-			recipeDisplayName: "Snowball",
-			inputs: [
-				{
-					itemClass: "Desc_Snow_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_SnowballProjectile_C",
-					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/FICSMAS",
-			priority: 0
-		},
-		Recipe_XmasBall1_C: {
-			className: "Recipe_XmasBall1_C",
-			recipeDisplayName: "Red FICSMAS Ornament",
-			inputs: [
-				{
-					itemClass: "Desc_Gift_C",
-					amountPerMinute: 5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_XmasBall1_C",
-					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_SmelterMk1_C",
-			category: "Categories/FICSMAS",
-			priority: 0
-		},
-		Recipe_XmasBall2_C: {
-			className: "Recipe_XmasBall2_C",
-			recipeDisplayName: "Blue FICSMAS Ornament",
-			inputs: [
-				{
-					itemClass: "Desc_Gift_C",
-					amountPerMinute: 5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_XmasBall2_C",
-					amountPerMinute: 10
-				}
-			],
-			producedIn: "Build_SmelterMk1_C",
 			category: "Categories/FICSMAS",
 			priority: 0
 		},
@@ -7345,26 +6609,64 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/FICSMAS",
 			priority: 0
 		},
-		Recipe_XmasBall4_C: {
-			className: "Recipe_XmasBall4_C",
-			recipeDisplayName: "Iron FICSMAS Ornament",
+		Recipe_Fireworks_02_C: {
+			className: "Recipe_Fireworks_02_C",
+			recipeDisplayName: "Fancy Fireworks",
 			inputs: [
 				{
-					itemClass: "Desc_XmasBall2_C",
-					amountPerMinute: 15
+					itemClass: "Desc_XmasBranch_C",
+					amountPerMinute: 10
 				},
 				{
-					itemClass: "Desc_IronIngot_C",
-					amountPerMinute: 15
+					itemClass: "Desc_XmasBow_C",
+					amountPerMinute: 7.5
 				}
 			],
 			outputs: [
 				{
-					itemClass: "Desc_XmasBall4_C",
+					itemClass: "Desc_Fireworks_Projectile_02_C",
+					amountPerMinute: 2.5
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/FICSMAS",
+			priority: 2
+		},
+		Recipe_Snow_C: {
+			className: "Recipe_Snow_C",
+			recipeDisplayName: "FICSMAS Actual Snow",
+			inputs: [
+				{
+					itemClass: "Desc_Gift_C",
+					amountPerMinute: 25
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Snow_C",
+					amountPerMinute: 10
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/FICSMAS",
+			priority: 0
+		},
+		Recipe_XmasBow_C: {
+			className: "Recipe_XmasBow_C",
+			recipeDisplayName: "FICSMAS Bow",
+			inputs: [
+				{
+					itemClass: "Desc_Gift_C",
+					amountPerMinute: 10
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_XmasBow_C",
 					amountPerMinute: 5
 				}
 			],
-			producedIn: "Build_FoundryMk1_C",
+			producedIn: "Build_ConstructorMk1_C",
 			category: "Categories/FICSMAS",
 			priority: 0
 		},
@@ -7388,25 +6690,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/FICSMAS",
-			priority: 0
-		},
-		Recipe_XmasBow_C: {
-			className: "Recipe_XmasBow_C",
-			recipeDisplayName: "FICSMAS Bow",
-			inputs: [
-				{
-					itemClass: "Desc_Gift_C",
-					amountPerMinute: 10
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_XmasBow_C",
-					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
 			category: "Categories/FICSMAS",
 			priority: 0
 		},
@@ -7475,173 +6758,112 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/FICSMAS",
 			priority: 0
 		},
-		Desc_Coal_C: {
-			className: "Desc_Coal_C",
-			recipeDisplayName: "Coal (Resource)",
-			inputs: [],
-			outputs: [
+		Recipe_XmasBall4_C: {
+			className: "Recipe_XmasBall4_C",
+			recipeDisplayName: "Iron FICSMAS Ornament",
+			inputs: [
 				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 60
+					itemClass: "Desc_XmasBall2_C",
+					amountPerMinute: 15
+				},
+				{
+					itemClass: "Desc_IronIngot_C",
+					amountPerMinute: 15
 				}
 			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
+			outputs: [
+				{
+					itemClass: "Desc_XmasBall4_C",
+					amountPerMinute: 5
+				}
+			],
+			producedIn: "Build_FoundryMk1_C",
+			category: "Categories/FICSMAS",
 			priority: 0
 		},
-		Desc_LiquidOil_C: {
-			className: "Desc_LiquidOil_C",
-			recipeDisplayName: "Crude Oil (Resource)",
-			inputs: [],
-			outputs: [
+		Recipe_XmasBall1_C: {
+			className: "Recipe_XmasBall1_C",
+			recipeDisplayName: "Red FICSMAS Ornament",
+			inputs: [
 				{
-					itemClass: "Desc_LiquidOil_C",
-					amountPerMinute: 60
+					itemClass: "Desc_Gift_C",
+					amountPerMinute: 5
 				}
 			],
-			producedIn: "Build_OilPump_C",
-			category: "Categories/ExtractableResources",
+			outputs: [
+				{
+					itemClass: "Desc_XmasBall1_C",
+					amountPerMinute: 5
+				}
+			],
+			producedIn: "Build_SmelterMk1_C",
+			category: "Categories/FICSMAS",
 			priority: 0
 		},
-		Desc_NitrogenGas_C: {
-			className: "Desc_NitrogenGas_C",
-			recipeDisplayName: "Nitrogen Gas (Resource)",
-			inputs: [],
-			outputs: [
+		Recipe_Snowball_C: {
+			className: "Recipe_Snowball_C",
+			recipeDisplayName: "Snowball",
+			inputs: [
 				{
-					itemClass: "Desc_NitrogenGas_C",
-					amountPerMinute: 60
+					itemClass: "Desc_Snow_C",
+					amountPerMinute: 15
 				}
 			],
-			producedIn: "Build_FrackingExtractor_C",
-			category: "Categories/ExtractableResources",
+			outputs: [
+				{
+					itemClass: "Desc_SnowballProjectile_C",
+					amountPerMinute: 5
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/FICSMAS",
 			priority: 0
 		},
-		Desc_OreBauxite_C: {
-			className: "Desc_OreBauxite_C",
-			recipeDisplayName: "Bauxite (Resource)",
-			inputs: [],
-			outputs: [
+		Recipe_Fireworks_03_C: {
+			className: "Recipe_Fireworks_03_C",
+			recipeDisplayName: "Sparkly Fireworks",
+			inputs: [
 				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 60
+					itemClass: "Desc_XmasBranch_C",
+					amountPerMinute: 7.5
+				},
+				{
+					itemClass: "Desc_Snow_C",
+					amountPerMinute: 5
 				}
 			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
+			outputs: [
+				{
+					itemClass: "Desc_Fireworks_Projectile_03_C",
+					amountPerMinute: 2.5
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/FICSMAS",
+			priority: 1
 		},
-		Desc_OreCopper_C: {
-			className: "Desc_OreCopper_C",
-			recipeDisplayName: "Copper Ore (Resource)",
-			inputs: [],
-			outputs: [
+		Recipe_Fireworks_01_C: {
+			className: "Recipe_Fireworks_01_C",
+			recipeDisplayName: "Sweet Fireworks",
+			inputs: [
 				{
-					itemClass: "Desc_OreCopper_C",
-					amountPerMinute: 60
+					itemClass: "Desc_XmasBranch_C",
+					amountPerMinute: 15
+				},
+				{
+					itemClass: "Desc_CandyCane_C",
+					amountPerMinute: 7.5
 				}
 			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
-		},
-		Desc_OreGold_C: {
-			className: "Desc_OreGold_C",
-			recipeDisplayName: "Caterium Ore (Resource)",
-			inputs: [],
 			outputs: [
 				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 60
+					itemClass: "Desc_Fireworks_Projectile_01_C",
+					amountPerMinute: 2.5
 				}
 			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
-		},
-		Desc_OreIron_C: {
-			className: "Desc_OreIron_C",
-			recipeDisplayName: "Iron Ore (Resource)",
-			inputs: [],
-			outputs: [
-				{
-					itemClass: "Desc_OreIron_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
-		},
-		Desc_OreUranium_C: {
-			className: "Desc_OreUranium_C",
-			recipeDisplayName: "Uranium (Resource)",
-			inputs: [],
-			outputs: [
-				{
-					itemClass: "Desc_OreUranium_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
-		},
-		Desc_RawQuartz_C: {
-			className: "Desc_RawQuartz_C",
-			recipeDisplayName: "Raw Quartz (Resource)",
-			inputs: [],
-			outputs: [
-				{
-					itemClass: "Desc_RawQuartz_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
-		},
-		Desc_Stone_C: {
-			className: "Desc_Stone_C",
-			recipeDisplayName: "Limestone (Resource)",
-			inputs: [],
-			outputs: [
-				{
-					itemClass: "Desc_Stone_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
-		},
-		Desc_Sulfur_C: {
-			className: "Desc_Sulfur_C",
-			recipeDisplayName: "Sulfur (Resource)",
-			inputs: [],
-			outputs: [
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_MinerMk2_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
-		},
-		Desc_Water_C: {
-			className: "Desc_Water_C",
-			recipeDisplayName: "Water (Resource)",
-			inputs: [],
-			outputs: [
-				{
-					itemClass: "Desc_Water_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_WaterPump_C",
-			category: "Categories/ExtractableResources",
-			priority: 0
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/FICSMAS",
+			priority: 3
 		}
 	},
 	parts: {
@@ -7651,9 +6873,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SpelevatorPart_5",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_5_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_12_C: {
@@ -7662,9 +6881,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AIExpension",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_12_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_7_C: {
@@ -7673,9 +6889,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AssemblyDirectorSystem",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_7_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_3_C: {
@@ -7684,10 +6897,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "SpelevatorPart_3",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_HighSpeedWiring_C",
-				"Recipe_SpaceElevatorPart_3_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_11_C: {
@@ -7696,9 +6905,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_BallisticWarpDrive",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_11_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_10_C: {
@@ -7707,9 +6913,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_BiochemicalSculptor",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_10_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_6_C: {
@@ -7718,9 +6921,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_MagneticFieldGenerator",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_6_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_4_C: {
@@ -7729,9 +6929,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SpelevatorPart_4",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_4_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_9_C: {
@@ -7740,9 +6937,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_NuclearPasta",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_9_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_1_C: {
@@ -7751,10 +6945,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SpelevatorPart_1",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_PlasticSmartPlating_C",
-				"Recipe_SpaceElevatorPart_1_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_8_C: {
@@ -7763,9 +6953,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ThermalPropulsionRocket",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_8_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_SpaceElevatorPart_2_C: {
@@ -7774,10 +6961,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SpelevatorPart_2",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceElevatorPart_2_C",
-				"Recipe_Alternate_FlexibleFramework_C"
-			],
 			category: "Categories/SpaceElevator"
 		},
 		Desc_AluminumIngot_C: {
@@ -7786,10 +6969,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AluminiumIngot",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PureAluminumIngot_C",
-				"Recipe_IngotAluminum_C"
-			],
 			category: "Categories/Ingots"
 		},
 		Desc_GoldIngot_C: {
@@ -7798,12 +6977,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CateriumIngot",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_PureCateriumIngot_C",
-				"Recipe_Alternate_CateriumIngot_Tempered_C",
-				"Recipe_Alternate_CateriumIngot_Leached_C",
-				"Recipe_IngotCaterium_C"
-			],
 			category: "Categories/Ingots"
 		},
 		Desc_CopperIngot_C: {
@@ -7812,13 +6985,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CopperIngot",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_PureCopperIngot_C",
-				"Recipe_Alternate_CopperAlloyIngot_C",
-				"Recipe_Alternate_CopperIngot_Tempered_C",
-				"Recipe_Alternate_CopperIngot_Leached_C",
-				"Recipe_IngotCopper_C"
-			],
 			category: "Categories/Ingots"
 		},
 		Desc_FicsiteIngot_C: {
@@ -7827,11 +6993,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_FicsiteIngot",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_FicsiteIngot_Iron_C",
-				"Recipe_FicsiteIngot_AL_C",
-				"Recipe_FicsiteIngot_CAT_C"
-			],
 			category: "Categories/Ingots"
 		},
 		Desc_IronIngot_C: {
@@ -7840,13 +7001,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_IronIngot",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_IngotIron_C",
-				"Recipe_Alternate_PureIronIngot_C",
-				"Recipe_Alternate_IronIngot_Leached_C",
-				"Recipe_Alternate_IronIngot_Basic_C",
-				"Recipe_Alternate_IngotIron_C"
-			],
 			category: "Categories/Ingots"
 		},
 		Desc_SteelIngot_C: {
@@ -7855,12 +7009,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SteelIngot",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_IngotSteel_C",
-				"Recipe_Alternate_CokeSteelIngot_C",
-				"Recipe_Alternate_IngotSteel_2_C",
-				"Recipe_Alternate_IngotSteel_1_C"
-			],
 			category: "Categories/Ingots"
 		},
 		Desc_CompactedCoal_C: {
@@ -7869,13 +7017,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CompactedCoal",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_RocketFuel_Nitro_C",
-				"Recipe_RocketFuel_C",
-				"Recipe_Alternate_IonizedFuel_Dark_C",
-				"Recipe_IonizedFuel_C",
-				"Recipe_Alternate_EnrichedCoal_C"
-			],
 			category: "Categories/Compounds"
 		},
 		Desc_Cement_C: {
@@ -7884,12 +7025,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Concrete",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_WetConcrete_C",
-				"Recipe_Alternate_RubberConcrete_C",
-				"Recipe_Alternate_Concrete_C",
-				"Recipe_Concrete_C"
-			],
 			category: "Categories/Compounds"
 		},
 		Desc_CopperDust_C: {
@@ -7898,9 +7033,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CopperDust",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_CopperDust_C"
-			],
 			category: "Categories/Compounds"
 		},
 		Desc_QuartzCrystal_C: {
@@ -7909,12 +7041,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_QuartzResource",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_PureQuartzCrystal_C",
-				"Recipe_QuartzCrystal_C",
-				"Recipe_Alternate_Quartz_Purified_C",
-				"Recipe_Alternate_Quartz_Fused_C"
-			],
 			category: "Categories/Compounds"
 		},
 		Desc_Silica_C: {
@@ -7923,12 +7049,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Silica",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_AluminaSolution_C",
-				"Recipe_Silica_C",
-				"Recipe_Alternate_Silica_Distilled_C",
-				"Recipe_Alternate_Silica_C"
-			],
 			category: "Categories/Compounds"
 		},
 		Desc_AluminumPlate_C: {
@@ -7937,9 +7057,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AluminiumSheet",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_AluminumSheet_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_AluminumCasing_C: {
@@ -7948,10 +7065,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AluminiumCasing",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_AluminumCasing_C",
-				"Recipe_Alternate_AlcladCasing_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_CopperSheet_C: {
@@ -7960,10 +7073,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CopperSheet",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_SteamedCopperSheet_C",
-				"Recipe_CopperSheet_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_SteelPlateReinforced_C: {
@@ -7972,10 +7081,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_EncasedSteelBeam",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_EncasedIndustrialBeam_C",
-				"Recipe_Alternate_EncasedIndustrialBeam_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_FicsiteMesh_C: {
@@ -7984,9 +7089,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_FicsiteMesh",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_FicsiteMesh_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_ModularFrameHeavy_C: {
@@ -7995,11 +7097,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ModularFrameHeavy",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_HeavyFlexibleFrame_C",
-				"Recipe_ModularFrameHeavy_C",
-				"Recipe_Alternate_ModularFrameHeavy_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_IronPlate_C: {
@@ -8008,11 +7105,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_IronPlates",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_IronPlate_C",
-				"Recipe_Alternate_CoatedIronPlate_C",
-				"Recipe_Alternate_SteelCastedPlate_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_IronRod_C: {
@@ -8021,11 +7113,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_IronRods",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_IronRod_C",
-				"Recipe_Alternate_SteelRod_C",
-				"Recipe_Alternate_AluminumRod_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_ModularFrame_C: {
@@ -8034,11 +7121,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ModularFrame",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_ModularFrame_C",
-				"Recipe_Alternate_BoltedFrame_C",
-				"Recipe_Alternate_ModularFrame_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_IronPlateReinforced_C: {
@@ -8047,12 +7129,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ReinforcedIronPlates",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_AdheredIronPlate_C",
-				"Recipe_Alternate_ReinforcedIronPlate_2_C",
-				"Recipe_Alternate_ReinforcedIronPlate_1_C",
-				"Recipe_IronPlateReinforced_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_IronScrew_C: {
@@ -8061,11 +7137,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_IronScrews",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_Screw_2_C",
-				"Recipe_Alternate_Screw_C",
-				"Recipe_Screw_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_SteelPlate_C: {
@@ -8074,11 +7145,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SteelBeam",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SteelBeam_C",
-				"Recipe_Alternate_SteelBeam_Molded_C",
-				"Recipe_Alternate_SteelBeam_Aluminum_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_SteelPipe_C: {
@@ -8087,11 +7153,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SteelPipe",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SteelPipe_C",
-				"Recipe_Alternate_SteelPipe_Molded_C",
-				"Recipe_Alternate_SteelPipe_Iron_C"
-			],
 			category: "Categories/StandardParts"
 		},
 		Desc_CircuitBoardHighSpeed_C: {
@@ -8100,10 +7161,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AILimiter",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_AILimiter_C",
-				"Recipe_Alternate_AILimiter_Plastic_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_Cable_C: {
@@ -8112,12 +7169,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Cables",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_CoatedCable_C",
-				"Recipe_Alternate_Cable_2_C",
-				"Recipe_Alternate_Cable_1_C",
-				"Recipe_Cable_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_CircuitBoard_C: {
@@ -8126,12 +7177,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CircuitBoard",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_CircuitBoard_C",
-				"Recipe_Alternate_ElectrodeCircuitBoard_C",
-				"Recipe_Alternate_CircuitBoard_2_C",
-				"Recipe_Alternate_CircuitBoard_1_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_HighSpeedConnector_C: {
@@ -8140,10 +7185,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_HighSpeedConnector",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_HighSpeedConnector_C",
-				"Recipe_Alternate_HighSpeedConnector_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_HighSpeedWire_C: {
@@ -8152,10 +7193,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Quickwire",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_Quickwire_C",
-				"Recipe_Quickwire_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_SAMIngot_C: {
@@ -8164,9 +7201,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ReanimatedSam",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_IngotSAM_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_SAMFluctuator_C: {
@@ -8175,9 +7209,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SamFluctuator",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SAMFluctuator_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_SingularityCell_C: {
@@ -8186,9 +7217,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SingularityCell",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SingularityCell_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_Wire_C: {
@@ -8197,12 +7225,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Wire",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_FusedWire_C",
-				"Recipe_Alternate_Wire_2_C",
-				"Recipe_Alternate_Wire_1_C",
-				"Recipe_Wire_C"
-			],
 			category: "Categories/Electronics"
 		},
 		Desc_Computer_C: {
@@ -8211,11 +7233,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Computer",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Computer_C",
-				"Recipe_Alternate_Computer_2_C",
-				"Recipe_Alternate_Computer_1_C"
-			],
 			category: "Categories/Communications"
 		},
 		Desc_CrystalOscillator_C: {
@@ -8224,10 +7241,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CrystalOscillator",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_CrystalOscillator_C",
-				"Recipe_Alternate_CrystalOscillator_C"
-			],
 			category: "Categories/Communications"
 		},
 		Desc_ModularFrameLightweight_C: {
@@ -8236,11 +7249,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_RadioControlUnit",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_RadioControlUnit_C",
-				"Recipe_Alternate_RadioControlSystem_C",
-				"Recipe_Alternate_RadioControlUnit_1_C"
-			],
 			category: "Categories/Communications"
 		},
 		Desc_ComputerSuper_C: {
@@ -8249,11 +7257,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_QuantumComputer",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_ComputerSuper_C",
-				"Recipe_Alternate_SuperStateComputer_C",
-				"Recipe_Alternate_OCSupercomputer_C"
-			],
 			category: "Categories/Communications"
 		},
 		Desc_PetroleumCoke_C: {
@@ -8262,9 +7265,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PetroleumCoke",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PetroleumCoke_C"
-			],
 			category: "Categories/OilProducts"
 		},
 		Desc_Plastic_C: {
@@ -8273,11 +7273,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Plastic",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Plastic_C",
-				"Recipe_ResidualPlastic_C",
-				"Recipe_Alternate_Plastic_1_C"
-			],
 			category: "Categories/OilProducts"
 		},
 		Desc_PolymerResin_C: {
@@ -8286,11 +7281,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PolymerResin",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_LiquidFuel_C",
-				"Recipe_Alternate_PolymerResin_C",
-				"Recipe_Alternate_HeavyOilResidue_C"
-			],
 			category: "Categories/OilProducts"
 		},
 		Desc_Rubber_C: {
@@ -8299,11 +7289,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Rubber",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Rubber_C",
-				"Recipe_ResidualRubber_C",
-				"Recipe_Alternate_RecycledRubber_C"
-			],
 			category: "Categories/OilProducts"
 		},
 		Desc_AluminaSolution_C: {
@@ -8312,11 +7297,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "LiquidAlumina_Pipe",
 			fluidColor: "(B=193,G=193,R=193,A=0)",
-			recipes: [
-				"Recipe_AluminaSolution_C",
-				"Recipe_UnpackageAlumina_C",
-				"Recipe_Alternate_SloppyAlumina_C"
-			],
 			category: "Categories/AdvancedRefinement"
 		},
 		Desc_AluminumScrap_C: {
@@ -8325,11 +7305,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AluminiumScrap",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_AluminumScrap_C",
-				"Recipe_Alternate_ElectroAluminumScrap_C",
-				"Recipe_Alternate_InstantScrap_C"
-			],
 			category: "Categories/AdvancedRefinement"
 		},
 		Desc_Diamond_C: {
@@ -8338,14 +7313,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Diamonds",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_Diamond_Turbo_C",
-				"Recipe_Diamond_C",
-				"Recipe_Alternate_Diamond_Pink_C",
-				"Recipe_Alternate_Diamond_Petroleum_C",
-				"Recipe_Alternate_Diamond_OilBased_C",
-				"Recipe_Alternate_Diamond_Cloudy_C"
-			],
 			category: "Categories/AdvancedRefinement"
 		},
 		Desc_DissolvedSilica_C: {
@@ -8354,9 +7321,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "IconDesc_DissolvedSilica",
 			fluidColor: "(B=238,G=190,R=226,A=0)",
-			recipes: [
-				"Recipe_Alternate_Quartz_Purified_C"
-			],
 			category: "Categories/AdvancedRefinement"
 		},
 		Desc_NitricAcid_C: {
@@ -8365,10 +7329,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "IconDesc_NitricAcid",
 			fluidColor: "(B=162,G=217,R=217,A=0)",
-			recipes: [
-				"Recipe_NitricAcid_C",
-				"Recipe_UnpackageNitricAcid_C"
-			],
 			category: "Categories/AdvancedRefinement"
 		},
 		Desc_SulfuricAcid_C: {
@@ -8377,11 +7337,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidSulfuricAcid_Pipe",
 			fluidColor: "(B=0,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_UraniumCell_C",
-				"Recipe_SulfuricAcid_C",
-				"Recipe_UnpackageSulfuricAcid_C"
-			],
 			category: "Categories/AdvancedRefinement"
 		},
 		Desc_FluidCanister_C: {
@@ -8390,19 +7345,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_EmptyCannister",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_UnpackageTurboFuel_C",
-				"Recipe_Alternate_SteelCanister_C",
-				"Recipe_FluidCanister_C",
-				"Recipe_UnpackageBioFuel_C",
-				"Recipe_UnpackageFuel_C",
-				"Recipe_UnpackageOil_C",
-				"Recipe_UnpackageOilResidue_C",
-				"Recipe_UnpackageWater_C",
-				"Recipe_UnpackageAlumina_C",
-				"Recipe_Alternate_CoatedIronCanister_C",
-				"Recipe_UnpackageSulfuricAcid_C"
-			],
 			category: "Categories/Containers"
 		},
 		Desc_GasTank_C: {
@@ -8411,13 +7353,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PressureTank",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_UnpackageRocketFuel_C",
-				"Recipe_UnpackageIonizedFuel_C",
-				"Recipe_UnpackageNitricAcid_C",
-				"Recipe_GasTank_C",
-				"Recipe_UnpackageNitrogen_C"
-			],
 			category: "Categories/Containers"
 		},
 		Desc_PressureConversionCube_C: {
@@ -8426,9 +7361,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ConversionCube",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PressureConversionCube_C"
-			],
 			category: "Categories/Containers"
 		},
 		Desc_PackagedAlumina_C: {
@@ -8437,9 +7369,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PackagedAluminaSolution",
 			fluidColor: "(B=42,G=83,R=58,A=255)",
-			recipes: [
-				"Recipe_PackagedAlumina_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_Fuel_C: {
@@ -8448,10 +7377,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Fuel",
 			fluidColor: "(B=21,G=125,R=235,A=255)",
-			recipes: [
-				"Recipe_Fuel_C",
-				"Recipe_Alternate_DilutedPackagedFuel_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedOilResidue_C: {
@@ -8460,9 +7385,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "OilResidue",
 			fluidColor: "(B=120,G=45,R=109,A=255)",
-			recipes: [
-				"Recipe_PackagedOilResidue_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedIonizedFuel_C: {
@@ -8471,9 +7393,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_IonizedRocketFuel",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PackagedIonizedFuel_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedBiofuel_C: {
@@ -8482,9 +7401,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_LiquidBiofuel",
 			fluidColor: "(B=42,G=83,R=58,A=255)",
-			recipes: [
-				"Recipe_PackagedBiofuel_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedNitricAcid_C: {
@@ -8493,9 +7409,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PackagedNitricAcid",
 			fluidColor: "(B=42,G=83,R=58,A=255)",
-			recipes: [
-				"Recipe_PackagedNitricAcid_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedNitrogenGas_C: {
@@ -8504,9 +7417,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PackagedNitrogen",
 			fluidColor: "(B=42,G=83,R=58,A=255)",
-			recipes: [
-				"Recipe_PackagedNitrogen_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedOil_C: {
@@ -8515,9 +7425,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "Oil",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PackagedCrudeOil_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedRocketFuel_C: {
@@ -8526,9 +7433,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PackagedRocketFuel",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PackagedRocketFuel_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedSulfuricAcid_C: {
@@ -8537,9 +7441,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PckagedSulphuricAcid",
 			fluidColor: "(B=42,G=83,R=58,A=255)",
-			recipes: [
-				"Recipe_PackagedSulfuricAcid_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_TurboFuel_C: {
@@ -8548,9 +7449,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_TurboFuel",
 			fluidColor: "(B=46,G=41,R=212,A=255)",
-			recipes: [
-				"Recipe_PackagedTurboFuel_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_PackagedWater_C: {
@@ -8559,9 +7457,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PackagedWater",
 			fluidColor: "(B=212,G=176,R=122,A=255)",
-			recipes: [
-				"Recipe_PackagedWater_C"
-			],
 			category: "Categories/Packaging"
 		},
 		Desc_LiquidOil_C: {
@@ -8570,10 +7465,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "LiquidOil_Pipe",
 			fluidColor: "(B=25,G=0,R=25,A=0)",
-			recipes: [
-				"Recipe_UnpackageOil_C",
-				"Desc_LiquidOil_C"
-			],
 			category: "Categories/Unpackaging"
 		},
 		Desc_HeavyOilResidue_C: {
@@ -8582,13 +7473,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidHeavyOilResidue_Pipe",
 			fluidColor: "(B=120,G=45,R=109,A=0)",
-			recipes: [
-				"Recipe_Plastic_C",
-				"Recipe_Rubber_C",
-				"Recipe_UnpackageOilResidue_C",
-				"Recipe_Alternate_PolymerResin_C",
-				"Recipe_Alternate_HeavyOilResidue_C"
-			],
 			category: "Categories/Unpackaging"
 		},
 		Desc_NitrogenGas_C: {
@@ -8597,12 +7481,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_GAS",
 			icon: "IconDesc_NitrogenGas",
 			fluidColor: "(B=89,G=89,R=89,A=0)",
-			recipes: [
-				"Recipe_Nitrogen_Bauxite_C",
-				"Recipe_Nitrogen_Caterium_C",
-				"Recipe_UnpackageNitrogen_C",
-				"Desc_NitrogenGas_C"
-			],
 			category: "Categories/Unpackaging"
 		},
 		Desc_Water_C: {
@@ -8611,17 +7489,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "LiquidWater_Pipe",
 			fluidColor: "(B=212,G=176,R=122,A=0)",
-			recipes: [
-				"Recipe_UnpackageWater_C",
-				"Recipe_AluminumScrap_C",
-				"Recipe_Alternate_ElectroAluminumScrap_C",
-				"Recipe_NonFissileUranium_C",
-				"Recipe_Battery_C",
-				"Recipe_Alternate_InstantScrap_C",
-				"Recipe_Alternate_FertileUranium_C",
-				"Recipe_Alternate_Silica_Distilled_C",
-				"Desc_Water_C"
-			],
 			category: "Categories/Unpackaging"
 		},
 		Desc_LiquidFuel_C: {
@@ -8630,12 +7497,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidFuel_Pipe",
 			fluidColor: "(B=21,G=125,R=235,A=0)",
-			recipes: [
-				"Recipe_LiquidFuel_C",
-				"Recipe_ResidualFuel_C",
-				"Recipe_UnpackageFuel_C",
-				"Recipe_Alternate_DilutedFuel_C"
-			],
 			category: "Categories/Fuel"
 		},
 		Desc_IonizedFuel_C: {
@@ -8644,11 +7505,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_GAS",
 			icon: "IconDesc_IonizedFuel",
 			fluidColor: "(B=26,G=95,R=213,A=60)",
-			recipes: [
-				"Recipe_Alternate_IonizedFuel_Dark_C",
-				"Recipe_IonizedFuel_C",
-				"Recipe_UnpackageIonizedFuel_C"
-			],
 			category: "Categories/Fuel"
 		},
 		Desc_LiquidBiofuel_C: {
@@ -8657,10 +7513,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidBiofuel_Pipe",
 			fluidColor: "(B=44,G=83,R=59,A=0)",
-			recipes: [
-				"Recipe_LiquidBiofuel_C",
-				"Recipe_UnpackageBioFuel_C"
-			],
 			category: "Categories/Fuel"
 		},
 		Desc_RocketFuel_C: {
@@ -8669,11 +7521,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_GAS",
 			icon: "IconDesc_RocketFuelPipe",
 			fluidColor: "(B=26,G=37,R=189,A=0)",
-			recipes: [
-				"Recipe_Alternate_RocketFuel_Nitro_C",
-				"Recipe_RocketFuel_C",
-				"Recipe_UnpackageRocketFuel_C"
-			],
 			category: "Categories/Fuel"
 		},
 		Desc_LiquidTurboFuel_C: {
@@ -8682,12 +7529,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidTurboFuel_Pipe",
 			fluidColor: "(B=46,G=41,R=212,A=0)",
-			recipes: [
-				"Recipe_Alternate_Turbofuel_C",
-				"Recipe_UnpackageTurboFuel_C",
-				"Recipe_Alternate_TurboHeavyFuel_C",
-				"Recipe_Alternate_TurboBlendFuel_C"
-			],
 			category: "Categories/Fuel"
 		},
 		Desc_Battery_C: {
@@ -8696,10 +7537,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Battery",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Battery_C",
-				"Recipe_Alternate_ClassicBattery_C"
-			],
 			category: "Categories/IndustrialParts"
 		},
 		Desc_CoolingSystem_C: {
@@ -8708,10 +7545,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CoolingSystem",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_CoolingSystem_C",
-				"Recipe_Alternate_CoolingDevice_C"
-			],
 			category: "Categories/IndustrialParts"
 		},
 		Desc_ModularFrameFused_C: {
@@ -8720,10 +7553,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_FusedModularFrame",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_FusedModularFrame_C",
-				"Recipe_Alternate_HeatFusedFrame_C"
-			],
 			category: "Categories/IndustrialParts"
 		},
 		Desc_AluminumPlateReinforced_C: {
@@ -8732,10 +7561,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Heatsink",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_HeatSink_C",
-				"Recipe_Alternate_HeatSink_1_C"
-			],
 			category: "Categories/IndustrialParts"
 		},
 		Desc_Motor_C: {
@@ -8744,11 +7569,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Engine",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Motor_C",
-				"Recipe_Alternate_ElectricMotor_C",
-				"Recipe_Alternate_Motor_1_C"
-			],
 			category: "Categories/IndustrialParts"
 		},
 		Desc_Rotor_C: {
@@ -8757,11 +7577,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Rotor",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_CopperRotor_C",
-				"Recipe_Rotor_C",
-				"Recipe_Alternate_Rotor_C"
-			],
 			category: "Categories/IndustrialParts"
 		},
 		Desc_Stator_C: {
@@ -8770,10 +7585,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Stator",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Stator_C",
-				"Recipe_Alternate_Stator_C"
-			],
 			category: "Categories/IndustrialParts"
 		},
 		Desc_MotorLightweight_C: {
@@ -8782,11 +7593,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_TurboMotor",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_TurboPressureMotor_C",
-				"Recipe_Alternate_TurboMotor_1_C",
-				"Recipe_MotorTurbo_C"
-			],
 			category: "Categories/IndustrialParts"
 		},
 		Desc_ElectromagneticControlRod_C: {
@@ -8795,10 +7601,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ElectromagneticControlRod",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_ElectromagneticControlRod_C",
-				"Recipe_Alternate_ElectromagneticControlRod_1_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_PlutoniumCell_C: {
@@ -8807,10 +7609,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_EncasedPlutoniumCell",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PlutoniumCell_C",
-				"Recipe_Alternate_InstantPlutoniumCell_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_UraniumCell_C: {
@@ -8819,10 +7617,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_NuclearCell",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_UraniumCell_C",
-				"Recipe_Alternate_UraniumCell_1_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_Ficsonium_C: {
@@ -8831,9 +7625,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_FicsoniumCell",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Ficsonium_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_FicsoniumFuelRod_C: {
@@ -8842,9 +7633,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_FicsoniumFuelRod",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_FicsoniumFuelRod_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_NonFissibleUranium_C: {
@@ -8853,10 +7641,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_NonFissileUranium",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_NonFissileUranium_C",
-				"Recipe_Alternate_FertileUranium_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_PlutoniumFuelRod_C: {
@@ -8865,10 +7649,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PlutoniumFuelRod",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PlutoniumFuelRod_C",
-				"Recipe_Alternate_PlutoniumFuelUnit_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_PlutoniumPellet_C: {
@@ -8877,9 +7657,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PlutoniumPellet",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Plutonium_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_PlutoniumWaste_C: {
@@ -8888,7 +7665,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PlutoniumWaste",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Nuclear"
 		},
 		Desc_NuclearFuelRod_C: {
@@ -8897,10 +7673,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_NuclearFuelRod",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_NuclearFuelRod_C",
-				"Recipe_Alternate_NuclearFuelRod_1_C"
-			],
 			category: "Categories/Nuclear"
 		},
 		Desc_NuclearWaste_C: {
@@ -8909,7 +7681,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_NuclearWaste",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Nuclear"
 		},
 		Desc_AlienPowerFuel_C: {
@@ -8918,9 +7689,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AlienPowerMatrix",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_AlienPowerFuel_C"
-			],
 			category: "Categories/QuantumTechnology"
 		},
 		Desc_DarkMatter_C: {
@@ -8929,11 +7697,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_TimeCrystal",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_DarkMatter_C",
-				"Recipe_Alternate_DarkMatter_Trap_C",
-				"Recipe_Alternate_DarkMatter_Crystallization_C"
-			],
 			category: "Categories/QuantumTechnology"
 		},
 		Desc_DarkEnergy_C: {
@@ -8942,15 +7705,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_GAS",
 			icon: "IconDesc_DarkEnergy",
 			fluidColor: "(B=249,G=175,R=253,A=150)",
-			recipes: [
-				"Recipe_DarkEnergy_C",
-				"Recipe_SuperpositionOscillator_C",
-				"Recipe_TemporalProcessor_C",
-				"Recipe_SpaceElevatorPart_12_C",
-				"Recipe_FicsoniumFuelRod_C",
-				"Recipe_AlienPowerFuel_C",
-				"Recipe_SyntheticPowerShard_C"
-			],
 			category: "Categories/QuantumTechnology"
 		},
 		Desc_QuantumEnergy_C: {
@@ -8959,7 +7713,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_GAS",
 			icon: "IconDesc_QuantumEnergy",
 			fluidColor: "(B=232,G=245,R=118,A=90)",
-			recipes: [],
 			category: "Categories/QuantumTechnology"
 		},
 		Desc_TemporalProcessor_C: {
@@ -8968,9 +7721,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_TemporalProcessor",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_TemporalProcessor_C"
-			],
 			category: "Categories/QuantumTechnology"
 		},
 		Desc_QuantumOscillator_C: {
@@ -8979,9 +7729,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SuperPositionOscillator",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SuperpositionOscillator_C"
-			],
 			category: "Categories/QuantumTechnology"
 		},
 		Desc_TimeCrystal_C: {
@@ -8990,9 +7737,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ExoticMatter",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_TimeCrystal_C"
-			],
 			category: "Categories/QuantumTechnology"
 		},
 		Desc_GenericBiomass_C: {
@@ -9001,12 +7745,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Biomass_Final",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Biomass_Mycelia_C",
-				"Recipe_Biomass_AlienProtein_C",
-				"Recipe_Biomass_Leaves_C",
-				"Recipe_Biomass_Wood_C"
-			],
 			category: "Categories/Biomass"
 		},
 		Desc_Fabric_C: {
@@ -9015,10 +7753,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Fabric",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_PolyesterFabric_C",
-				"Recipe_Fabric_C"
-			],
 			category: "Categories/Biomass"
 		},
 		Desc_HatcherParts_C: {
@@ -9027,7 +7761,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_HatcherPart",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Biomass"
 		},
 		Desc_HogParts_C: {
@@ -9036,7 +7769,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_HogPart",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Biomass"
 		},
 		Desc_Leaves_C: {
@@ -9045,7 +7777,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Leaves",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Biomass"
 		},
 		Desc_Mycelia_C: {
@@ -9054,7 +7785,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Mycelia",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Biomass"
 		},
 		Desc_Biofuel_C: {
@@ -9063,9 +7793,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SolidBiofuel",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Biofuel_C"
-			],
 			category: "Categories/Biomass"
 		},
 		Desc_SpitterParts_C: {
@@ -9074,7 +7801,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SpitterPart",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Biomass"
 		},
 		Desc_StingerParts_C: {
@@ -9083,7 +7809,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_StingerPart",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Biomass"
 		},
 		Desc_Wood_C: {
@@ -9092,7 +7817,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Wood",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/Biomass"
 		},
 		Desc_AlienDNACapsule_C: {
@@ -9101,9 +7825,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AlienDNA",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_AlienDNACapsule_C"
-			],
 			category: "Categories/AlienRemains"
 		},
 		Desc_AlienProtein_C: {
@@ -9112,12 +7833,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_AlienProtein",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Protein_Hog_C",
-				"Recipe_Protein_Spitter_C",
-				"Recipe_Protein_Stinger_C",
-				"Recipe_Protein_Crab_C"
-			],
 			category: "Categories/AlienRemains"
 		},
 		Desc_Crystal_C: {
@@ -9126,7 +7841,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "PowerSlugGreen",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/PowerShards"
 		},
 		Desc_CrystalShard_C: {
@@ -9135,12 +7849,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "PowerShard",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_PowerCrystalShard_1_C",
-				"Recipe_SyntheticPowerShard_C",
-				"Recipe_PowerCrystalShard_3_C",
-				"Recipe_PowerCrystalShard_2_C"
-			],
 			category: "Categories/PowerShards"
 		},
 		Desc_Crystal_mk3_C: {
@@ -9149,7 +7857,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "PowerSlugPurple",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/PowerShards"
 		},
 		Desc_Crystal_mk2_C: {
@@ -9158,7 +7865,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "PowerSlugYellow",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/PowerShards"
 		},
 		Desc_OreBauxite_C: {
@@ -9167,11 +7873,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Bauxite",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Bauxite_Caterium_C",
-				"Recipe_Bauxite_Copper_C",
-				"Desc_OreBauxite_C"
-			],
 			category: "Categories/RawMaterials"
 		},
 		Desc_OreGold_C: {
@@ -9180,11 +7881,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CateriumOre",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Caterium_Copper_C",
-				"Recipe_Caterium_Quartz_C",
-				"Desc_OreGold_C"
-			],
 			category: "Categories/RawMaterials"
 		},
 		Desc_Coal_C: {
@@ -9193,13 +7889,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CoalOre",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Coal_Iron_C",
-				"Recipe_Coal_Limestone_C",
-				"Recipe_Alternate_Coal_1_C",
-				"Recipe_Alternate_Coal_2_C",
-				"Desc_Coal_C"
-			],
 			category: "Categories/RawMaterials"
 		},
 		Desc_OreCopper_C: {
@@ -9208,11 +7897,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_copper_new",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Copper_Quartz_C",
-				"Recipe_Copper_Sulfur_C",
-				"Desc_OreCopper_C"
-			],
 			category: "Categories/RawMaterials"
 		},
 		Desc_OreIron_C: {
@@ -9221,10 +7905,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_iron_new",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Iron_Limestone_C",
-				"Desc_OreIron_C"
-			],
 			category: "Categories/RawMaterials"
 		},
 		Desc_Stone_C: {
@@ -9233,10 +7913,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "Stone",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Limestone_Sulfur_C",
-				"Desc_Stone_C"
-			],
 			category: "Categories/RawMaterials"
 		},
 		Desc_RawQuartz_C: {
@@ -9245,11 +7921,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_QuartzCrystal",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Quartz_Bauxite_C",
-				"Recipe_Quartz_Coal_C",
-				"Desc_RawQuartz_C"
-			],
 			category: "Categories/RawMaterials"
 		},
 		Desc_SAM_C: {
@@ -9258,7 +7929,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SameOre",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/RawMaterials"
 		},
 		Desc_Sulfur_C: {
@@ -9267,11 +7937,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "Sulfur",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Sulfur_Coal_C",
-				"Recipe_Sulfur_Iron_C",
-				"Desc_Sulfur_C"
-			],
 			category: "Categories/RawMaterials"
 		},
 		Desc_OreUranium_C: {
@@ -9280,55 +7945,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_UraniumOre",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Uranium_Bauxite_C",
-				"Desc_OreUranium_C"
-			],
 			category: "Categories/RawMaterials"
-		},
-		Desc_Chainsaw_C: {
-			className: "Desc_Chainsaw_C",
-			displayName: "Chainsaw",
-			form: "RF_SOLID",
-			icon: "IconDesc_Chainsaw",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Chainsaw_C"
-			],
-			category: "Categories/Tools"
-		},
-		Desc_GolfCart_C: {
-			className: "Desc_GolfCart_C",
-			displayName: "Factory Cart™",
-			form: "RF_SOLID",
-			icon: "IconDesc_GolfCart",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_FactoryCart_C"
-			],
-			category: "Categories/Tools"
-		},
-		Desc_GolfCartGold_C: {
-			className: "Desc_GolfCartGold_C",
-			displayName: "Golden Factory Cart™",
-			form: "RF_SOLID",
-			icon: "IconDesc_GolfCartGold",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_GoldenCart_C"
-			],
-			category: "Categories/Tools"
-		},
-		BP_EquipmentDescriptorObjectScanner_C: {
-			className: "BP_EquipmentDescriptorObjectScanner_C",
-			displayName: "Object Scanner",
-			form: "RF_SOLID",
-			icon: "ObjectScanner",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_ObjectScanner_C"
-			],
-			category: "Categories/Tools"
 		},
 		BP_ItemDescriptorPortableMiner_C: {
 			className: "BP_ItemDescriptorPortableMiner_C",
@@ -9336,88 +7953,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_PortableMiner",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_AutomatedMiner_C",
-				"Recipe_PortableMiner_C"
-			],
 			category: "Categories/Tools"
-		},
-		BP_EqDescZipLine_C: {
-			className: "BP_EqDescZipLine_C",
-			displayName: "Zipline",
-			form: "RF_SOLID",
-			icon: "IconDesc_Zipline",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_ZipLine_C"
-			],
-			category: "Categories/Tools"
-		},
-		BP_EquipmentDescriptorCandyCane_C: {
-			className: "BP_EquipmentDescriptorCandyCane_C",
-			displayName: "Candy Cane Basher",
-			form: "RF_SOLID",
-			icon: "IconDesc_CaneEquipment",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_CandyCaneBasher_C"
-			],
-			category: "Categories/Weapon"
-		},
-		BP_EquipmentDescriptorNobeliskDetonator_C: {
-			className: "BP_EquipmentDescriptorNobeliskDetonator_C",
-			displayName: "Nobelisk Detonator",
-			form: "RF_SOLID",
-			icon: "Detonator",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_NobeliskDetonator_C"
-			],
-			category: "Categories/Weapon"
-		},
-		Desc_RebarGunProjectile_C: {
-			className: "Desc_RebarGunProjectile_C",
-			displayName: "Rebar Gun",
-			form: "RF_SOLID",
-			icon: "IconDesc_RebarGun",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_RebarGun_C"
-			],
-			category: "Categories/Weapon"
-		},
-		BP_EquipmentDescriptorRifle_C: {
-			className: "BP_EquipmentDescriptorRifle_C",
-			displayName: "Rifle",
-			form: "RF_SOLID",
-			icon: "RifleMk1",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpaceRifleMk1_C"
-			],
-			category: "Categories/Weapon"
-		},
-		BP_EquipmentDescriptorStunSpear_C: {
-			className: "BP_EquipmentDescriptorStunSpear_C",
-			displayName: "Xeno-Basher",
-			form: "RF_SOLID",
-			icon: "IconDesc_XenoBasher",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XenoBasher_C"
-			],
-			category: "Categories/Weapon"
-		},
-		BP_EquipmentDescriptorShockShank_C: {
-			className: "BP_EquipmentDescriptorShockShank_C",
-			displayName: "Xeno-Zapper",
-			form: "RF_SOLID",
-			icon: "IconDesc_XenoZapper",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XenoZapper_C"
-			],
-			category: "Categories/Weapon"
 		},
 		Desc_Gunpowder_C: {
 			className: "Desc_Gunpowder_C",
@@ -9425,10 +7961,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Gunpowder",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Alternate_Gunpowder_1_C",
-				"Recipe_Gunpowder_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_NobeliskCluster_C: {
@@ -9437,9 +7969,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Cluster",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_NobeliskCluster_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_Rebar_Explosive_C: {
@@ -9448,9 +7977,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ExpRebar",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Rebar_Explosive_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_NobeliskGas_C: {
@@ -9459,9 +7985,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Gas",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_NobeliskGas_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_CartridgeSmartProjectile_C: {
@@ -9470,9 +7993,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_HomingRifle",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_CartridgeSmart_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_SpikedRebar_C: {
@@ -9481,9 +8001,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Rebar",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_SpikedRebar_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_NobeliskExplosive_C: {
@@ -9492,9 +8009,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Explosive",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Nobelisk_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_NobeliskNuke_C: {
@@ -9503,9 +8017,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Nuke",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_NobeliskNuke_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_NobeliskShockwave_C: {
@@ -9514,9 +8025,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Shock",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_NobeliskShockwave_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_CartridgeStandard_C: {
@@ -9525,9 +8033,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Rifle",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Cartridge_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_Rebar_Spreadshot_C: {
@@ -9536,9 +8041,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_ScatterRebar",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Rebar_Spreadshot_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_GunpowderMK2_C: {
@@ -9547,9 +8049,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_GunpowderMk2",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_GunpowderMK2_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_Rebar_Stunshot_C: {
@@ -9558,9 +8057,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_StunRebar",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Rebar_Stunshot_C"
-			],
 			category: "Categories/Ammunition"
 		},
 		Desc_CartridgeChaos_C: {
@@ -9569,77 +8065,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_TurboRifle",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_CartridgeChaos_Packaged_C",
-				"Recipe_CartridgeChaos_C"
-			],
 			category: "Categories/Ammunition"
-		},
-		BP_EquipmentDescriptorJumpingStilts_C: {
-			className: "BP_EquipmentDescriptorJumpingStilts_C",
-			displayName: "Blade Runners",
-			form: "RF_SOLID",
-			icon: "IconDesc_SprintingStilts",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_BladeRunners_C"
-			],
-			category: "Categories/BodyEquipment"
-		},
-		BP_EquipmentDescriptorGasmask_C: {
-			className: "BP_EquipmentDescriptorGasmask_C",
-			displayName: "Gas Mask",
-			form: "RF_SOLID",
-			icon: "GasMask",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Gasmask_C"
-			],
-			category: "Categories/BodyEquipment"
-		},
-		BP_EquipmentDescriptorHazmatSuit_C: {
-			className: "BP_EquipmentDescriptorHazmatSuit_C",
-			displayName: "Hazmat Suit",
-			form: "RF_SOLID",
-			icon: "IconDesc_HazmatSuit",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_HazmatSuit_C"
-			],
-			category: "Categories/BodyEquipment"
-		},
-		BP_EquipmentDescriptorHoverPack_C: {
-			className: "BP_EquipmentDescriptorHoverPack_C",
-			displayName: "Hoverpack",
-			form: "RF_SOLID",
-			icon: "IconDesc_Hoverpack",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Hoverpack_C"
-			],
-			category: "Categories/BodyEquipment"
-		},
-		BP_EquipmentDescriptorJetPack_C: {
-			className: "BP_EquipmentDescriptorJetPack_C",
-			displayName: "Jetpack",
-			form: "RF_SOLID",
-			icon: "Jetpack",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_JetPack_C"
-			],
-			category: "Categories/BodyEquipment"
-		},
-		Desc_Parachute_C: {
-			className: "Desc_Parachute_C",
-			displayName: "Parachute",
-			form: "RF_SOLID",
-			icon: "Parachute",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Parachute_C"
-			],
-			category: "Categories/BodyEquipment"
 		},
 		Desc_Filter_C: {
 			className: "Desc_Filter_C",
@@ -9647,9 +8073,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_GasMaskFilter",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_FilterGasMask_C"
-			],
 			category: "Categories/Consumables"
 		},
 		Desc_HazmatFilter_C: {
@@ -9658,23 +8081,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_HazmatFilter",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_FilterHazmat_C"
-			],
-			category: "Categories/Consumables"
-		},
-		Desc_Medkit_C: {
-			className: "Desc_Medkit_C",
-			displayName: "Medicinal Inhaler",
-			form: "RF_SOLID",
-			icon: "Inhaler",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_MedicinalInhalerAlienOrgans_C",
-				"Recipe_TherapeuticInhaler_C",
-				"Recipe_MedicinalInhaler_C",
-				"Recipe_NutritionalInhaler_C"
-			],
 			category: "Categories/Consumables"
 		},
 		Desc_XmasBall2_C: {
@@ -9683,9 +8089,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_XmasBall_Blue",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasBall2_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_CandyCane_C: {
@@ -9694,9 +8097,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_CanePart",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_CandyCane_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_XmasBall3_C: {
@@ -9705,9 +8105,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_XmasBall_Yellow",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasBall3_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_Fireworks_Projectile_02_C: {
@@ -9716,9 +8113,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Fireworks_02",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Fireworks_02_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_Snow_C: {
@@ -9727,9 +8121,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Snow",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Snow_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_XmasBow_C: {
@@ -9738,9 +8129,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Bow",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasBow_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_Gift_C: {
@@ -9749,7 +8137,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Gift",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
 			category: "Categories/FICSMAS"
 		},
 		Desc_XmasBallCluster_C: {
@@ -9758,9 +8145,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Balls",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasBallCluster_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_XmasBranch_C: {
@@ -9769,9 +8153,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Branch",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasBranch_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_XmasStar_C: {
@@ -9780,9 +8161,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Star",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasStar_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_XmasWreath_C: {
@@ -9791,9 +8169,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_WreathNoBow",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasWreath_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_XmasBall4_C: {
@@ -9802,9 +8177,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_XmasBall_Silver",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasBall4_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_XmasBall1_C: {
@@ -9813,9 +8185,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_XmasBall_Red",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_XmasBall1_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_SnowballProjectile_C: {
@@ -9824,9 +8193,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_SnowballProjectile",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Snowball_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_Fireworks_Projectile_03_C: {
@@ -9835,9 +8201,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Fireworks_03",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Fireworks_03_C"
-			],
 			category: "Categories/FICSMAS"
 		},
 		Desc_Fireworks_Projectile_01_C: {
@@ -9846,37 +8209,80 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			form: "RF_SOLID",
 			icon: "IconDesc_Fireworks_01",
 			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [
-				"Recipe_Fireworks_01_C"
-			],
 			category: "Categories/FICSMAS"
+		}
+	},
+	productionBuildings: {
+		Build_MinerMk1_C: {
+			buildingClassName: "Build_MinerMk1_C",
+			baseProductionRate: 60,
+			outputs: [
+				"Desc_Coal_C",
+				"Desc_Stone_C",
+				"Desc_OreIron_C",
+				"Desc_OreBauxite_C",
+				"Desc_OreCopper_C",
+				"Desc_LiquidOil_C",
+				"Desc_OreGold_C",
+				"Desc_RawQuartz_C",
+				"Desc_Sulfur_C",
+				"Desc_OreUranium_C"
+			]
 		},
-		Desc_Shroom_C: {
-			className: "Desc_Shroom_C",
-			displayName: "Bacon Agaric",
-			form: "RF_SOLID",
-			icon: "Mushroom",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
-			category: "Categories/Equipment"
+		Build_MinerMk2_C: {
+			buildingClassName: "Build_MinerMk2_C",
+			baseProductionRate: 120,
+			outputs: [
+				"Desc_Coal_C",
+				"Desc_Stone_C",
+				"Desc_OreIron_C",
+				"Desc_OreBauxite_C",
+				"Desc_OreCopper_C",
+				"Desc_LiquidOil_C",
+				"Desc_OreGold_C",
+				"Desc_RawQuartz_C",
+				"Desc_Sulfur_C",
+				"Desc_OreUranium_C"
+			]
 		},
-		Desc_Nut_C: {
-			className: "Desc_Nut_C",
-			displayName: "Beryl Nut",
-			form: "RF_SOLID",
-			icon: "Nut",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
-			category: "Categories/Equipment"
+		Build_MinerMk3_C: {
+			buildingClassName: "Build_MinerMk3_C",
+			baseProductionRate: 240,
+			outputs: [
+				"Desc_Coal_C",
+				"Desc_Stone_C",
+				"Desc_OreIron_C",
+				"Desc_OreBauxite_C",
+				"Desc_OreCopper_C",
+				"Desc_LiquidOil_C",
+				"Desc_OreGold_C",
+				"Desc_RawQuartz_C",
+				"Desc_Sulfur_C",
+				"Desc_OreUranium_C"
+			]
 		},
-		Desc_Berry_C: {
-			className: "Desc_Berry_C",
-			displayName: "Paleberry",
-			form: "RF_SOLID",
-			icon: "IconDesc_Berry",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			recipes: [],
-			category: "Categories/Equipment"
+		Build_OilPump_C: {
+			buildingClassName: "Build_OilPump_C",
+			baseProductionRate: 120,
+			outputs: [
+				"Desc_LiquidOil_C"
+			]
+		},
+		Build_FrackingExtractor_C: {
+			buildingClassName: "Build_FrackingExtractor_C",
+			baseProductionRate: 60,
+			outputs: [
+				"Desc_LiquidOil_C",
+				"Desc_NitrogenGas_C",
+				"Desc_Water_C"
+			]
+		},
+		Build_WaterPump_C: {
+			buildingClassName: "Build_WaterPump_C",
+			baseProductionRate: 120,
+			outputs: [
+				"Desc_Water_C"
+			]
 		}
 	},
 	buildings: {
@@ -9917,7 +8323,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		},
 		Build_MinerMk2_C: {
 			className: "Build_MinerMk2_C",
-			displayName: "Miner",
+			displayName: "Miner Mk.2",
 			icon: "IconDesc_MinerMk2"
 		},
 		Build_ManufacturerMk1_C: {
@@ -9945,6 +8351,16 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			displayName: "Resource Well Extractor",
 			icon: "IconDesc_Extractor"
 		},
+		Build_MinerMk3_C: {
+			className: "Build_MinerMk3_C",
+			displayName: "Miner Mk.3",
+			icon: "IconDesc_MinerMk3"
+		},
+		Build_MinerMk1_C: {
+			className: "Build_MinerMk1_C",
+			displayName: "Miner Mk.1",
+			icon: "IconDesc_MinerMk1"
+		},
 		Build_ConstructorMk1_C: {
 			className: "Build_ConstructorMk1_C",
 			displayName: "Constructor",
@@ -9952,13 +8368,8 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		},
 		Build_SmelterMk1_C: {
 			className: "Build_SmelterMk1_C",
-			displayName: "Smelter",
+			displayName: "Foundry",
 			icon: "IconDesc_SmelterMk1"
-		},
-		Build_Workshop_C: {
-			className: "Build_Workshop_C",
-			displayName: "Equipment Workshop",
-			icon: "Workshop"
 		}
 	},
 	categories: {
@@ -9982,9 +8393,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		"Categories/PowerShards": "Power Shards",
 		"Categories/RawMaterials": "Raw Materials",
 		"Categories/Tools": "Tools",
-		"Categories/Weapon": "Weapons",
 		"Categories/Ammunition": "Ammunition",
-		"Categories/BodyEquipment": "Body Equipment",
 		"Categories/Consumables": "Consumables",
 		"Categories/FICSMAS": "FICSMAS Holiday Event",
 		"Categories/ExtractableResources": "Extractable Resources"
@@ -9992,41 +8401,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 	icons: {
 		IconDesc_PortableMiner: {
 			name: "IconDesc_PortableMiner",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_Chainsaw: {
-			name: "IconDesc_Chainsaw",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_GolfCartGold: {
-			name: "IconDesc_GolfCartGold",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_GolfCart: {
-			name: "IconDesc_GolfCart",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_Hoverpack: {
-			name: "IconDesc_Hoverpack",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_SprintingStilts: {
-			name: "IconDesc_SprintingStilts",
 			resolutions: [
 				256,
 				48
@@ -10076,13 +8450,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		},
 		IconDesc_TurboRifle: {
 			name: "IconDesc_TurboRifle",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_Zipline: {
-			name: "IconDesc_Zipline",
 			resolutions: [
 				256,
 				48
@@ -10158,8 +8525,22 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				48
 			]
 		},
+		IconDesc_MinerMk1: {
+			name: "IconDesc_MinerMk1",
+			resolutions: [
+				512,
+				48
+			]
+		},
 		IconDesc_MinerMk2: {
 			name: "IconDesc_MinerMk2",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_MinerMk3: {
+			name: "IconDesc_MinerMk3",
 			resolutions: [
 				512,
 				48
@@ -10207,13 +8588,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				48
 			]
 		},
-		Workshop: {
-			name: "Workshop",
-			resolutions: [
-				512,
-				48
-			]
-		},
 		IconDesc_Balls: {
 			name: "IconDesc_Balls",
 			resolutions: [
@@ -10230,13 +8604,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		},
 		IconDesc_Branch: {
 			name: "IconDesc_Branch",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_CaneEquipment: {
-			name: "IconDesc_CaneEquipment",
 			resolutions: [
 				256,
 				48
@@ -10347,13 +8714,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				48
 			]
 		},
-		IconDesc_Berry: {
-			name: "IconDesc_Berry",
-			resolutions: [
-				256,
-				48
-			]
-		},
 		PowerShard: {
 			name: "PowerShard",
 			resolutions: [
@@ -10377,90 +8737,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		},
 		PowerSlugYellow: {
 			name: "PowerSlugYellow",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		Mushroom: {
-			name: "Mushroom",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		Nut: {
-			name: "Nut",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		Parachute: {
-			name: "Parachute",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		GasMask: {
-			name: "GasMask",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		ObjectScanner: {
-			name: "ObjectScanner",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		Jetpack: {
-			name: "Jetpack",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		Inhaler: {
-			name: "Inhaler",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_RebarGun: {
-			name: "IconDesc_RebarGun",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		Detonator: {
-			name: "Detonator",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		RifleMk1: {
-			name: "RifleMk1",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_XenoZapper: {
-			name: "IconDesc_XenoZapper",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_XenoBasher: {
-			name: "IconDesc_XenoBasher",
 			resolutions: [
 				256,
 				48
@@ -10825,13 +9101,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		},
 		IconDesc_Gunpowder: {
 			name: "IconDesc_Gunpowder",
-			resolutions: [
-				256,
-				48
-			]
-		},
-		IconDesc_HazmatSuit: {
-			name: "IconDesc_HazmatSuit",
 			resolutions: [
 				256,
 				48

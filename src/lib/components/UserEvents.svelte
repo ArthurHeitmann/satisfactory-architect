@@ -1,17 +1,15 @@
 <script lang="ts">
-    import { floorToNearest, roundToNearest } from "$lib/utilties";
-    import type { Snippet } from "svelte";
+	import { roundToNearest } from "$lib/utilties";
+	import type { Snippet } from "svelte";
 
 	export interface DragEvent {
 		deltaX: number;
 		deltaY: number;
 		totalDeltaX: number;
 		totalDeltaY: number;
-		clientX: number;
-		clientY: number;
-		isTouchEvent: boolean;
+		cursorEvent: CursorEvent;
 	}
-	export interface ClickEvent {
+	export interface CursorEvent {
 		clientX: number;
 		clientY: number;
 		hasShiftKey: boolean;
@@ -21,7 +19,8 @@
 		hasPrimaryButton: boolean;
 		isSecondaryButton: boolean;
 		isMiddleButton: boolean;
-		target: EventTarget | null;
+		isTouchEvent: boolean;
+		target: EventTarget|null;
 	}
 
 	interface Props {
@@ -29,8 +28,10 @@
 		onDrag?: ((event: DragEvent) => void) | null;
 		onDragStart?: ((event: DragEvent) => void) | null;
 		onDragEnd?: ((event: DragEvent) => void) | null;
+		onCursorMove?: ((event: CursorEvent) => void) | null;
 		onZoom?: ((deltaFactor: number, cursorX: number, cursorY: number) => void) | null;
-		onClick?: ((event: ClickEvent) => void) | null;
+		onClick?: ((event: CursorEvent) => void) | null;
+		onWindowClick?: ((event: CursorEvent) => void) | null;
 		onContextMenu?: ((event: MouseEvent) => void) | null;
 		onDoubleClick?: ((event: MouseEvent, isTouchEvent: boolean) => void) | null;
 		onKeyDown?: ((key: string, event: KeyboardEvent) => void) | null;
@@ -40,6 +41,7 @@
 		dragStartThreshold?: number;
 		dragThreshold?: number;
 		dragStep?: number;
+		debugKey?: string;
 	}
 
 	let {
@@ -47,8 +49,10 @@
 		onDrag = null,
 		onDragStart = null,
 		onDragEnd = null,
+		onCursorMove = null,
 		onZoom = null,
 		onClick = null,
+		onWindowClick = null,
 		onContextMenu = null,
 		onDoubleClick = null,
 		onKeyDown = null,
@@ -58,6 +62,7 @@
 		dragStartThreshold = 0,
 		dragThreshold = 0,
 		dragStep = 0,
+		debugKey = "",
 	}: Props = $props();
 
 	let isDragging: boolean = $state(false);
@@ -69,28 +74,30 @@
 	let lastPinchDistance: number = 0;
 	let lastTouchAt: number = 0;
 	let lastDragAt: number = 0;
-	const id = Math.random().toString(36).substring(2, 15);
+	let dragStartButton: number = 0;
 
 	function handleDragStart(clientX: number, clientY: number, event: MouseEvent | TouchEvent) {
-		hasDragStarted = dragStartThreshold > 0;
+		hasDragStarted = dragStartThreshold === 0;
 		isDragging = true;
 		lastX = clientX;
 		lastY = clientY;
 		startX = clientX;
 		startY = clientY;
-		onDragStart?.({
-			deltaX: 0,
-			deltaY: 0,
-			totalDeltaX: 0,
-			totalDeltaY: 0,
-			clientX,
-			clientY,
-			isTouchEvent: isTouchEvent(),
-		});
-		onClick?.(eventToClickEvent(event));
+		dragStartButton = event instanceof MouseEvent ? event.button : 0;
+		if (hasDragStarted) {
+			event.stopPropagation();
+			onDragStart?.({
+				deltaX: 0,
+				deltaY: 0,
+				totalDeltaX: 0,
+				totalDeltaY: 0,
+				cursorEvent: eventToCursorEvent(event),
+			});
+			onClick?.(eventToCursorEvent(event));
+		}
 	}
 
-	function handleDrag(clientX: number, clientY: number, event: Event) {
+	function handleDrag(clientX: number, clientY: number, event: MouseEvent | TouchEvent) {
 		if (!isDragging)
 			return;
 		event.stopPropagation();
@@ -101,6 +108,14 @@
 			if (distance < dragStartThreshold)
 				return;
 			hasDragStarted = true;
+			console.log(event);
+			onDragStart?.({
+				deltaX: 0,
+				deltaY: 0,
+				totalDeltaX: 0,
+				totalDeltaY: 0,
+				cursorEvent: eventToCursorEvent(event, dragStartButton),
+			});
 		}
 		if (distance < dragThreshold)
 			return;
@@ -115,14 +130,12 @@
 				deltaY: deltaYStep,
 				totalDeltaX: lastX - startX,
 				totalDeltaY: lastY - startY,
-				clientX: lastX,
-				clientY: lastY,
-				isTouchEvent: isTouchEvent(),
+				cursorEvent: eventToCursorEvent(event, dragStartButton),
 			});
 		}
 	}
 
-	function handleDragEnd(event: Event) {
+	function handleDragEnd(event: UIEvent) {
 		if (!isDragging)
 			return;
 		event.stopPropagation();
@@ -135,9 +148,7 @@
 			deltaY: lastY - startY,
 			totalDeltaX: lastX - startX,
 			totalDeltaY: lastY - startY,
-			clientX: lastX,
-			clientY: lastY,
-			isTouchEvent: isTouchEvent(),
+			cursorEvent: eventToCursorEvent(event, dragStartButton),
 		});
 	}
 	
@@ -147,12 +158,19 @@
 		onZoom?.(deltaFactor, cursorX, cursorY);
 	}
 
+	function handleCursorMove(event: MouseEvent | TouchEvent) {
+		if (!onCursorMove)
+			return;
+		event.stopPropagation();
+		onCursorMove(eventToCursorEvent(event));
+	}
 
 
 	function handleMouseDown(event: MouseEvent) {
 		if (!onDrag)
 			return;
-		event.stopPropagation();
+		if (targetsInput(event) && event.button !== 1)
+			return;
 		if (event.button === 1) {
 			if (!allowMiddleClickDrag)
 				return;
@@ -160,22 +178,31 @@
 		else if (event.button === 2) {
 			if (!allowRightClickDrag)
 				return;
+			event.preventDefault();
 		}
 		else if (event.button !== 0) {
 			return;
 		}
+		event.stopPropagation();
 		handleDragStart(event.clientX, event.clientY, event);
 	}
 
 	function handleMouseMove(event: MouseEvent) {
+		handleCursorMove(event);
+		if (targetsInput(event) || !isDragging)
+			return;
 		handleDrag(event.clientX, event.clientY, event);
 	}
 
-	function handleMouseUp(event: Event) {
+	function handleMouseUp(event: UIEvent) {
+		if (targetsInput(event) || !isDragging)
+			return;
 		handleDragEnd(event);
 	}
 
 	function handleTouchStart(event: TouchEvent) {
+		if (targetsInput(event))
+			return;
 		lastTouchAt = Date.now();
 		if (!onDrag && !onZoom)
 			return;
@@ -191,6 +218,12 @@
 	}
 
 	function handleTouchMove(event: TouchEvent) {
+		if (onCursorMove && event.touches.length === 1) {
+			event.preventDefault();
+			handleCursorMove(event);
+		}
+		if (targetsInput(event) || !isDragging)
+			return;
 		if (event.touches.length === 1 && isDragging) {
 			event.stopPropagation();
 			event.preventDefault();
@@ -213,9 +246,7 @@
 					deltaY,
 					totalDeltaX: deltaX,
 					totalDeltaY: deltaY,
-					clientX: center.x,
-					clientY: center.y,
-					isTouchEvent: isTouchEvent(),
+					cursorEvent: eventToCursorEvent(event),
 				});
 			}
 			lastX = center.x;
@@ -224,7 +255,9 @@
 		}
 	}
 
-	function handleTouchEnd(event: Event|TouchEvent) {
+	function handleTouchEnd(event: UIEvent|TouchEvent) {
+		if (targetsInput(event) || !isDragging)
+			return;
 		if ("touches" in event && event.touches.length > 0) {
 			if (isDragging) {
 				const center = getTouchCenter(event.touches);
@@ -260,16 +293,16 @@
 				deltaY: -event.deltaY,
 				totalDeltaX: -event.deltaX,
 				totalDeltaY: -event.deltaY,
-				clientX: event.clientX,
-				clientY: event.clientY,
-				isTouchEvent: isTouchEvent(),
+				cursorEvent: eventToCursorEvent(event),
 			});
 		}
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
+		if (targetsInput(event))
+			return;
 		onKeyDown?.(event.key, event);
-		if (event.key === 'Escape' && isDragging) {
+		if (event.key === "Escape" && isDragging) {
 			event.stopPropagation();
 			handleMouseUp(event);
 			handleTouchEnd(event);
@@ -279,15 +312,27 @@
 	function handleClick(event: MouseEvent) {
 		if (!onClick)
 			return;
+		if (targetsInput(event))
+			return;
 		event.stopPropagation();
-		if (Date.now() - lastDragAt === 0) {
+		if (Math.abs(Date.now() - lastDragAt) < 20) {
 			return;
 		}
-		onClick(eventToClickEvent(event));
+		onClick(eventToCursorEvent(event));
+		handleWindowClick(event);
+	}
+
+	function handleWindowClick(event: MouseEvent) {
+		if (!onWindowClick)
+			return;
+		event.stopPropagation();
+		onWindowClick(eventToCursorEvent(event));
 	}
 
 	function handleDoubleClick(event: MouseEvent) {
 		if (!onDoubleClick)
+			return;
+		if (targetsInput(event))
 			return;
 		onDoubleClick(event, isTouchEvent());
 	}
@@ -299,8 +344,6 @@
 	}
 
 	function getTouchCenter(touches: TouchList): { x: number; y: number } {
-		// const x = (touches[0].clientX + touches[1].clientX) / 2;
-		// const y = (touches[0].clientY + touches[1].clientY) / 2;
 		let x = 0;
 		let y = 0;
 		for (let i = 0; i < touches.length; i++) {
@@ -314,38 +357,65 @@
 		return Date.now() - lastTouchAt < 500;
 	};
 
-	function eventToClickEvent(event: MouseEvent | TouchEvent): ClickEvent {
+	function targetsInput(event: UIEvent): boolean {
+		const target = event.target as Element|null;
+		if (target?.tagName === "INPUT" || target?.tagName === "TEXTAREA")
+			return true;
+		const contentEditable = target?.getAttribute("contenteditable");
+		if (contentEditable === "true" || contentEditable === "plaintext-only")
+			return true;
+		return false;
+	}
+
+	function eventToCursorEvent(event: MouseEvent | TouchEvent | UIEvent, button?: number): CursorEvent {
+		if (!(event instanceof MouseEvent) && !(event instanceof TouchEvent)) {
+			return {
+				clientX: lastX,
+				clientY: lastY,
+				hasShiftKey: false,
+				hasCtrlKey: false,
+				hasMetaKey: false,
+				hasAltKey: false,
+				hasPrimaryButton: event instanceof MouseEvent && (button ?? event.button) === 0,
+				isSecondaryButton: event instanceof MouseEvent && (button ?? event.button) === 2,
+				isMiddleButton: event instanceof MouseEvent && (button ?? event.button) === 1,
+				isTouchEvent: false,
+				target: event.target,
+			};
+		}
 		return {
-			clientX: event instanceof MouseEvent ? event.clientX : event.touches[0].clientX,
-			clientY: event instanceof MouseEvent ? event.clientY : event.touches[0].clientY,
+			clientX: event instanceof MouseEvent ? event.clientX : event.touches[0]?.clientX ?? lastX,
+			clientY: event instanceof MouseEvent ? event.clientY : event.touches[0]?.clientY ?? lastY,
 			hasShiftKey: event.shiftKey,
 			hasCtrlKey: event.ctrlKey,
 			hasMetaKey: event.metaKey,
 			hasAltKey: event.altKey,
-			hasPrimaryButton: event instanceof MouseEvent && event.button === 0,
-			isSecondaryButton: event instanceof MouseEvent && event.button === 2,
-			isMiddleButton: event instanceof MouseEvent && event.button === 1,
+			hasPrimaryButton: event instanceof MouseEvent && (button ?? event.button) === 0,
+			isSecondaryButton: event instanceof MouseEvent && (button ?? event.button) === 2,
+			isMiddleButton: event instanceof MouseEvent && (button ?? event.button) === 1,
+			isTouchEvent: isTouchEvent(),
 			target: event.target,
 		};
 	}
 
-	const listeners = {
+	const listeners = $derived({
 		onmousedown: onDrag ? handleMouseDown : undefined,
 		ontouchstart: onDrag ? handleTouchStart : undefined,
 		onwheel: onZoom ? handleWheel : undefined,
 		onclick: onClick ? handleClick : undefined,
 		oncontextmenu: onContextMenu,
 		ondblclick: onDoubleClick ? handleDoubleClick : undefined,
-	};
+	});
 </script>
 
 {@render children({ listeners, isDragging })}
 
 <svelte:window
-	onmousemove={onDrag ? handleMouseMove : undefined}
+	onmousemove={onDrag || onCursorMove ? handleMouseMove : undefined}
 	onmouseup={onDrag ? handleMouseUp : undefined}
 	on:touchmove|nonpassive={onDrag || onZoom ? handleTouchMove : undefined}
 	ontouchend={onDrag ? handleTouchEnd : undefined}
 	ontouchcancel={onDrag ? handleTouchEnd : undefined}
 	onkeydown={onDrag || onKeyDown ? handleKeyDown : undefined}
+	onclick={onWindowClick ? handleWindowClick : undefined}
 />

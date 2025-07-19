@@ -1,5 +1,6 @@
+import type { NewNodeDetails } from "./components/datamodel/GraphNode.svelte";
 
-export type EventType = "" | "showContextMenu" | "showRecipeSelector";
+export type EventType = "" | "showContextMenu" | "showProductionSelector";
 
 export interface EventBase {
 	type: EventType;
@@ -19,7 +20,7 @@ export class EventStream {
 		}
 	}
 
-	emit(event: EventBase): void {
+	emit(event: AllowedEventTypes): void {
 		for (const listener of this.listeners) {
 			listener(event);
 		}
@@ -50,9 +51,9 @@ interface ContextMenuItem2 {
 }
 export type ContextMenuItem = ContextMenuItem1 | ContextMenuItem2;
 
-export interface ShowRecipeSelectorEvent extends EventBase {
-	type: "showRecipeSelector";
-	onSelect: (recipe: string) => void;
+export interface ShowProductionSelectorEvent extends EventBase {
+	type: "showProductionSelector";
+	onSelect: (result: NewNodeDetails) => void;
 	onCancel?: () => void;
 	x: number;
 	y: number;
@@ -60,3 +61,9 @@ export interface ShowRecipeSelectorEvent extends EventBase {
 	requiredOutputsClassName?: string;
 	autofocus?: boolean;
 }
+
+export interface EmptyEvent extends EventBase {
+	type: "";
+}
+
+export type AllowedEventTypes = EmptyEvent | ShowContextMenuEvent | ShowProductionSelectorEvent;

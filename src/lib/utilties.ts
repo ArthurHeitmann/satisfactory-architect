@@ -1,14 +1,57 @@
 
-export function debounce<T extends (...args: any[]) => void>(func: T, delay: number): (...args: Parameters<T>) => void {
-	let timeoutId: NodeJS.Timeout | null = null;
-	return (...args: Parameters<T>) => {
-		if (timeoutId) {
-			clearTimeout(timeoutId);
+export class Debouncer<T extends (...args: any[]) => void> {
+	private timeoutId: NodeJS.Timeout | null = null;
+	private func: T;
+	private delay: number;
+
+	constructor(func: T, delay: number) {
+		this.func = func;
+		this.delay = delay;
+	}
+
+	call(...args: Parameters<T>) {
+		if (this.timeoutId) {
+			clearTimeout(this.timeoutId);
 		}
-		timeoutId = setTimeout(() => {
-			func(...args);
-		}, delay);
-	};
+		this.timeoutId = setTimeout(() => {
+			this.func(...args);
+		}, this.delay);
+	}
+
+	cancel() {
+		if (this.timeoutId) {
+			clearTimeout(this.timeoutId);
+			this.timeoutId = null;
+		}
+	}
+}
+
+export class Throttler<T extends (...args: any[]) => void> {
+	private lastCallTime: number = 0;
+	private func: T;
+	private delay: number;
+
+	constructor(func: T, delay: number) {
+		this.func = func;
+		this.delay = delay;
+	}
+
+	call(...args: Parameters<T>) {
+		const now = Date.now();
+		if (now - this.lastCallTime >= this.delay) {
+			this.lastCallTime = now;
+			this.func(...args);
+		}
+	}
+
+	callNow(...args: Parameters<T>) {
+		this.lastCallTime = Date.now();
+		this.func(...args);
+	}
+
+	reset() {
+		this.lastCallTime = 0;
+	}
 }
 
 export function roundToNearest(value: number, nearest: number): number {
@@ -47,4 +90,22 @@ export function pluralStr(base: string, count: number): string {
 	} else {
 		return `${count} ${base}s`;
 	}
+}
+
+export function floatToString(value: number, precision: number = 2): string {
+	return value.toFixed(precision).replace(/\.?0+$/, "");
+}
+
+export function angleBetweenPoints(
+	centerPoint: { x: number; y: number },
+	outerPoint: { x: number; y: number }
+): number {
+	const dx = outerPoint.x - centerPoint.x;
+	const dy = outerPoint.y - centerPoint.y;
+	const angle = Math.atan2(dy, dx);
+	return angle < 0 ? angle + 2 * Math.PI : angle;
+}
+
+export function assertUnreachable(x: never): never {
+	throw new Error("Didn't expect to get here");
 }

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import type { ContextMenuItem, EventStream, ShowRecipeSelectorEvent } from "$lib/EventStream.svelte";
-    import { getContext, onDestroy, onMount } from "svelte";
-    import RecipeSelector from "../RecipeSelector.svelte";
-    import { GraphNode, type GraphPage } from "$lib/components/datamodel/datamodel.svelte";
-    import { roundToNearest } from "$lib/utilties";
-    import { gridSize } from "../datamodel/layoutConstants";
+	import type { ContextMenuItem, EventStream, ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import { getContext, onDestroy, onMount } from "svelte";
+	import RecipeSelector from "../RecipeSelector.svelte";
+	import { roundToNearest } from "$lib/utilties";
+	import { gridSize } from "../datamodel/constants";
+	import type { NewNodeDetails } from "../datamodel/GraphNode.svelte";
 
 	interface Props {
-		event: ShowRecipeSelectorEvent;
+		event: ShowProductionSelectorEvent;
 		dismissEventStream?: EventStream;
 		onclose: () => void;
 	}
@@ -22,8 +22,8 @@
 
 	let cssWidth = $state("auto");
 
-	function onRecipeSelected(recipe: string) {
-		event.onSelect(recipe);
+	function onRecipeSelected(result: NewNodeDetails) {
+		event.onSelect(result);
 		onclose();
 	}
 

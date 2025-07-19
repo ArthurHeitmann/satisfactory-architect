@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, copyFileSync, writeFileSync } from "fs";
 import { basename, join } from "path";
 import argsParser from "args-parser";
 import { parseUeData } from "./ue_data_parser";
-import { SFBuilding, SFIcon, SFPart, SFRecipe, SFRecipePart, SatisfactoryDatabase } from "../src/lib/satisfactoryDatabaseTypes";
+import { SFBuilding, SFIcon, SFPart, SFProductionBuilding, SFRecipe, SFRecipePart, SatisfactoryDatabase } from "../src/lib/satisfactoryDatabaseTypes";
 import { gameCategories } from "./categories";
 
 function parseFullName(fullName: string): string {
@@ -20,7 +20,7 @@ function parseRecipePartList(listString: string, duration: number): SFRecipePart
 		if (amount >= 1000) {
 			amount = Math.round(amount / 1000);
 		}
-		return <SFRecipePart>{
+		return {
 			itemClass: parseFullName(item.ItemClass as string),
 			amountPerMinute: amount * 60 / duration,
 		};
@@ -67,7 +67,6 @@ async function main() {
 	const jsonData = JSON.parse(content);
 
 	const recipes = new Map<string, SFRecipe>();
-	const recipesByPart = new Map<string, string[]>();
 	const referencedParts = new Set<string>();
 	const referencedBuildings = new Set<string>();
 	const referencedCategories = new Set<string>();
@@ -84,9 +83,9 @@ async function main() {
 			let allProducedIn = parseUeData(classDef["mProducedIn"]) as string[];
 			allProducedIn = allProducedIn.filter((item: string) => !item.includes("BuildGun"));
 			let producedIn =
-				allProducedIn.find((item: string) => item.startsWith("/Game/FactoryGame/Buildable/Factory")) ??
+				allProducedIn.find((item: string) => item.startsWith("/Game/FactoryGame/Buildable/Factory")) /*??
 				allProducedIn.find((item: string) => item.startsWith("/Game/FactoryGame/Buildable/-Shared/WorkBench")) ??
-				allProducedIn[0];
+				allProducedIn[0]*/;
 			if (!producedIn) {
 				continue;
 			}
@@ -119,13 +118,6 @@ async function main() {
 				referencedParts.add(part.itemClass);
 			}
 
-			for (const outputPart of recipe.outputs) {
-				if (!recipesByPart.has(outputPart.itemClass)) {
-					recipesByPart.set(outputPart.itemClass, []);
-				}
-				recipesByPart.get(outputPart.itemClass)!.push(recipe.className);
-			}
-
 			referencedBuildings.add(producedIn);
 			referencedBuildings.add(producedIn.replace(/^Build_/, "Desc_"));
 			referencedCategories.add(recipe.category);
@@ -133,6 +125,7 @@ async function main() {
 	}
 	// resource extractors
 	const visitedResources = new Set<string>();
+	const productionBuildings = new Map<string, SFProductionBuilding>();
 	for (const classDefs of jsonData) {
 		for (const classDef of classDefs["Classes"]) {
 			const className = classDef["ClassName"];
@@ -156,25 +149,22 @@ async function main() {
 					}
 				}
 			}
+			let productionRate = Number(classDef["mItemsPerCycle"]) / Number(classDef["mExtractCycleTime"]);
+			if (!productionRate) {
+				continue;
+			}
+			if (productionRate >= 1000) {
+				productionRate = Math.round(productionRate / 1000);
+			}
+			productionRate *= 60;
+
+			productionBuildings.set(className, {
+				buildingClassName: className,
+				baseProductionRate: productionRate,
+				outputs: resources,
+			});
 			for (const resource of resources) {
-				if (visitedResources.has(resource)) {
-					continue;
-				}
 				visitedResources.add(resource);
-				const recipe = <SFRecipe>{
-					className: resource,
-					recipeDisplayName: "[RESOURCE]",
-					inputs: [],
-					outputs: [{ itemClass: resource, amountPerMinute: 60 }],
-					producedIn: className,
-					category: "Categories/ExtractableResources",
-					priority: 0,
-				};
-				recipes.set(resource, recipe);
-				if (!recipesByPart.has(resource)) {
-					recipesByPart.set(resource, []);
-				}
-				recipesByPart.get(resource)!.push(resource);
 				referencedParts.add(resource);
 				referencedBuildings.add(className);
 			}
@@ -196,14 +186,13 @@ async function main() {
 			if (!referencedParts.has(className)) {
 				continue;
 			}
-			const icon = parseFullName(classDef["mPersistentBigIcon"] as string);
+			let icon = parseFullName(classDef["mPersistentBigIcon"] as string);
 			const part: SFPart = {
 				className: className,
 				displayName: classDef["mDisplayName"],
 				form: classDef["mForm"] as string,
 				icon: splitIconName(icon)?.iconName ?? "",
 				fluidColor: classDef["mFluidColor"] as string,
-				recipes: recipesByPart.get(className) ?? [],
 				category: gameCategories.partCategories[className] || "",
 			};
 			if (!part.category) {
@@ -216,11 +205,6 @@ async function main() {
 			}
 			usedIcons.add(icon);
 			parts.set(part.className, part);
-
-			const resourceRecipe = recipes.get(className);
-			if (resourceRecipe && resourceRecipe.recipeDisplayName === "[RESOURCE]") {
-				resourceRecipe.recipeDisplayName = `${part.displayName} (Resource)`;
-			}
 		}
 	}
 
@@ -228,7 +212,13 @@ async function main() {
 	// buildings
 	for (const classDefs of jsonData) {
 		for (const classDef of classDefs["Classes"]) {
-			const className = classDef["ClassName"].replace(/^Desc_/, "Build_");
+			let className = classDef["ClassName"].replace(/^Desc_/, "Build_");
+			if (className.startsWith("Recipe_")) {
+				const newClassName = className.replace(/^Recipe_/, "Build_");
+				if (referencedBuildings.has(newClassName)) {
+					className = newClassName;
+				}
+			}
 			if (!className.startsWith("Build_")) {
 				continue;
 			}
@@ -241,15 +231,15 @@ async function main() {
 				icon: "",
 			};
 			if (!building.displayName && classDef["mDisplayName"]) {
-				building.displayName = classDef["mDisplayName"].split(" Mk.")[0];
+				building.displayName = classDef["mDisplayName"];
 			}
 			if (!building.icon && classDef["mPersistentBigIcon"]) {
 				const icon = parseFullName(classDef["mPersistentBigIcon"] as string);
 				building.icon = splitIconName(icon)?.iconName ?? "";
 				usedIcons.add(icon);
+				usedIcons.add(icon);
 			}
 			buildings.set(building.className, building);
-			usedIcons.add(building.icon);
 		}
 	}
 	const referencedBuildBuildings = Array.from(referencedBuildings.values()).filter((building) => building.startsWith("Build_"));
@@ -290,34 +280,43 @@ async function main() {
 				resolutions: [resolution, 48],
 			});
 			const destPath = join(imgSavePath, `${iconName}.png`);
-			copyFileSync(filePath, destPath);
+			// copyFileSync(filePath, destPath);
 		}
 		console.log(`Copied ${imgPaths.size} icons to ${imgSavePath}.`);
 	}
 
-	const sortedRecipes = Array.from(recipes.values()).sort((a, b) => {
-		const aCat = gameCategories.categoryDetails[a.category];
-		const bCat = gameCategories.categoryDetails[b.category];
+	const recipeGroups: Record<string, SFRecipe[]> = {};
+	for (const recipe of recipes.values()) {
+		const outputDisplayName = parts.get(recipe.outputs[0].itemClass)!.displayName;
+		if (!recipeGroups[outputDisplayName]) {
+			recipeGroups[outputDisplayName] = [];
+		}
+		recipeGroups[outputDisplayName].push(recipe);
+	}
+	const sortedRecipeGroups = Object.entries(recipeGroups).sort((a, b) => {
+		const aCat = gameCategories.categoryDetails[a[1][0].category];
+		const bCat = gameCategories.categoryDetails[b[1][0].category];
 		if (aCat?.priority !== bCat?.priority) {
 			return (aCat?.priority ?? 99) - (bCat?.priority ?? 99);
 		}
 		if (aCat?.displayName !== bCat?.displayName) {
 			return (aCat?.displayName ?? "").localeCompare(bCat?.displayName ?? "") || 0;
 		}
-		const itemClassCmp = a.outputs[0].itemClass.localeCompare(b.outputs[0].itemClass);
-		if (itemClassCmp !== 0) {
-			return itemClassCmp;
-		}
-		const aIsAlt = a.recipeDisplayName.startsWith("Alternate:");
-		const bIsAlt = b.recipeDisplayName.startsWith("Alternate:");
-		if (aIsAlt && !bIsAlt) {
-			return 1; // Place alts after regular recipes
-		}
-		if (!aIsAlt && bIsAlt) {
-			return -1; // Place regular recipes before alts
-		}
-		return a.recipeDisplayName.localeCompare(b.recipeDisplayName) || 0;
+		return a[0].localeCompare(b[0]);
 	});
+	for (const group of Object.values(recipeGroups)) {
+		group.sort((a, b) => {
+			const aIsAlt = a.recipeDisplayName.startsWith("Alternate:");
+			const bIsAlt = b.recipeDisplayName.startsWith("Alternate:");
+			if (aIsAlt && !bIsAlt) {
+				return 1;
+			} else if (!aIsAlt && bIsAlt) {
+				return -1;
+			}
+			return a.recipeDisplayName.localeCompare(b.recipeDisplayName);
+		});
+	}
+	const sortedRecipes = sortedRecipeGroups.flatMap(([_, recipes]) => recipes);
 	const sortedParts = Array.from(parts.values()).sort((a, b) => {
 		const aCat = gameCategories.categoryDetails[a.category];
 		const bCat = gameCategories.categoryDetails[b.category];
@@ -329,6 +328,11 @@ async function main() {
 		}
 		return a.displayName.localeCompare(b.displayName) || 0;
 	});
+	const sortedProductionBuildings = Array.from(productionBuildings.entries()).sort((a, b) => {
+		const aDisplayName = buildings.get(a[0])?.displayName || a[0];
+		const bDisplayName = buildings.get(b[0])?.displayName || b[0];
+		return aDisplayName.localeCompare(bDisplayName) || 0;
+	});
 	const sortedCategories = Array.from(Object.entries(categories)).sort((a, b) => {
 		const aCat = gameCategories.categoryDetails[a[0]];
 		const bCat = gameCategories.categoryDetails[b[0]];
@@ -338,9 +342,10 @@ async function main() {
 		return (aCat?.displayName ?? "").localeCompare(bCat?.displayName ?? "") || 0;
 	});
 
-	const outputData = <SatisfactoryDatabase>{
+	const outputData: SatisfactoryDatabase = {
 		recipes: Object.fromEntries(sortedRecipes.map((recipe) => [recipe.className, recipe])),
 		parts: Object.fromEntries(sortedParts.map((part) => [part.className, part])),
+		productionBuildings: Object.fromEntries(sortedProductionBuildings.map(([className, building]) => [className, building])),
 		buildings: Object.fromEntries(buildings.entries()),
 		categories: Object.fromEntries(sortedCategories),
 		icons: Object.fromEntries(icons.entries()),

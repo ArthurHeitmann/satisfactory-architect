@@ -3,7 +3,9 @@ import { writable, type Writable } from "svelte/store";
 
 const storage: any = browser ? localStorage : {};
 
-function loadFormLocalStorage<T>(key: string, defaultValue: T) {
+
+
+export function loadFormLocalStorage<T>(key: string, defaultValue: T) {
 	try {
 		const prefs = storage["preferences"] || "{}";
 		const stored = JSON.parse(prefs)[key];
@@ -16,17 +18,19 @@ function loadFormLocalStorage<T>(key: string, defaultValue: T) {
 	return defaultValue;
 }
 
+export function writeToLocalStorage(key: string, value: any) {
+	let prefs: any = {};
+	try {
+		prefs = JSON.parse(storage["preferences"] || "{}");
+	} catch (e) {
+		console.error(e);
+	}
+	prefs[key] = value;
+	storage["preferences"] = JSON.stringify(prefs);
+}
+
 export function localStorageState<T>(key: string, defaultValue: T): Writable<T> {
 	const store = writable<T>(loadFormLocalStorage(key, defaultValue));
-	store.subscribe((value) => {
-		let prefs: any = {};
-		try {
-			prefs = JSON.parse(storage["preferences"] || "{}");
-		} catch (e) {
-			console.error(e);
-		}
-		prefs[key] = value;
-		storage["preferences"] = JSON.stringify(prefs);
-	});
+	store.subscribe((value) => writeToLocalStorage(key, value));
 	return store;
 }

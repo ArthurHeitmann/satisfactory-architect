@@ -19,8 +19,13 @@ export interface SFPart {
 	form: string;
 	icon: string;
 	fluidColor: string;
-	recipes: string[];
 	category: string;
+}
+
+export interface SFProductionBuilding {
+	buildingClassName: string;
+	baseProductionRate: number;
+	outputs: string[];
 }
 
 export interface SFBuilding {
@@ -37,6 +42,7 @@ export interface SFIcon {
 export interface SatisfactoryDatabase {
 	recipes: Record<string, SFRecipe>;
 	parts: Record<string, SFPart>;
+	productionBuildings: Record<string, SFProductionBuilding>;
 	buildings: Record<string, SFBuilding>;
 	categories: Record<string, string>;
 	icons: Record<string, SFIcon>;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { base } from '$app/paths'
-    import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
+	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
 
 	interface Props {
 		icon: string;

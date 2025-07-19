@@ -23,6 +23,43 @@
   --primary: #ce5f27;
   --secondary: #efc0a9;
   --accent: #df6020;
+
+  --grid-background-color: var(--background-50);
+  --selection-area-background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+  --selection-area-border-color: var(--primary);
+  --node-background-color: var(--background);
+  --node-border-color: var(--background-100);
+  --node-border-hover-color: var(--background-200);
+  --node-border-highlight-color: var(--secondary);
+  --node-border-selected-color: var(--primary);
+  --node-main-text-color: var(--text);
+  --node-editable-text-color: var(--text);
+  --node-in-out-text-color: var(--text);
+  --edge-stroke-color: var(--background-400);
+  --edge-hover-stroke-color: var(--background-500);
+  --recipe-selector-background-color: var(--background);
+  --recipe-selector-tile-color: var(--background);
+  --recipe-selector-tile-hover-color: var(--background-100);
+  --recipe-selector-tile-active-color: var(--background-200);
+  --recipe-selector-tile-border-color: var(--background-100);
+  --recipe-selector-border-color: var(--background-100);
+  --context-menu-background-color: var(--background);
+  --context-menu-border-color: var(--background-100);
+  --context-menu-item-color: transparent;
+  --context-menu-item-hover-color: var(--background-100);
+  --context-menu-item-active-color: var(--background-200);
+  --text-shadow: 
+			0 0 2px white,
+			0 0 2px white,
+			0 0 3px white,
+			0 0 3px white,
+			0 0 3px white,
+			0 0 3px white,
+			0 0 3px white,
+			0 0 3px white,
+			0 0 3px white,
+			0 0 3px white,
+			0 0 6px white;
 }
 :root.dark-theme {
   --text: #f0f0f0;
@@ -41,8 +78,46 @@
   --primary: #d86931;
   --secondary: #562710;
   --accent: #df6020;
+
+  --grid-background-color: var(--background);
+  --selection-area-background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+  --selection-area-border-color: var(--primary);
+  --node-background-color: var(--background-100);
+  --node-border-color: var(--background-200);
+  --node-border-hover-color: var(--background-300);
+  --node-border-highlight-color: var(--secondary);
+  --node-border-selected-color: var(--primary);
+  --node-main-text-color: var(--text);
+  --node-editable-text-color: var(--text);
+  --node-in-out-text-color: var(--text);
+  --edge-stroke-color: var(--background-400);
+  --edge-hover-stroke-color: var(--background-500);
+  --recipe-selector-background-color: var(--background-100);
+  --recipe-selector-tile-color: var(--background-100);
+  --recipe-selector-tile-hover-color: var(--background-200);
+  --recipe-selector-tile-active-color: var(--background-300);
+  --recipe-selector-tile-border-color: var(--background-300);
+  --recipe-selector-border-color: var(--background-200);
+  --context-menu-background-color: var(--background-100);
+  --context-menu-border-color: var(--background-200);
+  --context-menu-item-color: transparent;
+  --context-menu-item-hover-color: var(--background-200);
+  --context-menu-item-active-color: var(--background-300);
+  --text-shadow: 
+			0 0 2px black,
+			0 0 2px black,
+			0 0 3px black,
+			0 0 3px black,
+			0 0 4px black,
+			0 0 4px black,
+			0 0 6px black;
 }
 
+:root {
+  --rounded-border-radius: 4px;
+  --rounded-border-radius-big: 8px;
+  --rounded-border-width: 2px;
+}
 
 *, *::before, *::after {
 	box-sizing: border-box;
@@ -76,4 +151,8 @@ button {
 
 :focus {
 	outline: none;
+}
+
+foreignObject {
+	overflow: visible;
 }

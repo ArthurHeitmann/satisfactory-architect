@@ -1,11 +1,14 @@
 
 <script lang="ts">
-    import GraphPageView from "$lib/components/GraphPageView.svelte";
-    import { AppState, GraphNode, GraphPage, GraphEdge, type GraphNodeResourceJointProperties } from "$lib/components/datamodel/datamodel.svelte";
-    import { localStorageState } from "$lib/localStorageState.svelte";
-    import { onMount, setContext } from "svelte";
+    import { browser } from "$app/environment";
+	import { AppState } from "$lib/components/datamodel/AppState.svelte";
+    import { StorageKeys } from "$lib/components/datamodel/constants";
+	import { GraphPage } from "$lib/components/datamodel/GraphPage.svelte";
+	import GraphPageView from "$lib/components/GraphPageView.svelte";
+	import { loadFormLocalStorage, localStorageState } from "$lib/localStorageState.svelte";
+	import { onMount, setContext } from "svelte";
 
-	const darkTheme = localStorageState("dark-theme", true);
+	const darkTheme = localStorageState(StorageKeys.darkTheme, true);
 	onMount(() => {
 		const applyTheme = (isDark: boolean) => {
 			if (isDark) {
@@ -18,44 +21,53 @@
 		};
 		applyTheme($darkTheme);
 		darkTheme.subscribe(applyTheme);
-	})
+	});
 
-
-	const app = AppState.newDefault();
-	setContext("app-state", app);
+	const app = (() => {
+		const savedJson = loadFormLocalStorage(StorageKeys.appState, null);
+		if (savedJson !== null) {
+			return AppState.fromJSON(savedJson);
+		} else {
+			const app = AppState.newDefault();
+			if (browser) {
+				app.addPage(GraphPage.newDefault(app.idGen));
+				app.pages[1].name = `Page ${app.pages.length}`;
+				const page = app.pages[0];
+				page.makeProductionNode(
+					{type: "recipe", recipeClassName: "Recipe_ModularFrameHeavy_C"},
+					{x: 300, y: 300},
+				);
+				page.makeProductionNode(
+					{type: "recipe", recipeClassName: "Recipe_UnpackageAlumina_C"},
+					{x: 600, y: 500},
+				);
+				page.makeProductionNode(
+					{type: "recipe", recipeClassName: "Recipe_PackagedAlumina_C"},
+					{x: 900, y: 300},
+				);
+			}
+			return app;
+		}
+	})();
+	
+	
 	const currentPageId = $derived(app.currentPage.id);
-	app.addPage(GraphPage.newDefault(app.idGen));
-	app.pages[1].name = `Page ${app.pages.length}`;
-	const page = app.pages[0];
-	const {parent: parent1, children: children1} = GraphNode.makeRecipeNode(
-		app.idGen,
-		{x: 300, y: 300},
-		[],
-		"Recipe_ModularFrameHeavy_C",
-	);
-	page.addNodes(parent1, ...children1);
-	page.addChildrenToNode(parent1, ...children1);
-	const {parent: parent2, children: children2} = GraphNode.makeRecipeNode(
-		app.idGen,
-		{x: 600, y: 500},
-		[],
-		"Recipe_UnpackageAlumina_C",
-	);
-	page.addNodes(parent2, ...children2);
-	page.addChildrenToNode(parent2, ...children2);
-	const {parent: parent3, children: children3} = GraphNode.makeRecipeNode(
-		app.idGen,
-		{x: 900, y: 300},
-		[],
-		"Recipe_PackagedAlumina_C",
-	);
-	page.addNodes(parent3, ...children3);
-	page.addChildrenToNode(parent3, ...children3);
+	setContext("app-state", app);
+
+
+	function onBeforeUnload() {
+		const json = app.toJSON();
+		app.saveToLocalStorage(json);
+	}
 </script>
+
+<svelte:window onbeforeunload={onBeforeUnload} />
 
 <div class="home">
 	<div class="page-view">
-		<GraphPageView page={app.currentPage} />
+		{#key app.currentPage.id}
+			<GraphPageView page={app.currentPage} />
+		{/key}
 	</div>
 	<div class="bottom-bar">
 		{#each app.pages as page (page.id)}

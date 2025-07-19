@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { EventStream, type EventBase, type EventType, type ShowContextMenuEvent, type ShowRecipeSelectorEvent } from "$lib/EventStream.svelte";
-    import { onDestroy, type Snippet } from "svelte";
-    import ContextMenuOverlay from "./ContextMenuOverlay.svelte";
-    import RecipeSelectorOverlay from "./RecipeSelectorOverlay.svelte";
+	import { EventStream, type EventBase, type EventType, type ShowContextMenuEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import { onDestroy, setContext, type Snippet } from "svelte";
+	import ContextMenuOverlay from "./ContextMenuOverlay.svelte";
+	import RecipeSelectorOverlay from "./RecipeSelectorOverlay.svelte";
 
 	interface Props {
 		children: Snippet;
@@ -12,11 +12,13 @@
 		children,
 		eventStream
 	}: Props = $props();
+	
+	setContext("event-stream", eventStream);
 
 	let activeEvents: EventBase[] = $state([]);
 
 	function handleEvent(event: EventBase) {
-		const uniqueEventTypes: EventType[] = ["showContextMenu", "showRecipeSelector"];
+		const uniqueEventTypes: EventType[] = ["showContextMenu", "showProductionSelector"];
 		const isUniqueEvent = uniqueEventTypes.includes(event.type);
 		if (isUniqueEvent) {
 			activeEvents = activeEvents.filter(e => e.type !== event.type);
@@ -43,13 +45,10 @@
 	const dismissEventStream = new EventStream();
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="overlay-layer"
 >
 	{@render children()}
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		class="overlays"
 		class:active={activeEvents.length > 0}
@@ -70,9 +69,9 @@
 					{dismissEventStream}
 					onclose={() => closeEvent(event)}
 				/>
-			{:else if event.type === "showRecipeSelector"}
+			{:else if event.type === "showProductionSelector"}
 				<RecipeSelectorOverlay
-					event={event as ShowRecipeSelectorEvent}
+					event={event as ShowProductionSelectorEvent}
 					{dismissEventStream}
 					onclose={() => closeEvent(event)}
 				/>

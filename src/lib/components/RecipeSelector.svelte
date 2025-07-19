@@ -1,14 +1,17 @@
 <script lang="ts">
-    import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
-    import { innerWidth } from "svelte/reactivity/window";
-    import SfIconView from "./SFIconView.svelte";
-    import { onMount } from "svelte";
-    import type { SFRecipe } from "$lib/satisfactoryDatabaseTypes";
+	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
+	import { innerWidth } from "svelte/reactivity/window";
+	import SfIconView from "./SFIconView.svelte";
+	import { onMount } from "svelte";
+	import type { SFPart, SFRecipe } from "$lib/satisfactoryDatabaseTypes";
+	import MergerIcon from "./icons/MergerIcon.svelte";
+	import SplitterIcon from "./icons/SplitterIcon.svelte";
+	import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
 
 	interface Props {
 		requiredInputsClassName?: string;
 		requiredOutputsClassName?: string;
-		onRecipeSelected: (recipeClassName: string) => void;
+		onRecipeSelected: (details: NewNodeDetails) => void;
 		onNoAvailableRecipes: () => void;
 		cssWidth?: string;
 		autofocusSearch?: boolean;
@@ -51,13 +54,44 @@
 		}
 		return map;
 	});
+
+	const { factoryPart, inputOutputType, productionBuildings } = $derived.by(() => {
+		let factoryPart: SFPart | null = null;
+		let inputOutputType: "input" | "output" | null = null;
+		let requiredClassName: string = "";
+		if (requiredInputsClassName.length > 0) {
+			inputOutputType = "input";
+			requiredClassName = requiredInputsClassName;
+		} else if (requiredOutputsClassName.length > 0) {
+			inputOutputType = "output";
+			requiredClassName = requiredOutputsClassName;
+		}
+
+		if (inputOutputType !== null) {
+			factoryPart = satisfactoryDatabase.parts[requiredClassName];
+		}
+		const productionBuildings: string[] = [];
+		if (inputOutputType === "output") {
+			for (const building of Object.values(satisfactoryDatabase.productionBuildings)) {
+				if (building.outputs.includes(requiredClassName)) {
+					productionBuildings.push(building.buildingClassName);
+				}
+			}
+		}
+
+		return {factoryPart, inputOutputType, productionBuildings};
+	});
 	
+	const maxPerCategoryCount = $derived(Math.max(
+		...Object.values(recipesByCategory).map(groupRecipes => groupRecipes.length),
+		(factoryPart !== null ? 3 : 0) + productionBuildings.length,
+	));
 
 	const iconSize = 100;
 	const iconTopPadding = 5;
 	const labelHeight = 40;
 	const itemSize = iconSize + iconTopPadding + labelHeight;
-	const itemsPerRow = $derived(Math.max(2, Math.min(availableRecipes.length, 5,
+	const itemsPerRow = $derived(Math.max(2, Math.min(maxPerCategoryCount, 5,
 		Math.floor(((innerWidth.current ?? 500) - 150) / itemSize))
 	));
 	$effect(() => {
@@ -66,7 +100,7 @@
 
 	let input: HTMLInputElement;
 	onMount(() => {
-		if (availableRecipes.length === 0) {
+		if (maxPerCategoryCount === 0) {
 			onNoAvailableRecipes();
 		}
 		if (input && autofocusSearch) {
@@ -77,7 +111,7 @@
 
 <div
 	class="recipe-selector"
-	style="--items-per-row: {itemsPerRow}; --item-size: {itemSize}px;"
+	style="--items-per-row: {itemsPerRow}; --item-size: {itemSize}px; --icon-size: {iconSize}px; --icon-top-padding: {iconTopPadding}px; --label-height: {labelHeight}px;"
 >
 	<div class="search-bar">
 		<input
@@ -88,6 +122,68 @@
 		/>
 	</div>
 	<div class="recipe-list">
+		{#if inputOutputType !== null}
+			<div class="recipe-group">
+				<div class="recipe-group-title-wrapper">
+					<div class="recipe-group-title">
+						<div>Special</div>
+					</div>
+				</div>
+				<div class="recipe-grid">
+					{#each ["splitter", "merger"] as const as splitterMerger}
+						<button
+							class="recipe-item"
+							onclick={() => onRecipeSelected({ type: splitterMerger, resourceClassName: factoryPart!.className })}
+						>
+							{#if splitterMerger === "splitter"}
+								<SplitterIcon
+									size={iconSize}
+									fill="var(--text)"
+								/>
+							{:else}
+								<MergerIcon
+									size={iconSize}
+									fill="var(--text)"
+								/>
+							{/if}
+							<div
+								class="recipe-name"
+								style="line-height: {labelHeight / 2}px; max-height: {labelHeight}px;"
+							>
+								<span>{splitterMerger === "splitter" ? "Splitter" : "Merger"}</span>
+							</div>
+						</button>
+					{/each}
+					<button
+						class="recipe-item"
+						onclick={() => onRecipeSelected({type: inputOutputType === "input" ? "factory-input" : "factory-output", partClassName: factoryPart!.className})}
+					>
+						<SfIconView icon={factoryPart!.icon} size={iconSize} />
+						<div
+							class="recipe-name"
+							style="line-height: {labelHeight / 2}px; max-height: {labelHeight}px;"
+						>
+							<span>Factory {inputOutputType === "input" ? "Output" : "Input"}</span>
+						</div>
+					</button>
+					{#each productionBuildings as productionBuildingName}
+						{@const building = satisfactoryDatabase.buildings[productionBuildingName]}
+						<button
+							class="recipe-item"
+							onclick={() => onRecipeSelected({type: "extraction", partClassName: factoryPart!.className, buildingClassName: productionBuildingName})}
+						>
+							<SfIconView icon={factoryPart!.icon} size={iconSize} />
+							<div
+								class="recipe-name"
+								style="line-height: {labelHeight / 2}px; max-height: {labelHeight}px;"
+							>
+								<span>{building.displayName ?? productionBuildingName}</span>
+							</div>
+						</button>
+					{/each}
+				</div>
+			</div>
+		{/if}
 		{#each Object.entries(recipesByCategory) as [category, groupRecipes]}
 			<div class="recipe-group">
 				<div class="recipe-group-title-wrapper">
@@ -100,8 +196,7 @@
 						{@const firstOutput = satisfactoryDatabase.parts[recipe.outputs[0].itemClass]}
 						<button
 							class="recipe-item"
-							style="width: {itemSize}px; height: {itemSize}px; padding-top: {iconTopPadding}px;"
-							onclick={() => onRecipeSelected(recipe.className)}
+							onclick={() => onRecipeSelected({type: "recipe", recipeClassName: recipe.className})}
 						>
 							<SfIconView icon={firstOutput.icon} size={iconSize} />
 							<div
@@ -123,8 +218,9 @@
 		display: flex;
 		flex-direction: column;
 		padding: 0 10px 10px 10px;
-		background-color: var(--background-300);
-		border-radius: 8px;
+		background-color: var(--recipe-selector-background-color);
+		border-radius: var(--rounded-border-radius);
+		border: var(--rounded-border-width) solid var(--recipe-selector-border-color);
 		max-height: var(--max-height);
 	}
 
@@ -153,12 +249,12 @@
 		.recipe-group-title-wrapper {
 			position: sticky;
 			top: 0;
-			background: var(--background-300);
+			background: var(--recipe-selector-background-color);
 			padding-bottom: 5px;
 
 			.recipe-group-title {
-				background: var(--background-200);
-				border-radius: 4px;
+				background: var(--recipe-selector-tile-color);
+				border-radius: var(--rounded-border-radius);
 				display: flex;
 				align-items: center;
 				gap: 5px;
@@ -178,12 +274,18 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		background-color: var(--background-200);
-		border-radius: 4px;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		width: var(--item-size);
+		padding-top: var(--icon-top-padding);
+		background-color: var(--recipe-selector-tile-color);
+		border-radius: var(--rounded-border-radius);
+		border: var(--rounded-border-width) solid var(--recipe-selector-tile-border-color);
 
 		&:hover {
-			background-color: var(--background-100);
+			background-color: var(--recipe-selector-tile-hover-color);	
+		}
+
+		&:active {
+			background-color: var(--recipe-selector-tile-active-color);
 		}
 
 		.recipe-name {
@@ -191,7 +293,6 @@
 			display: flex;
 			align-items: center;
 			font-size: 14px;
-			color: var(--text-primary);
 			word-break: break-word;
 			padding: 0 4px;
 			overflow: hidden;
