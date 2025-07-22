@@ -13,6 +13,7 @@ export class NodePriorities {
 	static readonly RECIPE = 0;
 	static readonly RESOURCE_JOINT = 1;
 	static readonly OTHER = 0;
+	static readonly TOP_LEVEL = 999;
 }
 
 export class StorageKeys {

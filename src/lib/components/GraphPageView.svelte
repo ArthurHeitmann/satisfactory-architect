@@ -124,7 +124,7 @@
 	}
 
 	function addNewProductionNode(productionDetails: NewNodeDetails, event: MouseEvent) {
-		const point = page.screenToGraphCoords({x: event.clientX, y: event.clientY});
+		const point = page.screenToPageCoords({x: event.clientX, y: event.clientY});
 		page.makeProductionNode(productionDetails, { x: point.x, y: point.y });
 	}
 
@@ -191,7 +191,7 @@
 					x: e.cursorEvent.clientX - svgRect.left,
 					y: e.cursorEvent.clientY - svgRect.top
 				};
-				const point = page.screenToGraphCoords(cursor);
+				const point = page.screenToPageCoords(cursor);
 				selectionAreaRaw = {
 					x: point.x,
 					y: point.y,
@@ -242,7 +242,7 @@
 				y: cursorY - svgRect.top
 			};
 			const scaleDelta = currentScale - newScale;
-			const point = page.screenToGraphCoords(cursor);
+			const point = page.screenToPageCoords(cursor);
 			page.view.offset.x += point.x * scaleDelta;
 			page.view.offset.y += point.y * scaleDelta;
 			page.view.scale = newScale;

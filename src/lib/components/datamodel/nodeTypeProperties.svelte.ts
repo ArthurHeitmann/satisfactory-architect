@@ -3,9 +3,9 @@ import { assertUnreachable } from "$lib/utilties";
 import type { GraphNodeType, GraphNode, GraphNodeResourceJointProperties, ProductionDetails } from "./GraphNode.svelte";
 import { resourceJointNodeRadius, splitterMergerNodeRadius } from "./constants";
 
-const draggableTypes: GraphNodeType[] = ["production", "resource-joint", "splitter", "merger"];
+const draggableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
 const selectableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
-const deletableTypes: GraphNodeType[] = ["production", "resource-joint", "splitter", "merger"];
+const deletableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
 const attachableTypes: GraphNodeType[] = ["resource-joint", "splitter", "merger"];
 
 const nodeRadius: Partial<Record<GraphNodeType, number>> = {
@@ -15,9 +15,6 @@ const nodeRadius: Partial<Record<GraphNodeType, number>> = {
 };
 
 export function isNodeDraggable(node: GraphNode): boolean {
-	if (node.properties.type === "resource-joint" && !node.properties.locked) {
-		return false;
-	}
 	return draggableTypes.includes(node.properties.type);
 }
 
@@ -34,6 +31,13 @@ export function isNodeDeletable(node: GraphNode): boolean {
 
 export function isNodeAttachable(node: GraphNode): boolean {
 	return attachableTypes.includes(node.properties.type);
+}
+
+export function isResourceNodeSplittable(node: GraphNode): boolean {
+	if (node.properties.type === "resource-joint" && node.properties.locked) {
+		return true;
+	}
+	return false;
 }
 
 export function canUseInvertedEdgeControlPoint(node: GraphNode): boolean {

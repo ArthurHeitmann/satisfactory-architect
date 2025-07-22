@@ -7,7 +7,7 @@ import { NodePriorities } from "./constants";
 import { isNodeAttachable } from "./nodeTypeProperties.svelte";
 import { applyJsonToMap, applyJsonToSet, StateHistory, type JsonSerializable } from "./StateHistory.svelte";
 import { GraphEdge } from "./GraphEdge.svelte";
-import { type LayoutOrientation, GraphNode, type GraphNodeResourceJointProperties, type NewNodeDetails, type GraphNodeSplitterMergerProperties, type ProductionDetails } from "./GraphNode.svelte";
+import { type LayoutOrientation, GraphNode, type GraphNodeResourceJointProperties, type NewNodeDetails, type GraphNodeSplitterMergerProperties, type ProductionDetails, type JointDragType } from "./GraphNode.svelte";
 import { GraphView, type IVector2D } from "./GraphView.svelte";
 
 export type PageContext = { page: GraphPage };
@@ -186,7 +186,8 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		}
 	}
 
-	getResourceJointAttachableNodes(movingNode: GraphNode<GraphNodeResourceJointProperties>, originalNode: GraphNode): GraphNode[] {
+	getResourceJointAttachableNodes(movingNode: GraphNode<GraphNodeResourceJointProperties>): GraphNode[] {
+		const originalNode = this.nodes.get(movingNode.properties.dragStartNodeId!)!;
 		const ignoreNodeIds = new Set([movingNode.id]);
 		const ignoreEdges = [...movingNode.edges, ...originalNode.edges];
 		if (movingNode.edges.size >= 1) {
@@ -256,11 +257,18 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		return attachableNodes;
 	}
 
-	startMovingRecipeResourceJoint(node: GraphNode, position: IVector2D, jointType: "input" | "output", resourceClassName: string, layoutOrientation?: LayoutOrientation): GraphNode<GraphNodeResourceJointProperties> {
+	startMovingRecipeResourceJoint(
+		node: GraphNode,
+		position: IVector2D,
+		jointType: "input" | "output",
+		jointDragType: JointDragType,
+		resourceClassName: string,
+		layoutOrientation?: LayoutOrientation,
+	): GraphNode<GraphNodeResourceJointProperties> {
 		const newNode = new GraphNode<GraphNodeResourceJointProperties>(
 			this.idGen.nextId(),
 			position,
-			NodePriorities.RESOURCE_JOINT,
+			NodePriorities.TOP_LEVEL,
 			[],
 			null,
 			[],
@@ -268,8 +276,10 @@ export class GraphPage implements JsonSerializable<PageContext> {
 				type: "resource-joint",
 				resourceClassName: resourceClassName,
 				jointType: jointType === "input" ? "output" : "input",
-				locked: false,
 				layoutOrientation: oppositeLayoutOrientation[layoutOrientation!],
+				locked: false,
+				jointDragType: jointDragType,
+				dragStartNodeId: node.id,
 			}
 		);
 		this.addNodes(newNode);
@@ -277,41 +287,6 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			new GraphEdge(this.context, this.idGen.nextId(), "item-flow", "", "", { displayType: "curved" }),
 			jointType === "input" ? newNode : node,
 			jointType === "input" ? node : newNode
-		);
-		newNode.onDragStart();
-		return newNode;
-	}
-
-	startMovingConnectedRecipeResourceJoint(node: GraphNode<GraphNodeResourceJointProperties>, position: IVector2D, edge: GraphEdge): GraphNode<GraphNodeResourceJointProperties> {
-		let otherNode: GraphNode| undefined;
-		if (edge.startNodeId === node.id) {
-			otherNode = this.nodes.get(edge.endNodeId);
-		} else if (edge.endNodeId === node.id) {
-			otherNode = this.nodes.get(edge.startNodeId);
-		}
-		if (!otherNode) {
-			throw new Error("Edge does not connect to the specified node.");
-		}
-		const newNode = new GraphNode<GraphNodeResourceJointProperties>(
-			this.idGen.nextId(),
-			position,
-			NodePriorities.RESOURCE_JOINT,
-			[],
-			null,
-			[],
-			{
-				type: "resource-joint",
-				resourceClassName: node.properties.resourceClassName,
-				jointType: node.properties.jointType,
-				locked: false,
-				layoutOrientation: oppositeLayoutOrientation[node.properties.layoutOrientation!],
-			}
-		);
-		this.addNodes(newNode);
-		this.addEdgeBetweenNodes(
-			edge,
-			node.properties.jointType === "input" ? otherNode : newNode,
-			node.properties.jointType === "input" ? newNode : otherNode
 		);
 		newNode.onDragStart();
 		return newNode;
@@ -357,7 +332,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		}
 	}
 
-	screenToGraphCoords(screen: IVector2D): IVector2D {
+	screenToPageCoords(screen: IVector2D): IVector2D {
 		const graphX = (screen.x - this.view.offset.x) / this.view.scale;
 		const graphY = (screen.y - this.view.offset.y) / this.view.scale;
 		return { x: graphX, y: graphY };

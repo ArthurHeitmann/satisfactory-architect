@@ -39,12 +39,15 @@ export interface GraphNodeProductionProperties extends GraphNodePropertiesBase {
 	resourceJoints: ResourceJointInfo[];
 }
 export type LayoutOrientation = "top" | "bottom" | "left" | "right";
+export type JointDragType = "drag-to-connect" | "click-to-connect";
 export interface GraphNodeResourceJointProperties extends GraphNodePropertiesBase {
 	type: "resource-joint";
 	resourceClassName: string;
 	jointType: "input" | "output";
-	locked: boolean;
 	layoutOrientation: LayoutOrientation | undefined;
+	locked: boolean;
+	jointDragType?: JointDragType;
+	dragStartNodeId?: Id;
 }
 export interface GraphNodeSplitterMergerProperties extends GraphNodePropertiesBase {
 	type: "splitter" | "merger";

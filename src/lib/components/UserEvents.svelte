@@ -28,6 +28,8 @@
 		onDrag?: ((event: DragEvent) => void) | null;
 		onDragStart?: ((event: DragEvent) => void) | null;
 		onDragEnd?: ((event: DragEvent) => void) | null;
+		onCursorDown?: ((event: CursorEvent) => void) | null;
+		onCursorUp?: ((event: CursorEvent) => void) | null;
 		onCursorMove?: ((event: CursorEvent) => void) | null;
 		onZoom?: ((deltaFactor: number, cursorX: number, cursorY: number) => void) | null;
 		onClick?: ((event: CursorEvent) => void) | null;
@@ -49,6 +51,8 @@
 		onDrag = null,
 		onDragStart = null,
 		onDragEnd = null,
+		onCursorDown = null,
+		onCursorUp = null,
 		onCursorMove = null,
 		onZoom = null,
 		onClick = null,
@@ -167,7 +171,7 @@
 
 
 	function handleMouseDown(event: MouseEvent) {
-		if (!onDrag)
+		if (!onDrag && !onCursorDown)
 			return;
 		if (targetsInput(event) && event.button !== 1)
 			return;
@@ -184,18 +188,26 @@
 			return;
 		}
 		event.stopPropagation();
-		handleDragStart(event.clientX, event.clientY, event);
+		if (onCursorDown) {
+			onCursorDown(eventToCursorEvent(event, event.button));
+		}
+		if (onDrag) {
+			handleDragStart(event.clientX, event.clientY, event);
+		}
 	}
 
 	function handleMouseMove(event: MouseEvent) {
 		handleCursorMove(event);
-		if (targetsInput(event) || !isDragging)
+		if (!isDragging)
 			return;
 		handleDrag(event.clientX, event.clientY, event);
 	}
 
 	function handleMouseUp(event: UIEvent) {
-		if (targetsInput(event) || !isDragging)
+		if (onCursorUp) {
+			onCursorUp(eventToCursorEvent(event));
+		}
+		if (!isDragging)
 			return;
 		handleDragEnd(event);
 	}
@@ -204,11 +216,17 @@
 		if (targetsInput(event))
 			return;
 		lastTouchAt = Date.now();
-		if (!onDrag && !onZoom)
+		if (!onDrag && !onZoom && !onCursorDown)
 			return;
 		event.stopPropagation();
+		event.preventDefault();
 		if (event.touches.length === 1) {
-			handleDragStart(event.touches[0].clientX, event.touches[0].clientY, event);
+			if (onCursorDown) {
+				onCursorDown(eventToCursorEvent(event));
+			}
+			if (onDrag) {
+				handleDragStart(event.touches[0].clientX, event.touches[0].clientY, event);
+			}
 		} else if (event.touches.length >= 2) {
 			lastPinchDistance = getPinchDistance(event.touches);
 			const center = getTouchCenter(event.touches);
@@ -219,10 +237,9 @@
 
 	function handleTouchMove(event: TouchEvent) {
 		if (onCursorMove && event.touches.length === 1) {
-			event.preventDefault();
 			handleCursorMove(event);
 		}
-		if (targetsInput(event) || !isDragging)
+		if (!isDragging)
 			return;
 		if (event.touches.length === 1 && isDragging) {
 			event.stopPropagation();
@@ -232,7 +249,8 @@
 		} else if (event.touches.length >= 2 && lastPinchDistance > 0) {
 			if (!onZoom)
 				return;
-			event.stopPropagation();
+			event.stopPropagation();;
+			event.preventDefault();
 			const currentPinchDistance = getPinchDistance(event.touches);
 			const deltaFactor = currentPinchDistance / lastPinchDistance;
 			lastPinchDistance = currentPinchDistance;
@@ -251,12 +269,14 @@
 			}
 			lastX = center.x;
 			lastY = center.y;
-			event.preventDefault();
 		}
 	}
 
 	function handleTouchEnd(event: UIEvent|TouchEvent) {
-		if (targetsInput(event) || !isDragging)
+		if (onCursorUp) {
+			onCursorUp(eventToCursorEvent(event));
+		}
+		if (!isDragging)
 			return;
 		if ("touches" in event && event.touches.length > 0) {
 			if (isDragging) {
@@ -399,8 +419,10 @@
 	}
 
 	const listeners = $derived({
-		onmousedown: onDrag ? handleMouseDown : undefined,
-		ontouchstart: onDrag ? handleTouchStart : undefined,
+		onmousedown: onDrag || onCursorDown ? handleMouseDown : undefined,
+		onmouseup: onCursorUp ? handleMouseUp : undefined,
+		ontouchstart: onDrag || onCursorDown ? handleTouchStart : undefined,
+		ontouchend: onCursorUp ? handleTouchEnd : undefined,
 		onwheel: onZoom ? handleWheel : undefined,
 		onclick: onClick ? handleClick : undefined,
 		oncontextmenu: onContextMenu,
@@ -413,9 +435,9 @@
 <svelte:window
 	onmousemove={onDrag || onCursorMove ? handleMouseMove : undefined}
 	onmouseup={onDrag ? handleMouseUp : undefined}
-	on:touchmove|nonpassive={onDrag || onZoom ? handleTouchMove : undefined}
-	ontouchend={onDrag ? handleTouchEnd : undefined}
-	ontouchcancel={onDrag ? handleTouchEnd : undefined}
+	on:touchmove|nonpassive={onDrag || onZoom || onCursorMove ? handleTouchMove : undefined}
+	ontouchend={onDrag || onCursorUp ? handleTouchEnd : undefined}
+	ontouchcancel={onDrag || onCursorUp ? handleTouchEnd : undefined}
 	onkeydown={onDrag || onKeyDown ? handleKeyDown : undefined}
 	onclick={onWindowClick ? handleWindowClick : undefined}
 />
