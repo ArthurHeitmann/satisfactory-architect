@@ -109,3 +109,7 @@ export function angleBetweenPoints(
 export function assertUnreachable(x: never): never {
 	throw new Error("Didn't expect to get here");
 }
+
+export function randomId(): string {
+	return Math.random().toString(36).substring(2, 10);
+}

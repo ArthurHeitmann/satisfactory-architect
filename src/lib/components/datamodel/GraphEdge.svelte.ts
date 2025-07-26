@@ -26,6 +26,11 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 	get startNodeId(): Id { return this._startNodeId; }
 	get endNodeId(): Id { return this._endNodeId; }
 	readonly properties: GraphEdgeProperties;
+	pushThroughput: number;
+	pullThroughput: number;
+	readonly minThroughput: number;
+	readonly netThroughput: number;
+	readonly relativeThroughput: number;
 
 	readonly startNode: GraphNode|undefined;
 	readonly endNode: GraphNode|undefined;
@@ -56,6 +61,11 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 		this._startNodeId = $state(startNodeId);
 		this._endNodeId = $state(endNodeId);
 		this.properties = $state(properties);
+		this.pushThroughput = $state(0);
+		this.pullThroughput = $state(0);
+		this.minThroughput = $derived(Math.min(this.pushThroughput, this.pullThroughput));
+		this.netThroughput = $derived(this.pushThroughput - this.pullThroughput);
+		this.relativeThroughput = $derived(this.netThroughput / this.minThroughput)
 		
 		this.startNode = $derived(this.context.page.nodes.get(this.startNodeId));
 		this.endNode = $derived(this.context.page.nodes.get(this.endNodeId));

@@ -31,8 +31,8 @@
 					icon: building?.icon,
 				};
 			}
-			case "factory-input":
-			case "factory-output": {
+			case "factory-output":
+			case "factory-input": {
 				const part = satisfactoryDatabase.parts[details.partClassName];
 				return {
 					icon: part?.icon,
@@ -49,6 +49,18 @@
 					icon: undefined,
 				};
 		}
+	});
+
+	const factoryName = $derived.by(() => {
+		if (node.properties.details.type !== "factory-reference") {
+			return undefined;
+		}
+		const pageId = node.properties.details.factoryId;
+		const factoryPage = page.context.appState.pages.find((p) => p.id === pageId);
+		if (!factoryPage) {
+			return `Factory (${pageId})`;
+		}
+		return factoryPage.name;
 	});
 
 	$effect(() => node.reorderRecipeJoints(page));
@@ -74,12 +86,14 @@
 			y={-productionNodeIconSize / 2}
 			size={productionNodeIconSize}
 		/>
+	{/if}
+	{#if node.properties.details.type !== "factory-reference"}
 		<SvgInput
 			x={-productionNodeIconSize / 2}
-			y={productionNodeIconSize / 2 - 15}
+			y={productionNodeIconSize / 2 - 10}
 			width={productionNodeIconSize}
-			height={15}
-			isEditable={true}
+			height={10}
+			isEditable={!node.properties.autoMultiplier}
 			fontSize={12}
 			value={floatToString(node.properties.multiplier, 3)}
 			onChange={(value) => {
@@ -90,6 +104,18 @@
 			}}
 			textAlign="right"
 		/>
+	{/if}
+	{#if factoryName}
+		<text
+			x="0"
+			y={productionNodeIconSize / 2 + 5}
+			text-anchor="middle"
+			font-size="12px"
+			font-family="monospace"
+			style="pointer-events: none;"
+		>
+			{factoryName}
+		</text>
 	{/if}
 	{#if globals.debugShowNodeIds}
 		<text

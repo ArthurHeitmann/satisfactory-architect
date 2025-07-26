@@ -25,11 +25,12 @@
 
 	interface Props {
 		children: Snippet<[{ listeners: Record<string, any>, isDragging: boolean }]>;
+		id: string;
 		onDrag?: ((event: DragEvent) => void) | null;
 		onDragStart?: ((event: DragEvent) => void) | null;
 		onDragEnd?: ((event: DragEvent) => void) | null;
 		onCursorDown?: ((event: CursorEvent) => void) | null;
-		onCursorUp?: ((event: CursorEvent) => void) | null;
+		onWindowCursorUp?: ((event: CursorEvent) => void) | null;
 		onCursorMove?: ((event: CursorEvent) => void) | null;
 		onZoom?: ((deltaFactor: number, cursorX: number, cursorY: number) => void) | null;
 		onClick?: ((event: CursorEvent) => void) | null;
@@ -43,16 +44,16 @@
 		dragStartThreshold?: number;
 		dragThreshold?: number;
 		dragStep?: number;
-		debugKey?: string;
 	}
 
 	let {
 		children,
+		id,
 		onDrag = null,
 		onDragStart = null,
 		onDragEnd = null,
 		onCursorDown = null,
-		onCursorUp = null,
+		onWindowCursorUp = null,
 		onCursorMove = null,
 		onZoom = null,
 		onClick = null,
@@ -66,7 +67,6 @@
 		dragStartThreshold = 0,
 		dragThreshold = 0,
 		dragStep = 0,
-		debugKey = "",
 	}: Props = $props();
 
 	let isDragging: boolean = $state(false);
@@ -204,8 +204,8 @@
 	}
 
 	function handleMouseUp(event: UIEvent) {
-		if (onCursorUp) {
-			onCursorUp(eventToCursorEvent(event));
+		if (onWindowCursorUp) {
+			onWindowCursorUp(eventToCursorEvent(event));
 		}
 		if (!isDragging)
 			return;
@@ -273,8 +273,8 @@
 	}
 
 	function handleTouchEnd(event: UIEvent|TouchEvent) {
-		if (onCursorUp) {
-			onCursorUp(eventToCursorEvent(event));
+		if (onWindowCursorUp) {
+			onWindowCursorUp(eventToCursorEvent(event));
 		}
 		if (!isDragging)
 			return;
@@ -420,9 +420,7 @@
 
 	const listeners = $derived({
 		onmousedown: onDrag || onCursorDown ? handleMouseDown : undefined,
-		onmouseup: onCursorUp ? handleMouseUp : undefined,
 		ontouchstart: onDrag || onCursorDown ? handleTouchStart : undefined,
-		ontouchend: onCursorUp ? handleTouchEnd : undefined,
 		onwheel: onZoom ? handleWheel : undefined,
 		onclick: onClick ? handleClick : undefined,
 		oncontextmenu: onContextMenu,
@@ -434,10 +432,10 @@
 
 <svelte:window
 	onmousemove={onDrag || onCursorMove ? handleMouseMove : undefined}
-	onmouseup={onDrag ? handleMouseUp : undefined}
+	onmouseup={onDrag || onWindowCursorUp ? handleMouseUp : undefined}
 	on:touchmove|nonpassive={onDrag || onZoom || onCursorMove ? handleTouchMove : undefined}
-	ontouchend={onDrag || onCursorUp ? handleTouchEnd : undefined}
-	ontouchcancel={onDrag || onCursorUp ? handleTouchEnd : undefined}
+	ontouchend={onDrag || onWindowCursorUp ? handleTouchEnd : undefined}
+	ontouchcancel={onDrag || onWindowCursorUp ? handleTouchEnd : undefined}
 	onkeydown={onDrag || onKeyDown ? handleKeyDown : undefined}
 	onclick={onWindowClick ? handleWindowClick : undefined}
 />

@@ -3,14 +3,18 @@ import { assertUnreachable } from "$lib/utilties";
 import { untrack } from "svelte";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
 import type { IdGen, Id } from "./IdGen";
-import { NodePriorities } from "./constants";
+import { dataModelVersion, NodePriorities } from "./constants";
 import { isNodeAttachable } from "./nodeTypeProperties.svelte";
 import { applyJsonToMap, applyJsonToSet, StateHistory, type JsonSerializable } from "./StateHistory.svelte";
 import { GraphEdge } from "./GraphEdge.svelte";
 import { type LayoutOrientation, GraphNode, type GraphNodeResourceJointProperties, type NewNodeDetails, type GraphNodeSplitterMergerProperties, type ProductionDetails, type JointDragType } from "./GraphNode.svelte";
 import { GraphView, type IVector2D } from "./GraphView.svelte";
+import type { AppState } from "./AppState.svelte";
 
-export type PageContext = { page: GraphPage };
+export type PageContext = {
+	appState: AppState,
+	page: GraphPage,
+};
 
 export const oppositeLayoutOrientation: Record<LayoutOrientation, LayoutOrientation> = {
 	"top": "bottom",
@@ -30,10 +34,11 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	readonly selectedNodes: SvelteSet<Id>;
 	readonly history: StateHistory<PageContext>;
 	readonly highlightedNodes: Record<NodeHighlightType, SvelteSet<Id>>;
+	userEventsPriorityNodeId: Id | null;
 
-	constructor(idGen: IdGen, id: Id, name: string, view: GraphView, nodes: GraphNode[], edges: GraphEdge[]) {
-		this.context = { page: this };
-		this.idGen = idGen;
+	constructor(appState: AppState, id: Id, name: string, view: GraphView, nodes: GraphNode[], edges: GraphEdge[]) {
+		this.context = { appState, page: this };
+		this.idGen = appState.idGen;
 		this.id = id;
 		this.name = $state(name);
 		this.view = view;
@@ -45,17 +50,21 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			attachable: new SvelteSet(),
 			hovered: new SvelteSet(),
 		};
+		this.userEventsPriorityNodeId = $state(null);
 	}
 
-	static newDefault(idGen: IdGen, name: string = "New Page"): GraphPage {
+	static newDefault(appState: AppState, name: string = "New Page"): GraphPage {
 		const view = GraphView.newDefault();
-		return new GraphPage(idGen, idGen.nextId(), name, view, [], []);
+		return new GraphPage(appState, appState.idGen.nextId(), name, view, [], []);
 	}
 
-	static fromJSON(idGen: IdGen, json: any): GraphPage {
+	static fromJSON(appState: AppState, json: any): GraphPage {
 		const view = GraphView.fromJSON(json.view);
-		const nodes = Object.values(json.nodes).map((n: any) => GraphNode.fromJSON(n));
-		const page = new GraphPage(idGen, json.id, json.name, view, nodes, []);
+		const page = new GraphPage(appState, json.id, json.name, view, [], []);
+		const nodes = Object.values(json.nodes).map((n: any) => GraphNode.fromJSON(n, page.context));
+		for (const node of nodes) {
+			page.nodes.set(node.id, node);
+		}
 		for (const [edgeId, edgeJson] of Object.entries(json.edges)) {
 			const edge = GraphEdge.fromJSON(edgeJson, page.context);
 			page.edges.set(edgeId, edge);
@@ -64,14 +73,18 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	}
 
 	applyJson(json: any): void {
+		// if (json.version !== dataModelVersion) {
+		// 	throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
+		// }
 		this.name = json.name;
-		applyJsonToMap(json.nodes, this.nodes, GraphNode.fromJSON, this);
+		applyJsonToMap(json.nodes, this.nodes, GraphNode.fromJSON, this.context);
 		applyJsonToMap(json.edges, this.edges, GraphEdge.fromJSON, this.context);
 		applyJsonToSet(json.selectedNodes, this.selectedNodes);
 	}
 
 	toJSON(): any {
 		return {
+			version: dataModelVersion,
 			id: this.id,
 			name: this.name,
 			view: untrack(() => this.view.toJSON()),
@@ -267,6 +280,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	): GraphNode<GraphNodeResourceJointProperties> {
 		const newNode = new GraphNode<GraphNodeResourceJointProperties>(
 			this.idGen.nextId(),
+			this.context,
 			position,
 			NodePriorities.TOP_LEVEL,
 			[],
@@ -342,6 +356,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		if (productionDetails.type === "splitter" || productionDetails.type === "merger") {
 			const node = new GraphNode<GraphNodeSplitterMergerProperties>(
 				this.idGen.nextId(),
+				this.context,
 				position,
 				NodePriorities.OTHER,
 				[],
@@ -355,6 +370,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		else {
 			const {parent, children} = GraphNode.makeProductionNode(
 				this.idGen,
+				this.context,
 				{x: 0, y: 0},
 				[],
 				productionDetails as ProductionDetails,

@@ -1,3 +1,5 @@
+export const dataModelVersion = 1;
+
 export const gridSize = 50;
 
 export const resourceJointNodeRadius = 16;

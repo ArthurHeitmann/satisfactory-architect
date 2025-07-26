@@ -65,7 +65,7 @@
 		{:else}
 			<div
 				class="svg-input"
-				style="font-size: {fontSize}px; pointer-events: none; text-align: {textAlign};"
+				style="font-size: {fontSize}px; pointer-events: none; text-align: {textAlign}; line-height: {height}px;"
 			>
 				{value}
 			</div>

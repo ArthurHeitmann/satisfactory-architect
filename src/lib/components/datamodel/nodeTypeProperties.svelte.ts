@@ -1,5 +1,6 @@
 import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
 import { assertUnreachable } from "$lib/utilties";
+import type { AppState } from "./AppState.svelte";
 import type { GraphNodeType, GraphNode, GraphNodeResourceJointProperties, ProductionDetails } from "./GraphNode.svelte";
 import { resourceJointNodeRadius, splitterMergerNodeRadius } from "./constants";
 
@@ -52,17 +53,23 @@ export function getNodeRadius(node: GraphNode): number {
 	return radius ?? 0;
 }
 
-export function getProductionNodeDisplayName(details: ProductionDetails): string {
+export function getProductionNodeDisplayName(details: ProductionDetails, appState: AppState): string {
 	switch (details.type) {
 		case "recipe":
 			const recipe = satisfactoryDatabase.recipes[details.recipeClassName];
 			return recipe?.recipeDisplayName ?? details.recipeClassName;
-		case "factory-input":
 		case "factory-output":
+		case "factory-input":
 			return satisfactoryDatabase.parts[details.partClassName]?.displayName ?? details.partClassName;
 		case "extraction":
 			const part = satisfactoryDatabase.parts[details.partClassName];
 			return part.displayName ?? details.partClassName;
+		case "factory-reference":
+			const page = appState.pages.find(p => p.id === details.factoryId);
+			if (!page) {
+				return `Factory Reference (${details.factoryId})`;
+			}
+			return page.name;
 		default:
 			assertUnreachable(details);
 	}

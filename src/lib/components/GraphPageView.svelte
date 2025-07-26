@@ -13,6 +13,8 @@
     import type { Id } from "./datamodel/IdGen";
     import { assertUnreachable } from "$lib/utilties";
     import { isNodeSelectable } from "./datamodel/nodeTypeProperties.svelte";
+    import { fade } from "svelte/transition";
+    import { calculateThroughputs } from "./datamodel/throughputsCalculator";
 
 	interface Props {
 		page: GraphPage;
@@ -26,6 +28,7 @@
 			return aNode.priority - bNode.priority;
 		});
 	});
+	const enableUserEvents = $derived(!page.userEventsPriorityNodeId);
 
 	let svg: SVGSVGElement;
 	let svgTopGroup: SVGGElement;
@@ -178,12 +181,17 @@
 				}
 			}
 		}
+	});
+
+	$effect(() => {
+		calculateThroughputs(page);
 	})
 </script>
 
 <OverlayLayer eventStream={eventStream}>
 	<UserEvents
-		onDragStart={(e) => {
+		id="Page {page.id}"
+		onDragStart={enableUserEvents ? (e) => {
 			dragType = e.cursorEvent.isMiddleButton || e.cursorEvent.isTouchEvent ? "move" : "select";
 			if (dragType === "select") {
 				const svgRect = svg.getBoundingClientRect();
@@ -207,8 +215,8 @@
 					page.selectedNodes.clear();
 				}
 			}
-		}}
-		onDrag={(e) => {
+		} : null}
+		onDrag={enableUserEvents ? (e) => {
 			if (isNaN(e.deltaX) || isNaN(e.deltaY)) {
 				return;
 			}
@@ -223,11 +231,11 @@
 			} else {
 				assertUnreachable(dragType);
 			}
-		}}
-		onDragEnd={() => {
+		} : null}
+		onDragEnd={enableUserEvents ? () => {
 			selectionAreaRaw = null;
-		}}
-		onZoom={(deltaFactor, cursorX, cursorY) => {
+		} : null}
+		onZoom={enableUserEvents ? (deltaFactor, cursorX, cursorY) => {
 			if (isNaN(deltaFactor) || isNaN(cursorX) || isNaN(cursorY) || deltaFactor === 0) {
 				return;
 			}
@@ -246,14 +254,13 @@
 			page.view.offset.x += point.x * scaleDelta;
 			page.view.offset.y += point.y * scaleDelta;
 			page.view.scale = newScale;
-		}}
-		onClick={onClick}	
-		onContextMenu={onContextMenu}
-		onDoubleClick={onDoubleClick}
-		onKeyDown={onKeyDown}
+		} : null}
+		onClick={enableUserEvents ? onClick : null}
+		onContextMenu={enableUserEvents ? onContextMenu : null}
+		onDoubleClick={enableUserEvents ? onDoubleClick : null}
+		onKeyDown={enableUserEvents ? onKeyDown : null}
 		allowMiddleClickDrag={true}
 		allowMultiTouchDrag={true}
-		debugKey="Page {page.id}"
 	>
 		{#snippet children({ listeners })}
 			<svg
@@ -304,6 +311,7 @@
 							y={selectionArea!.y}
 							width={selectionArea!.width}
 							height={selectionArea!.height}
+							transition:fade={{ duration: 100 }}
 						/>
 					{/if}
 				</g>

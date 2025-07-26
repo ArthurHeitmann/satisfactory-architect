@@ -34,6 +34,15 @@
 		return "";
 	});
 
+	const midPoint = $derived.by(() => {
+		if (!edge.pathPoints)
+			return null;
+		return {
+			x: (edge.pathPoints.startPoint.x + edge.pathPoints.endPointWithoutArrow.x) / 2,
+			y: (edge.pathPoints.startPoint.y + edge.pathPoints.endPointWithoutArrow.y) / 2,
+		};
+	});
+
 </script>
 
 {#if pathD}
@@ -65,14 +74,24 @@
 			d={pathD}
 			marker-end="url(#arrow)"
 		/>
-		{#if globals.debugShowEdgeIds}
+		{#if midPoint && edge.pushThroughput !== 0 && edge.pullThroughput !== 0}
 			<text
-				x={(edge.startNodePosition!.x + edge.endNodePosition!.x) / 2}
-				y={(edge.startNodePosition!.y + edge.endNodePosition!.y) / 2}
+				x={midPoint.x}
+				y={midPoint.y}
 				text-anchor="middle"
-				font-size="10px"
-				font-family="monospace"
-				style="pointer-events: none;"
+				class="edge-throughput-text"
+			>
+				<!-- {edge.pushThroughput} - {edge.pullThroughput} = {edge.netThroughput} -->
+				<!-- {edge.pushThroughput} - {edge.pullThroughput} -> {edge.minThroughput} -->
+				{edge.minThroughput} ({(edge.relativeThroughput * 100).toFixed(0)}%)
+			</text>
+		{/if}
+		{#if globals.debugShowEdgeIds && midPoint}
+			<text
+				x={midPoint.x}
+				y={midPoint.y + 13}
+				text-anchor="middle"
+				class="edge-id-text"
 			>
 				e {edge.id}
 			</text>
@@ -100,5 +119,9 @@
 		&.hovered {
 			stroke: var(--edge-hover-stroke-color);
 		}
+	}
+
+	.edge-throughput-text, .edge-id-text {
+		font-size: 10px;
 	}
 </style>

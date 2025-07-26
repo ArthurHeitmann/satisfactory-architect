@@ -2,11 +2,13 @@
 	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
 	import { innerWidth } from "svelte/reactivity/window";
 	import SfIconView from "./SFIconView.svelte";
-	import { onMount } from "svelte";
+	import { getContext, onMount } from "svelte";
 	import type { SFPart, SFRecipe } from "$lib/satisfactoryDatabaseTypes";
 	import MergerIcon from "./icons/MergerIcon.svelte";
 	import SplitterIcon from "./icons/SplitterIcon.svelte";
-	import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
+	import type { GraphNode, GraphNodeProductionProperties, NewNodeDetails } from "./datamodel/GraphNode.svelte";
+    import type { GraphPage } from "./datamodel/GraphPage.svelte";
+    import type { AppState } from "./datamodel/AppState.svelte";
 
 	interface Props {
 		requiredInputsClassName?: string;
@@ -24,6 +26,9 @@
 		cssWidth = $bindable(""),
 		autofocusSearch = false,
 	}: Props = $props();
+
+	const page = getContext("graph-page") as GraphPage;
+	const appState = getContext("app-state") as AppState;
 
 	let searchQuery = $derived("");
 
@@ -55,6 +60,43 @@
 		return map;
 	});
 
+	const factoryPages = (() => {
+		const pages: GraphPage[] = [];
+		const currentPageId = page.id;
+		for (const page of appState.pages) {
+			if (page.id === currentPageId) {
+				continue;
+			}
+			const inputNodeTypes: string[] = [];
+			const outputNodeTypes: string[] = [];
+			for (const node of page.nodes.values()) {
+				if (node.properties.type !== "production") {
+					continue;
+				}
+				if (node.properties.details.type === "factory-output") {
+					inputNodeTypes.push(node.properties.details.partClassName);
+				} else if (node.properties.details.type === "factory-input") {
+					outputNodeTypes.push(node.properties.details.partClassName);
+				}
+			}
+			if (inputNodeTypes.length === 0 && outputNodeTypes.length === 0) {
+				continue;
+			}
+			if (requiredInputsClassName) {
+				if (outputNodeTypes.includes(requiredInputsClassName)) {
+					pages.push(page);
+				}
+			} else if (requiredOutputsClassName) {
+				if (inputNodeTypes.includes(requiredOutputsClassName)) {
+					pages.push(page);
+				}
+			} else {
+				pages.push(page);
+			}
+		}
+		return pages;
+	})();
+
 	const { factoryPart, inputOutputType, productionBuildings } = $derived.by(() => {
 		let factoryPart: SFPart | null = null;
 		let inputOutputType: "input" | "output" | null = null;
@@ -84,7 +126,7 @@
 	
 	const maxPerCategoryCount = $derived(Math.max(
 		...Object.values(recipesByCategory).map(groupRecipes => groupRecipes.length),
-		(factoryPart !== null ? 3 : 0) + productionBuildings.length,
+		(factoryPart !== null ? 3 : 0) + productionBuildings.length + factoryPages.length,
 	));
 
 	const iconSize = 100;
@@ -122,6 +164,30 @@
 		/>
 	</div>
 	<div class="recipe-list">
+		{#if factoryPages.length > 0}
+			<div class="recipe-group">
+				<div class="recipe-group-title-wrapper">
+					<div class="recipe-group-title">
+						<div>Factories</div>
+					</div>
+				</div>
+				<div class="recipe-grid">
+					{#each factoryPages as factoryPage}
+						<button
+							class="recipe-item"
+							onclick={() => onRecipeSelected({type: "factory-reference", factoryId: factoryPage.id, jointsToExternalNodes: {}})}
+						>
+							<div
+								class="recipe-name"
+								style="line-height: {labelHeight / 2}px; max-height: {labelHeight}px;"
+							>
+								<span>{factoryPage.name}</span>
+							</div>
+						</button>
+					{/each}
+				</div>
+			</div>
+		{/if}
 		{#if inputOutputType !== null}
 			<div class="recipe-group">
 				<div class="recipe-group-title-wrapper">
@@ -156,7 +222,7 @@
 					{/each}
 					<button
 						class="recipe-item"
-						onclick={() => onRecipeSelected({type: inputOutputType === "input" ? "factory-input" : "factory-output", partClassName: factoryPart!.className})}
+						onclick={() => onRecipeSelected({type: inputOutputType === "input" ? "factory-output" : "factory-input", partClassName: factoryPart!.className})}
 					>
 						<SfIconView icon={factoryPart!.icon} size={iconSize} />
 						<div

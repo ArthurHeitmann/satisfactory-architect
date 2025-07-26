@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from "svelte";
+	import { getContext, onDestroy, onMount } from "svelte";
 	import RecipeNodeView from "./ProductionNodeView.svelte";
 	import UserEvents, { type CursorEvent, type DragEvent } from "../UserEvents.svelte";
 	import { isNodeSelectable, isNodeDraggable, isNodeDeletable, getNodeRadius, isResourceNodeSplittable } from "../datamodel/nodeTypeProperties.svelte";
@@ -13,6 +13,7 @@
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties, GraphNodeSplitterMergerProperties, JointDragType } from "../datamodel/GraphNode.svelte";
 	import type { GraphPage } from "../datamodel/GraphPage.svelte";
 	import type { IVector2D } from "../datamodel/GraphView.svelte";
+    import { fade } from "svelte/transition";
 
 	interface Props {
 		node: GraphNode;
@@ -32,12 +33,29 @@
 	
 	const isMovingResourceJoint = node.properties.type === "resource-joint" && node.properties.jointDragType !== undefined;
 	const jointDragType = isMovingResourceJoint ? node.properties.jointDragType! : null;
+	const enableEvents = $derived(page.userEventsPriorityNodeId ? page.userEventsPriorityNodeId === node.id : true);
 	// svelte-ignore state_referenced_locally
 	let dragStartPoint = $state(isMovingResourceJoint ? position : null);
 	let newNodeDragHasFinished = $state(false);
+	let enableWindowClick = $state(false);
 
 	const contextMenuItems = $derived.by(() => {
 		const items: ContextMenuItem[] = [];
+		if (node.properties.type === "production" && node.properties.details.type === "factory-reference") {
+			items.push({
+				label: "Update in-/outputs",
+				onClick: node.updateExternalFactoryJoints.bind(node),
+			});
+		}
+		if (node.properties.type === "production" && (node.properties.details.type === "factory-input" || node.properties.details.type === "factory-output")) {
+			items.push({
+				label: (node.properties.autoMultiplier ? "Manual" : "Auto") + " rate",
+				onClick: () => {
+					const properties = node.properties as GraphNodeProductionProperties;
+					properties.autoMultiplier = !properties.autoMultiplier;
+				},
+			});
+		}
 		if (isDeletable) {
 			if (isSelected && (page.selectedNodes.size > 1 || !page.selectedNodes.has(node.id))) {
 				const selectedCount = page.selectedNodes.size;
@@ -103,11 +121,23 @@
 		.filter(n => n.parentNode)
 		.map(n => ({ node: page.nodes.get(n.parentNode!)!, joint: n }));
 	
-		onMount(() => {
-			for (const n of [...connectableNodes, ...indirectlyConnectableNodes.map(n => n.node)]) {
-				page.highlightedNodes.attachable.add(n.id);
-			}
-		});
+	onMount(() => {
+		for (const n of [...connectableNodes, ...indirectlyConnectableNodes.map(n => n.node)]) {
+			page.highlightedNodes.attachable.add(n.id);
+		}
+
+		if (jointDragType === "click-to-connect") {
+			page.userEventsPriorityNodeId = node.id;
+			setTimeout(() => {
+				enableWindowClick = true;
+			}, 0);
+		}
+	});
+	onDestroy(() => {
+		if (page.userEventsPriorityNodeId === node.id) {
+			page.userEventsPriorityNodeId = null;
+		}
+	});
 
 	function getInRangeJointNode(): GraphNode | null {
 		const nodeRadius = getNodeRadius(node);
@@ -338,9 +368,6 @@
 				page.selectNode(node);
 			}
 		}
-		if (jointDragType === "click-to-connect") {
-			endMoveResourceJoint(event);
-		}
 	}
 
 	function onContextMenu(event: MouseEvent) {
@@ -357,18 +384,22 @@
 </script>
 
 <UserEvents
-	onDragStart={isDraggable ? onDragStart : null}
-	onDrag={isDraggable ? onDrag : null}
-	onDragEnd={isDraggable ? onDragEnd : null}
-	onClick={isSelectable || jointDragType === "click-to-connect" ? onClick : null}
-	onCursorDown={isResourceSplittable ? onSplitResourceStart : null}
-	onCursorMove={jointDragType ? onCursorMove : null}
-	onCursorUp={jointDragType === "drag-to-connect" ? endMoveResourceJoint : null}
-	onContextMenu={contextMenuItems.length > 0 ? onContextMenu : null}
-	debugKey="Node {node.id}"
+	id="Node {node.id}"
+	onDragStart={enableEvents && isDraggable ? onDragStart : null}
+	onDrag={enableEvents && isDraggable ? onDrag : null}
+	onDragEnd={enableEvents && isDraggable ? onDragEnd : null}
+	onClick={enableEvents && isSelectable ? onClick : null}
+	onWindowClick={enableEvents && enableWindowClick ? endMoveResourceJoint : null}
+	onCursorDown={enableEvents && isResourceSplittable ? onSplitResourceStart : null}
+	onCursorMove={enableEvents && jointDragType ? onCursorMove : null}
+	onWindowCursorUp={enableEvents && jointDragType === "drag-to-connect" ? endMoveResourceJoint : null}
+	onContextMenu={enableEvents && contextMenuItems.length > 0 ? onContextMenu : null}
 >
 	{#snippet children({ listeners })}
-		<g {...listeners} transform={`translate(${position.x}, ${position.y})`}>
+		<g
+			{...listeners}
+			transform={`translate(${position.x}, ${position.y})`}
+		>
 			{#if node.properties.type === "production"}
 				<ProductionNodeView node={node as GraphNode<GraphNodeProductionProperties>} />
 			{:else if node.properties.type === "resource-joint"}

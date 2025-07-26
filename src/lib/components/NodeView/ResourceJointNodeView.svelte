@@ -7,8 +7,9 @@
 	import { globals } from "../datamodel/globals.svelte";
 	import SvgInput from "../SvgInput.svelte";
 	import { floatToString } from "$lib/utilties";
-	import type { GraphNode, GraphNodeResourceJointProperties } from "../datamodel/GraphNode.svelte";
+	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "../datamodel/GraphNode.svelte";
 	import type { GraphPage } from "../datamodel/GraphPage.svelte";
+    import type { Id } from "../datamodel/IdGen";
 
 	interface Props {
 		node: GraphNode<GraphNodeResourceJointProperties>;
@@ -18,13 +19,7 @@
 	}: Props = $props();
 
 	const page = getContext("graph-page") as GraphPage;
-
-	// const parent = node.parentNode ? page.nodes.get(node.parentNode) as GraphNode<GraphNodeProductionProperties> : undefined;
-	// const layoutOrientation = $derived(parent?.properties.resourceJoints.find(joint => joint.id === node.id)?.layoutOrientation);
-	// const recipe = parent?.properties.details.recipeClassName ? satisfactoryDatabase.recipes[parent.properties.details.recipeClassName] : undefined;
-	// const recipePart = recipe ? [...recipe.inputs, ...recipe.outputs].find(p => p.itemClass === node.properties.resourceClassName) : undefined;
-	
-	const { productionRate, setProductionRate } = $derived.by(() => {
+	const { productionRate, setProductionRate, isEditable } = $derived.by(() => {
 		const parent = node.parentNode ? page.nodes.get(node.parentNode) : undefined;
 		const parentProperties = parent?.properties;
 		if (parentProperties?.type !== "production") {
@@ -38,22 +33,26 @@
 		const parentDetails = parentProperties.details;
 		let productionRate: number | undefined;
 		let setProductionRate: ((value: number) => void) | undefined;
+		let isEditable = true;
 		switch (parentDetails.type) {
 			case "recipe":
 				const recipe = satisfactoryDatabase.recipes[parentDetails.recipeClassName];
-				const output = recipe?.outputs[0];
-				if (output) {
-					productionRate = output.amountPerMinute * parentProperties.multiplier;
-					setProductionRate = ((value: number) => parentProperties.multiplier = value / output.amountPerMinute);
+				const recipeParts = node.properties.jointType === "input" ? recipe?.inputs : recipe?.outputs;
+				const recipePart = recipeParts?.find(p => p.itemClass === node.properties.resourceClassName);
+				const amountPerMinute = recipePart?.amountPerMinute;
+				if (amountPerMinute !== undefined) {
+					productionRate = amountPerMinute * parentProperties.multiplier;
+					setProductionRate = ((value: number) => parentProperties.multiplier = value / amountPerMinute);
 				}
 				break;
-			case "factory-input":
 			case "factory-output":
+			case "factory-input":
 				const factoryPart = satisfactoryDatabase.parts[parentDetails.partClassName];
 				if (factoryPart) {
-					productionRate = 60 * parentProperties.multiplier;
-					setProductionRate = ((value: number) => parentProperties.multiplier = value / 60);
+					productionRate = parentProperties.multiplier;
+					setProductionRate = ((value: number) => parentProperties.multiplier = value);
 				}
+				isEditable = !parentProperties.autoMultiplier;
 				break;
 			case "extraction":
 				const productionBuilding = satisfactoryDatabase.productionBuildings[parentDetails.buildingClassName];
@@ -63,11 +62,36 @@
 					setProductionRate = ((value: number) => parentProperties.multiplier = value / productionBuilding.baseProductionRate / purityModifier);
 				}
 				break;
+			case "factory-reference":
+				function getExternalNodeProperties(pageId: Id, externalId?: Id): GraphNodeProductionProperties | undefined {
+					if (!externalId)
+						return undefined;
+					const factoryPage = page.context.appState.pages.find(p => p.id === pageId);
+					const externalNode = factoryPage ? factoryPage.nodes.get(externalId) : undefined;
+					if (!externalNode || externalNode.properties.type !== "production") {
+						return undefined;
+					}
+					return externalNode.properties;
+				}
+				const factoryId = parentDetails.factoryId;
+				const externalNodeId = parentDetails.jointsToExternalNodes[node.id];
+				const externalNodeProperties = getExternalNodeProperties(factoryId, externalNodeId);
+				if (externalNodeProperties) {
+					productionRate = externalNodeProperties.multiplier;
+					setProductionRate = ((value: number) => {
+						const externalNodeProperties = getExternalNodeProperties(factoryId, externalNodeId);
+						if (externalNodeProperties) {
+							externalNodeProperties.multiplier = value;
+						}
+					});
+				}
+				break;
 		}
 
 		return {
 			productionRate,
 			setProductionRate,
+			isEditable,
 		};
 	});
 
@@ -97,22 +121,22 @@
 		y={-innerRadius}
 		size={innerRadius * 2}
 	/>
-	{#if productionRate !== undefined && setProductionRate}
+	{#if productionRate !== undefined}
 		<SvgInput
 			x={-inputWidth / 2}
 			y={8}
 			width={inputWidth}
-			height={12}
+			height={9}
 			fontSize={11}
-			isEditable={true}
+			isEditable={isEditable && setProductionRate !== undefined}
 			textAlign={"center"}
 			value={floatToString(productionRate, 4)}
-			onChange={(value) => {
+			onChange={setProductionRate !== undefined ? (value) => {
 				const parsedValue = Number(value);
 				if (!isNaN(parsedValue)) {
 					setProductionRate(parsedValue);
 				}
-			}}
+			} : undefined}
 		/>
 	{/if}
 	{#if globals.debugShowNodeIds}

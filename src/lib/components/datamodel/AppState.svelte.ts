@@ -1,6 +1,6 @@
 import { writeToLocalStorage } from "$lib/localStorageState.svelte";
 import { Debouncer } from "$lib/utilties";
-import { StorageKeys } from "./constants";
+import { dataModelVersion, StorageKeys } from "./constants";
 import { GraphPage } from "./GraphPage.svelte";
 import { IdGen, type Id } from "./IdGen";
 
@@ -26,18 +26,29 @@ export class AppState {
 
 	static newDefault(): AppState {
 		const idGen = new IdGen(0);
-		const page = GraphPage.newDefault(idGen, "Page 1");
-		return new AppState(idGen, page.id, [page]);
+		const state = new AppState(idGen, "", []);
+		const page = GraphPage.newDefault(state, "Page 1");
+		state.addPage(page);
+		state.setCurrentPage(page);
+		return state;
 	}
 
 	static fromJSON(json: any): AppState {
+		// if (json.version !== dataModelVersion) {
+		// 	throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
+		// }
 		const idGen = IdGen.fromJson(json.idGen);
-		const pages = json.pages.map((p: any) => GraphPage.fromJSON(idGen, p));
-		return new AppState(idGen, json.currentPageId, pages);
+		const state = new AppState(idGen, json.currentPageId, []);
+		const pages = json.pages.map((p: any) => GraphPage.fromJSON(state, p));
+		for (const page of pages) {
+			state.addPage(page);
+		}
+		return state;
 	}
 
 	toJSON(): any {
 		return {
+			version: dataModelVersion,
 			idGen: this.idGen.toJSON(),
 			currentPageId: this.currentPageId,
 			pages: this.pages.map((p) => p.toJSON()),

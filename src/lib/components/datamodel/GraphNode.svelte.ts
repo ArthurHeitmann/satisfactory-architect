@@ -28,14 +28,15 @@ export interface ProductionExtractionDetails {
 	purityModifier?: number;
 }
 export interface ProductionFactoryInOutDetails {
-	type: "factory-input" | "factory-output";
+	type: "factory-output" | "factory-input";
 	partClassName: string;
 }
-export type ProductionDetails = ProductionRecipeDetails | ProductionExtractionDetails | ProductionFactoryInOutDetails;
+export type ProductionDetails = ProductionRecipeDetails | ProductionExtractionDetails | ProductionFactoryInOutDetails | GraphNodeFactoryReferenceProperties;
 export interface GraphNodeProductionProperties extends GraphNodePropertiesBase {
 	type: "production";
 	details: ProductionDetails;
 	multiplier: number;
+	autoMultiplier: boolean;
 	resourceJoints: ResourceJointInfo[];
 }
 export type LayoutOrientation = "top" | "bottom" | "left" | "right";
@@ -56,11 +57,13 @@ export interface GraphNodeSplitterMergerProperties extends GraphNodePropertiesBa
 export interface GraphNodeFactoryReferenceProperties extends GraphNodePropertiesBase {
 	type: "factory-reference";
 	factoryId: Id;
+	jointsToExternalNodes: Record<Id, Id>;
 }
-export type NewNodeDetails = ProductionDetails | GraphNodeSplitterMergerProperties | GraphNodeFactoryReferenceProperties;
-export type GraphNodeProperties = GraphNodeProductionProperties | GraphNodeResourceJointProperties | GraphNodeSplitterMergerProperties | GraphNodeFactoryReferenceProperties;
+export type NewNodeDetails = ProductionDetails | GraphNodeSplitterMergerProperties;
+export type GraphNodeProperties = GraphNodeProductionProperties | GraphNodeResourceJointProperties | GraphNodeSplitterMergerProperties;
 export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> implements JsonSerializable<PageContext> {
 	readonly id: Id;
+	readonly context: PageContext;
 	readonly position: Vector2D;
 	private dragStartPosition: IVector2D;
 	readonly priority: number;
@@ -68,10 +71,11 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 	parentNode: Id|null;
 	readonly children: SvelteSet<Id>;
 	readonly properties: T;
-	readonly size: IVector2D;
+	size: IVector2D;
 
-	constructor(id: Id, position: IVector2D, priority: number, edges: Id[], parentNode: Id|null, children: Id[], properties: T, size?: IVector2D) {
+	constructor(id: Id, context: PageContext, position: IVector2D, priority: number, edges: Id[], parentNode: Id|null, children: Id[], properties: T, size?: IVector2D) {
 		this.id = id;
+		this.context = context;
 		this.position = new Vector2D(position);
 		this.dragStartPosition = { x: 0, y: 0 };
 		this.priority = priority;
@@ -86,18 +90,21 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 				y: radius,
 			};
 		}
-		this.size = size;
+		this.size = $state(size);
 	}
 
 	static makeProductionNode(
 		idGen: IdGen,
+		context: PageContext,
 		position: IVector2D,
 		edges: Id[],
 		details: ProductionDetails,
-		multiplier: number = 1,
 	): {parent: GraphNode<GraphNodeProductionProperties>, children: GraphNode<GraphNodeResourceJointProperties>[]} {
 		let inputs: SFRecipePart[];
 		let outputs: SFRecipePart[];
+		let multiplier = 1;
+		const extInputNodeIds: Id[] = [];
+		const extOutputNodeIds: Id[] = [];
 		switch (details.type) {
 			case "recipe":
 				const recipe = satisfactoryDatabase.recipes[details.recipeClassName];
@@ -107,19 +114,20 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 				inputs = recipe.inputs;
 				outputs = recipe.outputs;
 				break;
-			case "factory-input":
 			case "factory-output":
+			case "factory-input":
 				const recipePart = {
 					itemClass: details.partClassName,
-					amountPerMinute: 60,
+					amountPerMinute: 1,
 				};
-				if (details.type === "factory-input") {
+				if (details.type === "factory-output") {
 					inputs = [recipePart];
 					outputs = [];
 				} else {
 					inputs = [];
 					outputs = [recipePart];
 				}
+				multiplier = 60;
 				break;
 			case "extraction":
 				const part = satisfactoryDatabase.parts[details.partClassName];
@@ -132,21 +140,47 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 					amountPerMinute: 60
 				} ];
 				break;
+			case "factory-reference":
+				const page = context.appState.pages.find(p => p.id === details.factoryId);
+				if (!page) {
+					throw new Error(`Factory page with id ${details.factoryId} does not exist.`);
+				}
+				inputs = [];
+				outputs = [];
+				for (const node of page.nodes.values()) {
+					if (node.properties.type !== "production") {
+						continue;
+					}
+					if (node.properties.details.type === "factory-input") {
+						inputs.push({
+							itemClass: node.properties.details.partClassName,
+							amountPerMinute: node.properties.multiplier,
+						});
+						extInputNodeIds.push(node.id);
+					} else if (node.properties.details.type === "factory-output") {
+						outputs.push({
+							itemClass: node.properties.details.partClassName,
+							amountPerMinute: node.properties.multiplier,
+						});
+						extOutputNodeIds.push(node.id);
+					}
+				}
+				break;
 			default:
 				assertUnreachable(details);
 		}
-		const displayName = getProductionNodeDisplayName(details);
-		const nodeSize = GraphNode.calcSize(Math.max(inputs.length, outputs.length), displayName);
+		const nodeSize = GraphNode.calcSize(Math.max(inputs.length, outputs.length));
 		const children: GraphNode<GraphNodeResourceJointProperties>[] = [];
 		const resourceJoints: ResourceJointInfo[] = [];
 		const inputsGapSize = floorToNearest(nodeSize.y / inputs.length, gridSize);
 		const outputsGapSize = floorToNearest(nodeSize.y / outputs.length, gridSize);
-		const inputsYStart = -inputsGapSize/2 * (inputs.length - 1)
-		const outputsYStart = -outputsGapSize/2 * (outputs.length - 1)
+		const inputsYStart = -inputsGapSize/2 * (inputs.length - 1);
+		const outputsYStart = -outputsGapSize/2 * (outputs.length - 1);
 		for (let i = 0; i < inputs.length; i++) {
 			const input = inputs[i];
 			const jointNode = new GraphNode(
 				idGen.nextId(),
+				context,
 				{x: -nodeSize.x / 2, y: inputsYStart + inputsGapSize * i},
 				NodePriorities.RESOURCE_JOINT,
 				[],
@@ -160,6 +194,10 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 					layoutOrientation: "left",
 				}
 			);
+			if (details.type === "factory-reference") {
+				const externalId = extInputNodeIds[i];
+				details.jointsToExternalNodes[jointNode.id] = externalId;
+			}
 			children.push(jointNode);
 			resourceJoints.push({ id: jointNode.id, type: "input" });
 		}
@@ -167,6 +205,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			const output = outputs[i];
 			const jointNode = new GraphNode(
 				idGen.nextId(),
+				context,
 				{x: nodeSize.x / 2, y: outputsYStart + outputsGapSize * i},
 				NodePriorities.RESOURCE_JOINT,
 				[],
@@ -180,6 +219,10 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 					layoutOrientation: "right",
 				}
 			);
+			if (details.type === "factory-reference") {
+				const externalId = extOutputNodeIds[i];
+				details.jointsToExternalNodes[jointNode.id] = externalId;
+			}
 			children.push(jointNode);
 			resourceJoints.push({ id: jointNode.id, type: "output" });
 		}
@@ -187,15 +230,17 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			type: "production",
 			details,
 			multiplier,
+			autoMultiplier: false,
 			resourceJoints: resourceJoints,
 		};
-		const parent = new GraphNode(idGen.nextId(), position, NodePriorities.RECIPE, edges, null, [], properties, nodeSize);
+		const parent = new GraphNode(idGen.nextId(), context, position, NodePriorities.RECIPE, edges, null, [], properties, nodeSize);
 		return { parent, children };
 	}
 
-	static fromJSON(json: any): GraphNode {
+	static fromJSON(json: any, context: PageContext): GraphNode {
 		return new GraphNode(
 			json.id,
+			context,
 			{ x: json.position.x, y: json.position.y },
 			json.priority,
 			json.edges,
@@ -239,6 +284,8 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 	getAbsolutePosition(page: GraphPage): IVector2D {
 		const parentNode = this.parentNode ? page.nodes.get(this.parentNode) : null;
 		if (!parentNode) {
+			if (this.parentNode)
+				console.warn(`Node ${this.id} has no parent node, returning its own position as absolute position.`);
 			return { x: this.position.x, y: this.position.y };
 		}
 		const parentPosition = parentNode.getAbsolutePosition(page);
@@ -248,7 +295,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		};
 	}
 
-	private static calcSize(maxNodeCount: number, displayName: string): IVector2D {
+	private static calcSize(maxNodeCount: number): IVector2D {
 		const minHeight1 = (maxNodeCount + 1) * gridSize;
 		const minHeight2 = productionNodeIconSize + productionNodeVerticalPadding * 2;
 		const height = Math.max(minHeight1, minHeight2);
@@ -308,39 +355,6 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		const jointTargets = sameRowJoints
 			.map(srcJoint => {
 				const jointNode = page.nodes.get(srcJoint.id) as GraphNode<GraphNodeResourceJointProperties>;
-				// const angles = Array.from(jointNode.edges.values().map(edgeId => {
-				// 	const edge = page.edges.get(edgeId);
-				// 	let refJoint: GraphNode<GraphNodeResourceJointProperties> | undefined;
-				// 	if (edge) {
-				// 		let refJointId: Id | undefined;
-				// 		if (edge.startNodeId === jointNode.id) {
-				// 			refJointId = edge.endNodeId;
-				// 		} else if (edge.endNodeId === jointNode.id) {
-				// 			refJointId = edge.startNodeId;
-				// 		}
-				// 		if (refJointId) {
-				// 			refJoint = page.nodes.get(refJointId) as GraphNode<GraphNodeResourceJointProperties>;
-				// 		}
-				// 	}
-				// 	if (!refJoint) {
-				// 		refJoint = jointNode;
-				// 	}
-				// 	const pos = refJoint.getAbsolutePosition(page);
-				// 	const direction = {
-				// 		x: zeroAxis !== "x" ? pos.x - centerPoint.x : 1,
-				// 		y: zeroAxis !== "y" ? pos.y - centerPoint.y : 1,
-				// 	};
-				// 	let angle = Math.atan2(direction.y, direction.x);
-				// 	// keep in range [-180, 180]
-				// 	if (angle < -Math.PI) {
-				// 		angle += 2 * Math.PI;
-				// 	} else if (angle > Math.PI) {
-				// 		angle -= 2 * Math.PI;
-				// 	}
-				// 	return angle;
-				// }));
-				// const angle = angles.reduce((a, b) => a + b, 0) / Math.max(1, angles.length);
-				// return { node: jointNode, angle };
 				const edge = page.edges.get(jointNode.edges.values().next().value || "");
 				let refJoint: GraphNode<GraphNodeResourceJointProperties> | undefined;
 				if (edge) {
@@ -363,7 +377,6 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 					y: zeroAxis !== "y" ? pos.y - centerPoint.y : 1,
 				};
 				let angle = Math.atan2(direction.y, direction.x);
-				// keep in range [-180, 180]
 				if (angle < -Math.PI) {
 					angle += 2 * Math.PI;
 				} else if (angle > Math.PI) {
@@ -400,6 +413,114 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			target.node.position.x = newPosition.x;
 			target.node.position.y = newPosition.y;
 		}
+	}
 
+	updateExternalFactoryJoints(): void {
+		if (this.properties.type !== "production" || this.properties.details.type !== "factory-reference") {
+			return;
+		}
+		const details = this.properties.details;
+		const externalPage = this.context.appState.pages.find(p => p.id === details.factoryId);
+		if (!externalPage) {
+			throw new Error(`External factory page with id ${details.factoryId} does not exist.`);
+		}
+		const currentlyUsedExternalJoints = Object.values(details.jointsToExternalNodes);
+		const newUsedExternalJoints: Id[] = [];
+		const jointsToAdd: {type: "input" | "output", itemClass: string, externalId: Id}[] = [];
+		for (const node of externalPage.nodes.values()) {
+			if (node.properties.type !== "production") {
+				continue;
+			}
+			if (node.properties.details.type === "factory-input" || node.properties.details.type === "factory-output") {
+				newUsedExternalJoints.push(node.id);
+				if (currentlyUsedExternalJoints.includes(node.id)) {
+					continue;
+				}
+				const type = node.properties.details.type === "factory-input" ? "input" : "output";
+				jointsToAdd.push({
+					type,
+					itemClass: node.properties.details.partClassName,
+					externalId: node.id,
+				});
+			}
+		}
+		// delete old joints
+		const extToLocalJoints: Record<Id, Id> = {};
+		for (const [localId, externalId] of Object.entries(details.jointsToExternalNodes)) {
+			extToLocalJoints[externalId] = localId;
+		}
+		const localJointsToRemove = currentlyUsedExternalJoints
+			.filter(id => !newUsedExternalJoints.includes(id))
+			.map(id => extToLocalJoints[id]);
+		this.properties.resourceJoints = this.properties.resourceJoints
+			.filter(joint => !localJointsToRemove.includes(joint.id));
+		for (const localJointId of localJointsToRemove) {
+			delete details.jointsToExternalNodes[localJointId];
+			this.children.delete(localJointId);
+			this.context.page.removeNode(localJointId);
+		}
+		// add new joints
+		for (const joint of jointsToAdd) {
+			const newJointTmpPosition = {
+				x: this.size.x / 2,
+				y: this.size.y / 2,
+			}
+			const newJoint: GraphNode<GraphNodeResourceJointProperties> = new GraphNode(
+				this.context.page.idGen.nextId(),
+				this.context,
+				newJointTmpPosition,
+				NodePriorities.RESOURCE_JOINT,
+				[],
+				this.id,
+				[],
+				{
+					type: "resource-joint",
+					resourceClassName: joint.itemClass,
+					jointType: joint.type,
+					locked: true,
+					layoutOrientation: joint.type === "input" ? "left" : "right",
+				}
+			);
+			this.context.page.nodes.set(newJoint.id, newJoint);
+			this.properties.resourceJoints.push({ id: newJoint.id, type: joint.type });
+			details.jointsToExternalNodes[newJoint.id] = joint.externalId;
+			this.children.add(newJoint.id);
+		}
+
+		this.onJointCountChanged();
+	}
+
+	private onJointCountChanged(): void {
+		if (this.properties.type !== "production") {
+			return;
+		}
+		function nodeCmp(a: GraphNode, b: GraphNode): number {
+			const aPosSum = a.position.x + a.position.y;
+			const bPosSum = b.position.x + b.position.y;
+			return aPosSum - bPosSum;
+		}
+		const inputs = this.properties.resourceJoints.filter(joint => joint.type === "input")
+			.map(joint => this.context.page.nodes.get(joint.id)!)
+			.sort(nodeCmp);
+		const outputs = this.properties.resourceJoints.filter(joint => joint.type === "output")
+			.map(joint => this.context.page.nodes.get(joint.id)!)
+			.sort(nodeCmp);
+		const maxNodeCount = Math.max(inputs.length, outputs.length);
+		this.size = GraphNode.calcSize(maxNodeCount);
+
+		const inputsGapSize = floorToNearest(this.size.y / inputs.length, gridSize);
+		const outputsGapSize = floorToNearest(this.size.y / outputs.length, gridSize);
+		const inputsYStart = -inputsGapSize/2 * (inputs.length - 1);
+		const outputsYStart = -outputsGapSize/2 * (outputs.length - 1);
+		for (let i = 0; i < inputs.length; i++) {
+			const input = inputs[i];
+			input.position.x = -this.size.x / 2;
+			input.position.y = inputsYStart + inputsGapSize * i;
+		}
+		for (let i = 0; i < outputs.length; i++) {
+			const output = outputs[i];
+			output.position.x = this.size.x / 2;
+			output.position.y = outputsYStart + outputsGapSize * i;
+		}
 	}
 }

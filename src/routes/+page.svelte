@@ -4,7 +4,7 @@
 	import { AppState } from "$lib/components/datamodel/AppState.svelte";
     import { StorageKeys } from "$lib/components/datamodel/constants";
 	import { GraphPage } from "$lib/components/datamodel/GraphPage.svelte";
-	import GraphPageView from "$lib/components/GraphPageView.svelte";
+    import GraphPageView from "$lib/components/GraphPageView.svelte";
 	import { loadFormLocalStorage, localStorageState } from "$lib/localStorageState.svelte";
 	import { onMount, setContext } from "svelte";
 
@@ -30,7 +30,7 @@
 		} else {
 			const app = AppState.newDefault();
 			if (browser) {
-				app.addPage(GraphPage.newDefault(app.idGen));
+				app.addPage(GraphPage.newDefault(app));
 				app.pages[1].name = `Page ${app.pages.length}`;
 				const page = app.pages[0];
 				page.makeProductionNode(
@@ -81,7 +81,7 @@
 		{/each}
 		<button
 			class="page-button"
-			onclick={() => app.addPage(GraphPage.newDefault(app.idGen, `Page ${app.pages.length + 1}`))}
+			onclick={() => app.addPage(GraphPage.newDefault(app, `Page ${app.pages.length + 1}`))}
 		>
 			➕ Add Page
 		</button>
