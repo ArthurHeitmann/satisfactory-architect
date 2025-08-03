@@ -2,18 +2,21 @@ import { assertUnreachable } from "$lib/utilties";
 import type { LayoutOrientation, GraphNode } from "./GraphNode.svelte";
 import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import type { IVector2D } from "./GraphView.svelte";
-import type { Id } from "./IdGen";
+import type { Id, IdMapper } from "./IdGen";
 import { edgeArrowLength } from "./constants";
 import { canUseInvertedEdgeControlPoint, getNodeRadius } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, type JsonSerializable } from "./StateHistory.svelte";
+import { determineStraightEdgeCount, makeStraightEdgePoints } from "./straightEdgeRouting";
 
 export type GraphEdgeType = "item-flow";
 
-export type GraphEdgeDisplayType = "straight" | "curved";
+export type GraphEdgeDisplayType = "straight" | "curved" | "angled";
 export interface GraphEdgeProperties {
 	displayType: GraphEdgeDisplayType;
-	lastStartOrientation?: LayoutOrientation;
-	lastEndOrientation?: LayoutOrientation;
+	straightLineOffsets?: number[];
+	startOrientation?: LayoutOrientation;
+	endOrientation?: LayoutOrientation;
+	isDrainLine: boolean;
 }
 
 
@@ -28,9 +31,6 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 	readonly properties: GraphEdgeProperties;
 	pushThroughput: number;
 	pullThroughput: number;
-	readonly minThroughput: number;
-	readonly netThroughput: number;
-	readonly relativeThroughput: number;
 
 	readonly startNode: GraphNode|undefined;
 	readonly endNode: GraphNode|undefined;
@@ -53,6 +53,8 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 		startControlPointVector: IVector2D;
 		endControlPointVector: IVector2D;
 	}|undefined;
+	readonly straightEdgeCount: number|null;
+	readonly straightEdgePoints: IVector2D[]|null;
 
 	constructor(context: PageContext, id: Id, type: GraphEdgeType, startNodeId: Id, endNodeId: Id, properties: GraphEdgeProperties) {
 		this.context = context;
@@ -63,9 +65,6 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 		this.properties = $state(properties);
 		this.pushThroughput = $state(0);
 		this.pullThroughput = $state(0);
-		this.minThroughput = $derived(Math.min(this.pushThroughput, this.pullThroughput));
-		this.netThroughput = $derived(this.pushThroughput - this.pullThroughput);
-		this.relativeThroughput = $derived(this.netThroughput / this.minThroughput)
 		
 		this.startNode = $derived(this.context.page.nodes.get(this.startNodeId));
 		this.endNode = $derived(this.context.page.nodes.get(this.endNodeId));
@@ -176,6 +175,16 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 			hasStartOffset = startOffset.x !== 0 || startOffset.y !== 0;
 			hasEndOffset = endOffset.x !== 0 || endOffset.y !== 0;
 
+			if (!hasStartOffset && this.properties.startOrientation) {
+				startOffset = orientationToCtrlPoint[this.properties.startOrientation];
+			}
+			if (!hasEndOffset && this.properties.endOrientation) {
+				endOffset = orientationToCtrlPoint[this.properties.endOrientation];
+			}
+
+			hasStartOffset = startOffset.x !== 0 || startOffset.y !== 0;
+			hasEndOffset = endOffset.x !== 0 || endOffset.y !== 0;
+
 			if (!hasStartOffset) {
 				const orientation = getOrientationFromDirection(delta, false);
 				startOffset = orientationToCtrlPoint[orientation];
@@ -202,19 +211,30 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 			let startControlPointVector = { x: 0, y: 0 };
 			let endControlPointVector = { x: 0, y: 0 };
 
-			if (this.properties.displayType === "curved") {
+			const startNodeRadius = this.startNodeRadius!;
+			const endNodeRadius = this.endNodeRadius!;
+			if (this.properties.displayType === "straight") {
+				const unitVector = this.unitVector!;
+				startPoint = {
+					x: startPos.x + unitVector.x * startNodeRadius,
+					y: startPos.y + unitVector.y * startNodeRadius,
+				};
+				endPoint = {
+					x: endPos.x - unitVector.x * endNodeRadius,
+					y: endPos.y - unitVector.y * endNodeRadius,
+				};
+				endPointWithoutArrow = {
+					x: endPos.x - unitVector.x * (endNodeRadius + edgeArrowLength),
+					y: endPos.y - unitVector.y * (endNodeRadius + edgeArrowLength),
+				};
+			} else if (this.properties.displayType === "curved" || this.properties.displayType === "angled") {
 				const { startOffset, endOffset } = this.orientationVectors!;
 				const startNodeRadius = this.startNodeRadius!;
 				const endNodeRadius = this.endNodeRadius!;
-				const ctrlPointLength = this.controlPointLength!;
-
+				
 				startPoint = {
 					x: startPos.x + startOffset.x * startNodeRadius,
 					y: startPos.y + startOffset.y * startNodeRadius,
-				};
-				startControlPointVector = {
-					x: startOffset.x * (startNodeRadius + ctrlPointLength),
-					y: startOffset.y * (startNodeRadius + ctrlPointLength),
 				};
 				endPoint = {
 					x: endPos.x + endOffset.x * endNodeRadius,
@@ -224,13 +244,45 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 					x: endPoint.x + endOffset.x * edgeArrowLength,
 					y: endPoint.y + endOffset.y * edgeArrowLength,
 				};
-				endControlPointVector = {
-					x: endOffset.x * (endNodeRadius + ctrlPointLength + edgeArrowLength),
-					y: endOffset.y * (endNodeRadius + ctrlPointLength + edgeArrowLength),
-				};
+				if (this.properties.displayType === "curved") {
+					const ctrlPointLength = this.controlPointLength!;
+					startControlPointVector = {
+						x: startOffset.x * (startNodeRadius + ctrlPointLength),
+						y: startOffset.y * (startNodeRadius + ctrlPointLength),
+					};
+					endControlPointVector = {
+						x: endOffset.x * (endNodeRadius + ctrlPointLength + edgeArrowLength),
+						y: endOffset.y * (endNodeRadius + ctrlPointLength + edgeArrowLength),
+					};
+				}
+			} else {
+				assertUnreachable(this.properties.displayType);
 			}
 
 			return { startPoint, endPoint, endPointWithoutArrow, startControlPointVector, endControlPointVector };
+		});
+
+		this.straightEdgeCount = $derived.by(() => {
+			if (this.properties.displayType !== "angled") {
+				return null;
+			}
+			if (!this.pathPoints || !this.orientationVectors) {
+				return null;
+			}
+			const { startPoint, endPoint } = this.pathPoints;
+			const { startOffset, endOffset } = this.orientationVectors;
+			return determineStraightEdgeCount(startPoint, endPoint, startOffset, endOffset);
+		});
+		this.straightEdgePoints = $derived.by(() => {
+			if (this.straightEdgeCount === null) {
+				return null;
+			}
+			if (!this.pathPoints || !this.orientationVectors) {
+				return null;
+			}
+			const { startPoint, endPoint } = this.pathPoints;
+			const { startOffset, endOffset } = this.orientationVectors;
+			return makeStraightEdgePoints(startPoint, endPoint, startOffset, endOffset, this.straightEdgeCount);
 		});
 	}
 
@@ -253,6 +305,11 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 			endNodeId: this._endNodeId,
 			properties: $state.snapshot(this.properties),
 		};
+	}
+
+	afterPaste(mapper: IdMapper) {
+		this._startNodeId = mapper.mapId(this._startNodeId);
+		this._endNodeId = mapper.mapId(this._endNodeId);
 	}
 
 	connectNode(node: GraphNode, nodeType: "start" | "end", page: GraphPage): void {

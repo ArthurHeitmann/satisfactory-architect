@@ -1,6 +1,7 @@
 import { writeToLocalStorage } from "$lib/localStorageState.svelte";
 import { Debouncer } from "$lib/utilties";
 import { dataModelVersion, StorageKeys } from "./constants";
+import { globals, trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
 import { IdGen, type Id } from "./IdGen";
 
@@ -59,7 +60,7 @@ export class AppState {
 		if (this.pages.some((p) => p.id === page.id)) {
 			throw new Error(`Page with id ${page.id} already exists.`);
 		}
-		this.pages.push(page);
+		this.pages = [...this.pages, page];
 	}
 
 	removePage(pageId: Id): void {
@@ -80,6 +81,8 @@ export class AppState {
 	}
 
 	saveToLocalStorage(json: any): void {
-		writeToLocalStorage(StorageKeys.appState, json)
+		if (trackStateChanges()) {
+			writeToLocalStorage(StorageKeys.appState, json)
+		}
 	}
 }

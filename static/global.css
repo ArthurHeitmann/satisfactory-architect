@@ -23,6 +23,8 @@
   --primary: #ce5f27;
   --secondary: #efc0a9;
   --accent: #df6020;
+  --underflow-color: #D81B6F;
+  --overflow-color: #E8CD0F;
 
   --grid-background-color: var(--background-50);
   --selection-area-background-color: color-mix(in srgb, var(--primary) 15%, transparent);
@@ -42,6 +44,7 @@
   --recipe-selector-tile-hover-color: var(--background-100);
   --recipe-selector-tile-active-color: var(--background-200);
   --recipe-selector-tile-border-color: var(--background-100);
+  --recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px white) drop-shadow(0px 0px 5px white);
   --recipe-selector-border-color: var(--background-100);
   --context-menu-background-color: var(--background);
   --context-menu-border-color: var(--background-100);
@@ -78,6 +81,8 @@
   --primary: #d86931;
   --secondary: #562710;
   --accent: #df6020;
+  --underflow-color: #D81B6F;
+  --overflow-color: #E8CD0F;
 
   --grid-background-color: var(--background);
   --selection-area-background-color: color-mix(in srgb, var(--primary) 15%, transparent);
@@ -97,6 +102,7 @@
   --recipe-selector-tile-hover-color: var(--background-200);
   --recipe-selector-tile-active-color: var(--background-300);
   --recipe-selector-tile-border-color: var(--background-300);
+  --recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 4px black);
   --recipe-selector-border-color: var(--background-200);
   --context-menu-background-color: var(--background-100);
   --context-menu-border-color: var(--background-200);

@@ -1,8 +1,8 @@
 import { EventStream } from "$lib/EventStream.svelte";
-import { assertUnreachable } from "$lib/utilties";
+import { assertUnreachable, copyText } from "$lib/utilties";
 import { untrack } from "svelte";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
-import type { IdGen, Id } from "./IdGen";
+import { type IdGen, type Id, IdMapper, type PasteSource } from "./IdGen";
 import { dataModelVersion, NodePriorities } from "./constants";
 import { isNodeAttachable } from "./nodeTypeProperties.svelte";
 import { applyJsonToMap, applyJsonToSet, StateHistory, type JsonSerializable } from "./StateHistory.svelte";
@@ -120,6 +120,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			}
 		}
 		this.nodes.delete(nodeId);
+		this.selectedNodes.delete(nodeId);
 	}
 
 	removeSelectedNodes(): void {
@@ -298,7 +299,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		);
 		this.addNodes(newNode);
 		this.addEdgeBetweenNodes(
-			new GraphEdge(this.context, this.idGen.nextId(), "item-flow", "", "", { displayType: "curved" }),
+			new GraphEdge(this.context, this.idGen.nextId(), "item-flow", "", "", { displayType: "curved", isDrainLine: false }),
 			jointType === "input" ? newNode : node,
 			jointType === "input" ? node : newNode
 		);
@@ -317,16 +318,25 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		if (!movingEdge) {
 			throw new Error("Moving node does not have an edge.");
 		}
+		let otherNode: GraphNode|undefined;
 		if (movingEdge.startNodeId === movingNode.id) {
+			otherNode = this.nodes.get(movingEdge.endNodeId);
 			movingEdge.connectNode(destNode, "start", this);
 		} else if (movingEdge.endNodeId === movingNode.id) {
+			otherNode = this.nodes.get(movingEdge.startNodeId);
 			movingEdge.connectNode(destNode, "end", this);
+		} else {
+			throw new Error("Moving node is not connected to the edge.");
 		}
 		movingNode.edges.delete(movingEdge.id);
 		if (movingNode.edges.size === 0) {
 			this.removeNode(movingNode.id);
 		}
 		destNode.edges.add(movingEdge.id);
+
+		if (destNode.parentNode && destNode.parentNode === otherNode?.parentNode) {
+			movingEdge.properties.displayType = "angled";
+		}
 	}
 
 	moveNode(node: GraphNode, totalDeltaX: number, totalDeltaY: number) {
@@ -357,13 +367,15 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			const node = new GraphNode<GraphNodeSplitterMergerProperties>(
 				this.idGen.nextId(),
 				this.context,
-				position,
+				{x: 0, y: 0},
 				NodePriorities.OTHER,
 				[],
 				null,
 				[],
 				productionDetails,
 			);
+			node.onDragStart();
+			this.moveNode(node, position.x, position.y);
 			this.addNodes(node);
 			return node;
 		}
@@ -383,6 +395,84 @@ export class GraphPage implements JsonSerializable<PageContext> {
 				this.addChildrenToNode(parent, child);
 			}
 			return parent;
+		}
+	}
+
+	copyOrCutSelection(mode: "copy" | "cut") {
+		const selectedNodes = Array.from(this.selectedNodes.values()
+			.map((id) => this.nodes.get(id)!));
+		const selectedJointIds = new Set(selectedNodes
+			.flatMap(n => Array.from(n.children.values())));
+		const selectedJoints = Array.from(selectedJointIds.values()
+			.map((id) => this.nodes.get(id))
+			.filter(n => n !== undefined));
+		const allNodes = [...selectedNodes, ...selectedJoints];
+		const allNodeIds = new Set(allNodes.map(n => n.id));
+		const selectedEdges = Array.from(this.edges.values()
+			.filter(e => allNodeIds.has(e.startNodeId) && allNodeIds.has(e.endNodeId)));
+		const json = {
+			type: "factory-data",
+			version: dataModelVersion,
+			nodes: allNodes.map((n) => n.toJSON()),
+			edges: selectedEdges.map((e) => e.toJSON()),
+		};
+		copyText(JSON.stringify(json));
+		if (mode === "cut") {
+			this.removeSelectedNodes();
+		}
+	}
+
+	insertJson(text: string, pasteSource: PasteSource, centerPoint?: IVector2D) {
+		let data;
+		try {
+			data = JSON.parse(text);
+		} catch {
+			console.log("Not json data");
+			return;
+		}
+		if (data.type !== "factory-data" || data.version !== dataModelVersion) {
+			console.log("Unsupported data format or version");
+			return;
+		}
+		const idMapper = new IdMapper(this.idGen);
+		for (const item of [...data.nodes, ...data.edges]) {
+			if ("id" in item) {
+				item.id = idMapper.mapId(item.id);
+			}
+		}
+		const nodes = (data.nodes as any[]).map((n: any) => GraphNode.fromJSON(n, this.context));
+		const edges = (data.edges as any[]).map((e: any) => GraphEdge.fromJSON(e, this.context));
+		for (const node of nodes) {
+			node.afterPaste(idMapper, pasteSource);
+			this.addNodes(node);
+		}
+		for (const edge of edges) {
+			edge.afterPaste(idMapper);
+			this.addEdge(edge);
+		}
+
+		if (centerPoint) {
+			const nodesCenter: IVector2D = {x: 0, y: 0};
+			let count = 0;
+			for (const node of nodes) {
+				if (node.parentNode !== null) {
+					continue;
+				}
+				nodesCenter.x += node.position.x;
+				nodesCenter.y += node.position.y;
+				count++;
+			}
+			nodesCenter.x /= count;
+			nodesCenter.y /= count;
+			const deltaX = centerPoint.x - nodesCenter.x;
+			const deltaY = centerPoint.y - nodesCenter.y;
+			for (const node of nodes) {
+				if (node.parentNode !== null) {
+					continue;
+				}
+				node.position.x += deltaX;
+				node.position.y += deltaY;
+			}
 		}
 	}
 }

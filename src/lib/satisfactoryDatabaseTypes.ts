@@ -16,22 +16,32 @@ export interface SFRecipe {
 export interface SFPart {
 	className: string;
 	displayName: string;
-	form: string;
 	icon: string;
-	fluidColor: string;
 	category: string;
+	energy: number;
 }
 
-export interface SFProductionBuilding {
+export interface SFExtractionBuilding {
 	buildingClassName: string;
 	baseProductionRate: number;
 	outputs: string[];
+}
+
+export interface SFPowerFuel {
+	inputs: SFRecipePart[];
+	outputs: SFRecipePart[];
+}
+export interface SFPowerProducer {
+	buildingClassName: string;
+	fuels: Record<string, SFPowerFuel>;
 }
 
 export interface SFBuilding {
 	className: string;
 	displayName: string;
 	icon: string;
+	powerConsumption: number;
+	powerProduction: number;
 }
 
 export interface SFIcon {
@@ -42,7 +52,8 @@ export interface SFIcon {
 export interface SatisfactoryDatabase {
 	recipes: Record<string, SFRecipe>;
 	parts: Record<string, SFPart>;
-	productionBuildings: Record<string, SFProductionBuilding>;
+	extractionBuildings: Record<string, SFExtractionBuilding>;
+	powerProducers: Record<string, SFPowerProducer>;
 	buildings: Record<string, SFBuilding>;
 	categories: Record<string, string>;
 	icons: Record<string, SFIcon>;

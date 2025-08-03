@@ -14,6 +14,7 @@
 	import type { GraphPage } from "../datamodel/GraphPage.svelte";
 	import type { IVector2D } from "../datamodel/GraphView.svelte";
     import { fade } from "svelte/transition";
+    import { blockStateChanges, globals, unblockStateChanges } from "../datamodel/globals.svelte";
 
 	interface Props {
 		node: GraphNode;
@@ -47,14 +48,31 @@
 				onClick: node.updateExternalFactoryJoints.bind(node),
 			});
 		}
-		if (node.properties.type === "production" && (node.properties.details.type === "factory-input" || node.properties.details.type === "factory-output")) {
-			items.push({
-				label: (node.properties.autoMultiplier ? "Manual" : "Auto") + " rate",
-				onClick: () => {
-					const properties = node.properties as GraphNodeProductionProperties;
-					properties.autoMultiplier = !properties.autoMultiplier;
-				},
-			});
+		if (node.properties.type === "production") {
+			if (node.properties.details.type === "factory-input" || node.properties.details.type === "factory-output") {
+				items.push({
+					label: (node.properties.autoMultiplier ? "Manual" : "Auto") + " rate",
+					onClick: () => {
+						const properties = node.properties as GraphNodeProductionProperties;
+						properties.autoMultiplier = !properties.autoMultiplier;
+					},
+				});
+			}
+			if (node.properties.details.type === "extraction") {
+				const details = node.properties.details;
+				items.push({
+					label: "Make impure",
+					onClick: () => details.purityModifier = 0.5,
+				});
+				items.push({
+					label: "Make normal",
+					onClick: () => details.purityModifier = 1,
+				});
+				items.push({
+					label: "Make pure",
+					onClick: () => details.purityModifier = 2,
+				});
+			}
 		}
 		if (isDeletable) {
 			if (isSelected && (page.selectedNodes.size > 1 || !page.selectedNodes.has(node.id))) {
@@ -69,6 +87,18 @@
 				label: "Delete Node",
 				hint: "Del",
 				onClick: () => page.removeNode(node.id),
+			});
+		}
+		if (isSelected) {
+			items.push({
+				label: `Copy ${pluralStr("node", page.selectedNodes.size)}`,
+				hint: "Ctrl+C",
+				onClick: () => page.copyOrCutSelection("copy"),
+			});
+			items.push({
+				label: `Cut ${pluralStr("node", page.selectedNodes.size)}`,
+				hint: "Ctrl+X",
+				onClick: () => page.copyOrCutSelection("cut"),
 			});
 		}
 		let supportsNewIncomingConnection = false;
@@ -119,7 +149,8 @@
 	const connectableNodes = isMovingResourceJoint ? page.getResourceJointAttachableNodes(node as GraphNode<GraphNodeResourceJointProperties>) : [];
 	const indirectlyConnectableNodes = connectableNodes
 		.filter(n => n.parentNode)
-		.map(n => ({ node: page.nodes.get(n.parentNode!)!, joint: n }));
+		.map(n => ({ node: page.nodes.get(n.parentNode!)!, joint: n }))
+		.filter(n => n.node);
 	
 	onMount(() => {
 		for (const n of [...connectableNodes, ...indirectlyConnectableNodes.map(n => n.node)]) {
@@ -198,7 +229,7 @@
 	}
 
 	function startMoveResourceJoint(jointDragType: JointDragType, preferredJointType?: "input" | "output") {
-		page.history.enabled = false;
+		blockStateChanges();
 		let newNode: GraphNode<GraphNodeResourceJointProperties>;
 		if (node.properties.type === "resource-joint") {
 			newNode = page.startMovingRecipeResourceJoint(node, position, preferredJointType ?? node.properties.jointType, jointDragType, node.properties.resourceClassName, node.properties.layoutOrientation);
@@ -244,8 +275,8 @@
 		if (newNodeDragHasFinished) {
 			return;
 		}
+		unblockStateChanges();
 		page.clearHighlightedNodes();
-		page.history.enabled = true;
 
 		const targetNode = getInRangeJointNode();
 
@@ -267,6 +298,7 @@
 				newNodeDragHasFinished = true;
 				const edge = page.edges.get(node.edges.values().next().value || "");
 				const isInput = edge?.endNodeId === node.id;
+				blockStateChanges();
 				eventStream.emit({
 					type: "showProductionSelector",
 					x: e.clientX,
@@ -275,6 +307,7 @@
 					requiredInputsClassName: isInput ? node.properties.resourceClassName : undefined,
 					requiredOutputsClassName: !isInput ? node.properties.resourceClassName : undefined,
 					onSelect: (details) => {
+						unblockStateChanges();
 						const point = page.screenToPageCoords({x: e.clientX, y: e.clientY});
 						const newNode = page.makeProductionNode(details, point);
 						let destJoint: GraphNode | null = null;
@@ -304,6 +337,7 @@
 						page.removeNode(node.id);
 					},
 					onCancel: () => {
+						unblockStateChanges();
 						page.onResourceJointDragEnd(node);
 					},
 				});

@@ -8,10 +8,10 @@
 	import { globals } from "./datamodel/globals.svelte";
 	import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
 	import type { GraphPage } from "./datamodel/GraphPage.svelte";
-    import { EventStream } from "$lib/EventStream.svelte";
+    import { EventStream, type ContextMenuItem } from "$lib/EventStream.svelte";
     import type { IVector2D } from "./datamodel/GraphView.svelte";
     import type { Id } from "./datamodel/IdGen";
-    import { assertUnreachable } from "$lib/utilties";
+    import { assertUnreachable, getClipboardText, pluralStr } from "$lib/utilties";
     import { isNodeSelectable } from "./datamodel/nodeTypeProperties.svelte";
     import { fade } from "svelte/transition";
     import { calculateThroughputs } from "./datamodel/throughputsCalculator";
@@ -43,7 +43,7 @@
 		width: number;
 		height: number;
 	}
-	let dragType: "select" | "move" = $state("select");
+	let dragType: "select" | "move" = $state("move");
 	let selectionAreaRaw: BBox|null = $state(null);
 	let selectionArea: BBox|null = $derived.by(() => {
 		if (!selectionAreaRaw) {
@@ -65,6 +65,10 @@
 			page.history.redo();
 		} else if (key === "Delete" || key === "Backspace") {
 			page.removeSelectedNodes();
+		} else if (event.ctrlKey && key === "c") {
+			page.copyOrCutSelection("copy");
+		} else if (event.ctrlKey && key === "x") {
+			page.copyOrCutSelection("cut");
 		}
 	}
 
@@ -83,33 +87,52 @@
 			return;
 		}
 		event.preventDefault();
+		const items: ContextMenuItem[] = [];
+		items.push({
+			label: "Add Node",
+			onClick: () => eventStream.emit({
+				type: "showProductionSelector",
+				x: event.clientX,
+				y: event.clientY,
+				onSelect: (details) => addNewProductionNode(details, event),
+			})
+		});
+		if (page.selectedNodes.size > 0) {
+			items.push({
+				label: `Copy ${pluralStr("node", page.selectedNodes.size)}`,
+				hint: "Ctrl+C",
+				onClick: () => page.copyOrCutSelection("copy")
+			});
+			items.push({
+				label: `Cut ${pluralStr("node", page.selectedNodes.size)}`,
+				hint: "Ctrl+X",
+				onClick: () => page.copyOrCutSelection("cut")
+			});
+		}
+		if (window.navigator.clipboard && window.isSecureContext) {
+			items.push({
+				label: "Paste",
+				hint: "Ctrl+V",
+				onClick: () => paste()
+			});
+		}
+		items.push({
+			label: globals.debugConsoleLog ? "Disable Debug Log" : "Enable Debug Log",
+			onClick: () => globals.debugConsoleLog = !globals.debugConsoleLog
+		});
+		items.push({
+			label: globals.debugShowNodeIds ? "Hide Node IDs" : "Show Node IDs",
+			onClick: () => globals.debugShowNodeIds = !globals.debugShowNodeIds
+		});
+		items.push({
+			label: globals.debugShowEdgeIds ? "Hide Edge IDs" : "Show Edge IDs",
+			onClick: () => globals.debugShowEdgeIds = !globals.debugShowEdgeIds
+		});
 		eventStream.emit({
 			type: "showContextMenu",
 			x: event.clientX,
 			y: event.clientY,
-			items: [
-				{
-					label: "Add Node",
-					onClick: () => eventStream.emit({
-						type: "showProductionSelector",
-						x: event.clientX,
-						y: event.clientY,
-						onSelect: (details) => addNewProductionNode(details, event),
-					})
-				},
-				{
-					label: globals.debugConsoleLog ? "Disable Debug Log" : "Enable Debug Log",
-					onClick: () => globals.debugConsoleLog = !globals.debugConsoleLog
-				},
-				{
-					label: globals.debugShowNodeIds ? "Hide Node IDs" : "Show Node IDs",
-					onClick: () => globals.debugShowNodeIds = !globals.debugShowNodeIds
-				},
-				{
-					label: globals.debugShowEdgeIds ? "Hide Edge IDs" : "Show Edge IDs",
-					onClick: () => globals.debugShowEdgeIds = !globals.debugShowEdgeIds
-				},
-			]
+			items
 		});
 	}
 
@@ -124,6 +147,15 @@
 			autofocus: !isTouchEvent,
 			onSelect: (details) => addNewProductionNode(details, event),
 		});
+	}
+
+	async function paste(clipboardData: string|null = null) {
+		clipboardData ??= await getClipboardText();
+		if (!clipboardData) {
+			return;
+		}
+		const cursorPoint = page.screenToPageCoords(globals.mousePosition);
+		page.insertJson(clipboardData, "external", cursorPoint);
 	}
 
 	function addNewProductionNode(productionDetails: NewNodeDetails, event: MouseEvent) {
@@ -184,9 +216,17 @@
 	});
 
 	$effect(() => {
+		page.history.onDataChange();
+	});
+
+	$effect(() => {
 		calculateThroughputs(page);
-	})
+	});
 </script>
+
+<svelte:window
+	onpaste={e => paste(e.clipboardData?.getData("text/plain"))}
+/>
 
 <OverlayLayer eventStream={eventStream}>
 	<UserEvents
@@ -234,6 +274,7 @@
 		} : null}
 		onDragEnd={enableUserEvents ? () => {
 			selectionAreaRaw = null;
+			dragType = "move";
 		} : null}
 		onZoom={enableUserEvents ? (deltaFactor, cursorX, cursorY) => {
 			if (isNaN(deltaFactor) || isNaN(cursorX) || isNaN(cursorY) || deltaFactor === 0) {

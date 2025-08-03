@@ -20,3 +20,28 @@ export class IdGen {
 		return `${this.currentId++}`;
 	}
 }
+
+export class IdMapper {
+	private idGen: IdGen;
+	private idMap: Map<Id, Id>;
+
+	constructor(idGen: IdGen) {
+		this.idGen = idGen;
+		this.idMap = new Map<Id, Id>();
+	}
+
+	mapId(id: Id): Id {
+		if (this.idMap.has(id)) {
+			return this.idMap.get(id)!;
+		}
+		const newId = this.idGen.nextId();
+		this.idMap.set(id, newId);
+		return newId;
+	}
+
+	hasOldId(id: Id): boolean {
+		return this.idMap.has(id);
+	}
+}
+
+export type PasteSource = "local" | "external";

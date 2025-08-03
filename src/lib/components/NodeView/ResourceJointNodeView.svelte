@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
-	import type { SFRecipePart } from "$lib/satisfactoryDatabaseTypes";
+	import type { SFPowerFuel, SFRecipe, SFRecipePart } from "$lib/satisfactoryDatabaseTypes";
 	import { getContext } from "svelte";
 	import SfIconView from "../SFIconView.svelte";
 	import { getNodeRadius, isNodeSelectable } from "../datamodel/nodeTypeProperties.svelte";
 	import { globals } from "../datamodel/globals.svelte";
 	import SvgInput from "../SvgInput.svelte";
-	import { floatToString } from "$lib/utilties";
+	import { assertUnreachable, floatToString, isThroughputBalanced } from "$lib/utilties";
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "../datamodel/GraphNode.svelte";
 	import type { GraphPage } from "../datamodel/GraphPage.svelte";
     import type { Id } from "../datamodel/IdGen";
@@ -36,7 +36,14 @@
 		let isEditable = true;
 		switch (parentDetails.type) {
 			case "recipe":
-				const recipe = satisfactoryDatabase.recipes[parentDetails.recipeClassName];
+			case "power-production":
+				let recipe: SFRecipe|SFPowerFuel;
+				if (parentDetails.type === "recipe") {
+					recipe = satisfactoryDatabase.recipes[parentDetails.recipeClassName];
+				} else {
+					recipe = satisfactoryDatabase.powerProducers[parentDetails.powerBuildingClassName]
+						?.fuels[parentDetails.fuelClassName];
+				}
 				const recipeParts = node.properties.jointType === "input" ? recipe?.inputs : recipe?.outputs;
 				const recipePart = recipeParts?.find(p => p.itemClass === node.properties.resourceClassName);
 				const amountPerMinute = recipePart?.amountPerMinute;
@@ -55,7 +62,7 @@
 				isEditable = !parentProperties.autoMultiplier;
 				break;
 			case "extraction":
-				const productionBuilding = satisfactoryDatabase.productionBuildings[parentDetails.buildingClassName];
+				const productionBuilding = satisfactoryDatabase.extractionBuildings[parentDetails.buildingClassName];
 				const purityModifier = parentDetails.purityModifier ?? 1;
 				if (productionBuilding && purityModifier) {
 					productionRate = productionBuilding.baseProductionRate * purityModifier * parentProperties.multiplier;
@@ -95,6 +102,30 @@
 		};
 	});
 
+	const suggestedThroughput = $derived.by(() => {
+		if (node.edges.size === 0) {
+			return 0;
+		}
+		let throughputSum = 0;
+		for (const edgeId of node.edges.values()) {
+			const edge = page.edges.get(edgeId);
+			if (edge === undefined) {
+				continue;
+			}
+			if (node.properties.jointType === "input") {
+				throughputSum += edge.pushThroughput;
+			} else if (node.properties.jointType === "output") {
+				throughputSum += edge.pullThroughput;
+			} else {
+				assertUnreachable(node.properties.jointType);
+			}
+		}
+		if (isThroughputBalanced(throughputSum, productionRate ?? 0)) {
+			return 0;
+		}
+		return throughputSum;
+	});
+
 	const isSelected = $derived(page.selectedNodes.has(node.id));
 	const isSelectable = $derived(isNodeSelectable(node));
 	const highlightAttachable = $derived(page.highlightedNodes.attachable.has(node.id));
@@ -105,6 +136,17 @@
 	const outerRadius = getNodeRadius(node);
 	const innerRadius = outerRadius - 4;
 	const inputWidth = outerRadius * 2.2;
+	
+	const [suggestionOffset, suggestionTextAlign] = (() => {
+		const offset = outerRadius + 6;
+		if (node.properties.jointType === "input") {
+			return [-offset, "end"];
+		} else if (node.properties.jointType === "output") {
+			return [offset, "start"];
+		} else {
+			assertUnreachable(node.properties.jointType);
+		}
+	})();
 </script>
 
 <g
@@ -124,7 +166,7 @@
 	{#if productionRate !== undefined}
 		<SvgInput
 			x={-inputWidth / 2}
-			y={8}
+			y={11}
 			width={inputWidth}
 			height={9}
 			fontSize={11}
@@ -139,14 +181,31 @@
 			} : undefined}
 		/>
 	{/if}
+	{#if setProductionRate && suggestedThroughput !== 0}
+		<text
+			x={suggestionOffset}
+			y={0}
+			text-anchor={suggestionTextAlign}
+			dominant-baseline="middle"
+			style="font-size: 10px; line-height: 10px;"
+			onmousedown={(e) => {
+				e.stopPropagation();
+				setProductionRate(suggestedThroughput);
+			}}
+			ontouchstart={(e) => {
+				e.stopPropagation();
+				setProductionRate(suggestedThroughput);
+			}}
+		>
+			{floatToString(suggestedThroughput, 3)}
+		</text>
+	{/if}
 	{#if globals.debugShowNodeIds}
 		<text
 			x="0"
 			y="-10"
 			text-anchor="middle"
-			font-size="10px"
-			font-family="monospace"
-			style="pointer-events: none;"
+			style="pointer-events: none; font-size: 11px; font-family: monospace;"
 		>
 			n {node.id}
 		</text>
@@ -155,6 +214,8 @@
 
 <style lang="scss">
 	.resource-joint-node-view {
+		cursor: cell;
+
 		circle {
 			fill: var(--node-background-color);
 			stroke: var(--node-border-color);

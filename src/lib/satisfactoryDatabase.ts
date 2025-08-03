@@ -5287,6 +5287,20 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/QuantumTechnology",
 			priority: 2
 		},
+		Recipe_QuantumEnergy_C: {
+			className: "Recipe_QuantumEnergy_C",
+			recipeDisplayName: "Excited Photonic Matter",
+			inputs: [],
+			outputs: [
+				{
+					itemClass: "Desc_QuantumEnergy_C",
+					amountPerMinute: 200
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/QuantumTechnology",
+			priority: 1
+		},
 		Recipe_TemporalProcessor_C: {
 			className: "Recipe_TemporalProcessor_C",
 			recipeDisplayName: "Neural-Quantum Processor",
@@ -6870,1349 +6884,1181 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		Desc_SpaceElevatorPart_5_C: {
 			className: "Desc_SpaceElevatorPart_5_C",
 			displayName: "Adaptive Control Unit",
-			form: "RF_SOLID",
 			icon: "IconDesc_SpelevatorPart_5",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_12_C: {
 			className: "Desc_SpaceElevatorPart_12_C",
 			displayName: "AI Expansion Server",
-			form: "RF_SOLID",
 			icon: "IconDesc_AIExpension",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_7_C: {
 			className: "Desc_SpaceElevatorPart_7_C",
 			displayName: "Assembly Director System",
-			form: "RF_SOLID",
 			icon: "IconDesc_AssemblyDirectorSystem",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_3_C: {
 			className: "Desc_SpaceElevatorPart_3_C",
 			displayName: "Automated Wiring",
-			form: "RF_SOLID",
 			icon: "SpelevatorPart_3",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_11_C: {
 			className: "Desc_SpaceElevatorPart_11_C",
 			displayName: "Ballistic Warp Drive",
-			form: "RF_SOLID",
 			icon: "IconDesc_BallisticWarpDrive",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_10_C: {
 			className: "Desc_SpaceElevatorPart_10_C",
 			displayName: "Biochemical Sculptor",
-			form: "RF_SOLID",
 			icon: "IconDesc_BiochemicalSculptor",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_6_C: {
 			className: "Desc_SpaceElevatorPart_6_C",
 			displayName: "Magnetic Field Generator",
-			form: "RF_SOLID",
 			icon: "IconDesc_MagneticFieldGenerator",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_4_C: {
 			className: "Desc_SpaceElevatorPart_4_C",
 			displayName: "Modular Engine",
-			form: "RF_SOLID",
 			icon: "IconDesc_SpelevatorPart_4",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_9_C: {
 			className: "Desc_SpaceElevatorPart_9_C",
 			displayName: "Nuclear Pasta",
-			form: "RF_SOLID",
 			icon: "IconDesc_NuclearPasta",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_1_C: {
 			className: "Desc_SpaceElevatorPart_1_C",
 			displayName: "Smart Plating",
-			form: "RF_SOLID",
 			icon: "IconDesc_SpelevatorPart_1",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_8_C: {
 			className: "Desc_SpaceElevatorPart_8_C",
 			displayName: "Thermal Propulsion Rocket",
-			form: "RF_SOLID",
 			icon: "IconDesc_ThermalPropulsionRocket",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_SpaceElevatorPart_2_C: {
 			className: "Desc_SpaceElevatorPart_2_C",
 			displayName: "Versatile Framework",
-			form: "RF_SOLID",
 			icon: "IconDesc_SpelevatorPart_2",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/SpaceElevator"
+			category: "Categories/SpaceElevator",
+			energy: 0
 		},
 		Desc_AluminumIngot_C: {
 			className: "Desc_AluminumIngot_C",
 			displayName: "Aluminum Ingot",
-			form: "RF_SOLID",
 			icon: "IconDesc_AluminiumIngot",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ingots"
+			category: "Categories/Ingots",
+			energy: 0
 		},
 		Desc_GoldIngot_C: {
 			className: "Desc_GoldIngot_C",
 			displayName: "Caterium Ingot",
-			form: "RF_SOLID",
 			icon: "IconDesc_CateriumIngot",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ingots"
+			category: "Categories/Ingots",
+			energy: 0
 		},
 		Desc_CopperIngot_C: {
 			className: "Desc_CopperIngot_C",
 			displayName: "Copper Ingot",
-			form: "RF_SOLID",
 			icon: "IconDesc_CopperIngot",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ingots"
+			category: "Categories/Ingots",
+			energy: 0
 		},
 		Desc_FicsiteIngot_C: {
 			className: "Desc_FicsiteIngot_C",
 			displayName: "Ficsite Ingot",
-			form: "RF_SOLID",
 			icon: "IconDesc_FicsiteIngot",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ingots"
+			category: "Categories/Ingots",
+			energy: 0
 		},
 		Desc_IronIngot_C: {
 			className: "Desc_IronIngot_C",
 			displayName: "Iron Ingot",
-			form: "RF_SOLID",
 			icon: "IconDesc_IronIngot",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ingots"
+			category: "Categories/Ingots",
+			energy: 0
 		},
 		Desc_SteelIngot_C: {
 			className: "Desc_SteelIngot_C",
 			displayName: "Steel Ingot",
-			form: "RF_SOLID",
 			icon: "IconDesc_SteelIngot",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ingots"
+			category: "Categories/Ingots",
+			energy: 0
 		},
 		Desc_CompactedCoal_C: {
 			className: "Desc_CompactedCoal_C",
 			displayName: "Compacted Coal",
-			form: "RF_SOLID",
 			icon: "IconDesc_CompactedCoal",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Compounds"
+			category: "Categories/Compounds",
+			energy: 630
 		},
 		Desc_Cement_C: {
 			className: "Desc_Cement_C",
 			displayName: "Concrete",
-			form: "RF_SOLID",
 			icon: "IconDesc_Concrete",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Compounds"
+			category: "Categories/Compounds",
+			energy: 0
 		},
 		Desc_CopperDust_C: {
 			className: "Desc_CopperDust_C",
 			displayName: "Copper Powder",
-			form: "RF_SOLID",
 			icon: "IconDesc_CopperDust",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Compounds"
+			category: "Categories/Compounds",
+			energy: 0
 		},
 		Desc_QuartzCrystal_C: {
 			className: "Desc_QuartzCrystal_C",
 			displayName: "Quartz Crystal",
-			form: "RF_SOLID",
 			icon: "IconDesc_QuartzResource",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Compounds"
+			category: "Categories/Compounds",
+			energy: 0
 		},
 		Desc_Silica_C: {
 			className: "Desc_Silica_C",
 			displayName: "Silica",
-			form: "RF_SOLID",
 			icon: "IconDesc_Silica",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Compounds"
+			category: "Categories/Compounds",
+			energy: 0
 		},
 		Desc_AluminumPlate_C: {
 			className: "Desc_AluminumPlate_C",
 			displayName: "Alclad Aluminum Sheet",
-			form: "RF_SOLID",
 			icon: "IconDesc_AluminiumSheet",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_AluminumCasing_C: {
 			className: "Desc_AluminumCasing_C",
 			displayName: "Aluminum Casing",
-			form: "RF_SOLID",
 			icon: "IconDesc_AluminiumCasing",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_CopperSheet_C: {
 			className: "Desc_CopperSheet_C",
 			displayName: "Copper Sheet",
-			form: "RF_SOLID",
 			icon: "IconDesc_CopperSheet",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_SteelPlateReinforced_C: {
 			className: "Desc_SteelPlateReinforced_C",
 			displayName: "Encased Industrial Beam",
-			form: "RF_SOLID",
 			icon: "IconDesc_EncasedSteelBeam",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_FicsiteMesh_C: {
 			className: "Desc_FicsiteMesh_C",
 			displayName: "Ficsite Trigon",
-			form: "RF_SOLID",
 			icon: "IconDesc_FicsiteMesh",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_ModularFrameHeavy_C: {
 			className: "Desc_ModularFrameHeavy_C",
 			displayName: "Heavy Modular Frame",
-			form: "RF_SOLID",
 			icon: "IconDesc_ModularFrameHeavy",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_IronPlate_C: {
 			className: "Desc_IronPlate_C",
 			displayName: "Iron Plate",
-			form: "RF_SOLID",
 			icon: "IconDesc_IronPlates",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_IronRod_C: {
 			className: "Desc_IronRod_C",
 			displayName: "Iron Rod",
-			form: "RF_SOLID",
 			icon: "IconDesc_IronRods",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_ModularFrame_C: {
 			className: "Desc_ModularFrame_C",
 			displayName: "Modular Frame",
-			form: "RF_SOLID",
 			icon: "IconDesc_ModularFrame",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_IronPlateReinforced_C: {
 			className: "Desc_IronPlateReinforced_C",
 			displayName: "Reinforced Iron Plate",
-			form: "RF_SOLID",
 			icon: "IconDesc_ReinforcedIronPlates",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_IronScrew_C: {
 			className: "Desc_IronScrew_C",
 			displayName: "Screws",
-			form: "RF_SOLID",
 			icon: "IconDesc_IronScrews",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_SteelPlate_C: {
 			className: "Desc_SteelPlate_C",
 			displayName: "Steel Beam",
-			form: "RF_SOLID",
 			icon: "IconDesc_SteelBeam",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_SteelPipe_C: {
 			className: "Desc_SteelPipe_C",
 			displayName: "Steel Pipe",
-			form: "RF_SOLID",
 			icon: "IconDesc_SteelPipe",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/StandardParts"
+			category: "Categories/StandardParts",
+			energy: 0
 		},
 		Desc_CircuitBoardHighSpeed_C: {
 			className: "Desc_CircuitBoardHighSpeed_C",
 			displayName: "AI Limiter",
-			form: "RF_SOLID",
 			icon: "IconDesc_AILimiter",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_Cable_C: {
 			className: "Desc_Cable_C",
 			displayName: "Cable",
-			form: "RF_SOLID",
 			icon: "IconDesc_Cables",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_CircuitBoard_C: {
 			className: "Desc_CircuitBoard_C",
 			displayName: "Circuit Board",
-			form: "RF_SOLID",
 			icon: "IconDesc_CircuitBoard",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_HighSpeedConnector_C: {
 			className: "Desc_HighSpeedConnector_C",
 			displayName: "High-Speed Connector",
-			form: "RF_SOLID",
 			icon: "IconDesc_HighSpeedConnector",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_HighSpeedWire_C: {
 			className: "Desc_HighSpeedWire_C",
 			displayName: "Quickwire",
-			form: "RF_SOLID",
 			icon: "IconDesc_Quickwire",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_SAMIngot_C: {
 			className: "Desc_SAMIngot_C",
 			displayName: "Reanimated SAM",
-			form: "RF_SOLID",
 			icon: "IconDesc_ReanimatedSam",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_SAMFluctuator_C: {
 			className: "Desc_SAMFluctuator_C",
 			displayName: "SAM Fluctuator",
-			form: "RF_SOLID",
 			icon: "IconDesc_SamFluctuator",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_SingularityCell_C: {
 			className: "Desc_SingularityCell_C",
 			displayName: "Singularity Cell",
-			form: "RF_SOLID",
 			icon: "IconDesc_SingularityCell",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_Wire_C: {
 			className: "Desc_Wire_C",
 			displayName: "Wire",
-			form: "RF_SOLID",
 			icon: "IconDesc_Wire",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Electronics"
+			category: "Categories/Electronics",
+			energy: 0
 		},
 		Desc_Computer_C: {
 			className: "Desc_Computer_C",
 			displayName: "Computer",
-			form: "RF_SOLID",
 			icon: "IconDesc_Computer",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Communications"
+			category: "Categories/Communications",
+			energy: 0
 		},
 		Desc_CrystalOscillator_C: {
 			className: "Desc_CrystalOscillator_C",
 			displayName: "Crystal Oscillator",
-			form: "RF_SOLID",
 			icon: "IconDesc_CrystalOscillator",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Communications"
+			category: "Categories/Communications",
+			energy: 0
 		},
 		Desc_ModularFrameLightweight_C: {
 			className: "Desc_ModularFrameLightweight_C",
 			displayName: "Radio Control Unit",
-			form: "RF_SOLID",
 			icon: "IconDesc_RadioControlUnit",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Communications"
+			category: "Categories/Communications",
+			energy: 0
 		},
 		Desc_ComputerSuper_C: {
 			className: "Desc_ComputerSuper_C",
 			displayName: "Supercomputer",
-			form: "RF_SOLID",
 			icon: "IconDesc_QuantumComputer",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Communications"
+			category: "Categories/Communications",
+			energy: 0
 		},
 		Desc_PetroleumCoke_C: {
 			className: "Desc_PetroleumCoke_C",
 			displayName: "Petroleum Coke",
-			form: "RF_SOLID",
 			icon: "IconDesc_PetroleumCoke",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/OilProducts"
+			category: "Categories/OilProducts",
+			energy: 180
 		},
 		Desc_Plastic_C: {
 			className: "Desc_Plastic_C",
 			displayName: "Plastic",
-			form: "RF_SOLID",
 			icon: "IconDesc_Plastic",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/OilProducts"
+			category: "Categories/OilProducts",
+			energy: 0
 		},
 		Desc_PolymerResin_C: {
 			className: "Desc_PolymerResin_C",
 			displayName: "Polymer Resin",
-			form: "RF_SOLID",
 			icon: "IconDesc_PolymerResin",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/OilProducts"
+			category: "Categories/OilProducts",
+			energy: 0
 		},
 		Desc_Rubber_C: {
 			className: "Desc_Rubber_C",
 			displayName: "Rubber",
-			form: "RF_SOLID",
 			icon: "IconDesc_Rubber",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/OilProducts"
+			category: "Categories/OilProducts",
+			energy: 0
 		},
 		Desc_AluminaSolution_C: {
 			className: "Desc_AluminaSolution_C",
 			displayName: "Alumina Solution",
-			form: "RF_LIQUID",
 			icon: "LiquidAlumina_Pipe",
-			fluidColor: "(B=193,G=193,R=193,A=0)",
-			category: "Categories/AdvancedRefinement"
+			category: "Categories/AdvancedRefinement",
+			energy: 0
 		},
 		Desc_AluminumScrap_C: {
 			className: "Desc_AluminumScrap_C",
 			displayName: "Aluminum Scrap",
-			form: "RF_SOLID",
 			icon: "IconDesc_AluminiumScrap",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/AdvancedRefinement"
+			category: "Categories/AdvancedRefinement",
+			energy: 0
 		},
 		Desc_Diamond_C: {
 			className: "Desc_Diamond_C",
 			displayName: "Diamonds",
-			form: "RF_SOLID",
 			icon: "IconDesc_Diamonds",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/AdvancedRefinement"
+			category: "Categories/AdvancedRefinement",
+			energy: 0
 		},
 		Desc_DissolvedSilica_C: {
 			className: "Desc_DissolvedSilica_C",
 			displayName: "Dissolved Silica",
-			form: "RF_LIQUID",
 			icon: "IconDesc_DissolvedSilica",
-			fluidColor: "(B=238,G=190,R=226,A=0)",
-			category: "Categories/AdvancedRefinement"
+			category: "Categories/AdvancedRefinement",
+			energy: 0
 		},
 		Desc_NitricAcid_C: {
 			className: "Desc_NitricAcid_C",
 			displayName: "Nitric Acid",
-			form: "RF_LIQUID",
 			icon: "IconDesc_NitricAcid",
-			fluidColor: "(B=162,G=217,R=217,A=0)",
-			category: "Categories/AdvancedRefinement"
+			category: "Categories/AdvancedRefinement",
+			energy: 0
 		},
 		Desc_SulfuricAcid_C: {
 			className: "Desc_SulfuricAcid_C",
 			displayName: "Sulfuric Acid",
-			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidSulfuricAcid_Pipe",
-			fluidColor: "(B=0,G=255,R=255,A=0)",
-			category: "Categories/AdvancedRefinement"
+			category: "Categories/AdvancedRefinement",
+			energy: 0
 		},
 		Desc_FluidCanister_C: {
 			className: "Desc_FluidCanister_C",
 			displayName: "Empty Canister",
-			form: "RF_SOLID",
 			icon: "IconDesc_EmptyCannister",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Containers"
+			category: "Categories/Containers",
+			energy: 0
 		},
 		Desc_GasTank_C: {
 			className: "Desc_GasTank_C",
 			displayName: "Empty Fluid Tank",
-			form: "RF_SOLID",
 			icon: "IconDesc_PressureTank",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Containers"
+			category: "Categories/Containers",
+			energy: 0
 		},
 		Desc_PressureConversionCube_C: {
 			className: "Desc_PressureConversionCube_C",
 			displayName: "Pressure Conversion Cube",
-			form: "RF_SOLID",
 			icon: "IconDesc_ConversionCube",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Containers"
+			category: "Categories/Containers",
+			energy: 0
 		},
 		Desc_PackagedAlumina_C: {
 			className: "Desc_PackagedAlumina_C",
 			displayName: "Packaged Alumina Solution",
-			form: "RF_SOLID",
 			icon: "IconDesc_PackagedAluminaSolution",
-			fluidColor: "(B=42,G=83,R=58,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 0
 		},
 		Desc_Fuel_C: {
 			className: "Desc_Fuel_C",
 			displayName: "Packaged Fuel",
-			form: "RF_SOLID",
 			icon: "IconDesc_Fuel",
-			fluidColor: "(B=21,G=125,R=235,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 750
 		},
 		Desc_PackagedOilResidue_C: {
 			className: "Desc_PackagedOilResidue_C",
 			displayName: "Packaged Heavy Oil Residue",
-			form: "RF_SOLID",
 			icon: "OilResidue",
-			fluidColor: "(B=120,G=45,R=109,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 400
 		},
 		Desc_PackagedIonizedFuel_C: {
 			className: "Desc_PackagedIonizedFuel_C",
 			displayName: "Packaged Ionized Fuel",
-			form: "RF_SOLID",
 			icon: "IconDesc_IonizedRocketFuel",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 10000
 		},
 		Desc_PackagedBiofuel_C: {
 			className: "Desc_PackagedBiofuel_C",
 			displayName: "Packaged Liquid Biofuel",
-			form: "RF_SOLID",
 			icon: "IconDesc_LiquidBiofuel",
-			fluidColor: "(B=42,G=83,R=58,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 750
 		},
 		Desc_PackagedNitricAcid_C: {
 			className: "Desc_PackagedNitricAcid_C",
 			displayName: "Packaged Nitric Acid",
-			form: "RF_SOLID",
 			icon: "IconDesc_PackagedNitricAcid",
-			fluidColor: "(B=42,G=83,R=58,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 0
 		},
 		Desc_PackagedNitrogenGas_C: {
 			className: "Desc_PackagedNitrogenGas_C",
 			displayName: "Packaged Nitrogen Gas",
-			form: "RF_SOLID",
 			icon: "IconDesc_PackagedNitrogen",
-			fluidColor: "(B=42,G=83,R=58,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 0
 		},
 		Desc_PackagedOil_C: {
 			className: "Desc_PackagedOil_C",
 			displayName: "Packaged Oil",
-			form: "RF_SOLID",
 			icon: "Oil",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 320
 		},
 		Desc_PackagedRocketFuel_C: {
 			className: "Desc_PackagedRocketFuel_C",
 			displayName: "Packaged Rocket Fuel",
-			form: "RF_SOLID",
 			icon: "IconDesc_PackagedRocketFuel",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 7200
 		},
 		Desc_PackagedSulfuricAcid_C: {
 			className: "Desc_PackagedSulfuricAcid_C",
 			displayName: "Packaged Sulfuric Acid",
-			form: "RF_SOLID",
 			icon: "IconDesc_PckagedSulphuricAcid",
-			fluidColor: "(B=42,G=83,R=58,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 0
 		},
 		Desc_TurboFuel_C: {
 			className: "Desc_TurboFuel_C",
 			displayName: "Packaged Turbofuel",
-			form: "RF_SOLID",
 			icon: "IconDesc_TurboFuel",
-			fluidColor: "(B=46,G=41,R=212,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 2000
 		},
 		Desc_PackagedWater_C: {
 			className: "Desc_PackagedWater_C",
 			displayName: "Packaged Water",
-			form: "RF_SOLID",
 			icon: "IconDesc_PackagedWater",
-			fluidColor: "(B=212,G=176,R=122,A=255)",
-			category: "Categories/Packaging"
+			category: "Categories/Packaging",
+			energy: 0
 		},
 		Desc_LiquidOil_C: {
 			className: "Desc_LiquidOil_C",
 			displayName: "Crude Oil",
-			form: "RF_LIQUID",
 			icon: "LiquidOil_Pipe",
-			fluidColor: "(B=25,G=0,R=25,A=0)",
-			category: "Categories/Unpackaging"
+			category: "Categories/Unpackaging",
+			energy: 0.32
 		},
 		Desc_HeavyOilResidue_C: {
 			className: "Desc_HeavyOilResidue_C",
 			displayName: "Heavy Oil Residue",
-			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidHeavyOilResidue_Pipe",
-			fluidColor: "(B=120,G=45,R=109,A=0)",
-			category: "Categories/Unpackaging"
+			category: "Categories/Unpackaging",
+			energy: 0.4
 		},
 		Desc_NitrogenGas_C: {
 			className: "Desc_NitrogenGas_C",
 			displayName: "Nitrogen Gas",
-			form: "RF_GAS",
 			icon: "IconDesc_NitrogenGas",
-			fluidColor: "(B=89,G=89,R=89,A=0)",
-			category: "Categories/Unpackaging"
+			category: "Categories/Unpackaging",
+			energy: 0
 		},
 		Desc_Water_C: {
 			className: "Desc_Water_C",
 			displayName: "Water",
-			form: "RF_LIQUID",
 			icon: "LiquidWater_Pipe",
-			fluidColor: "(B=212,G=176,R=122,A=0)",
-			category: "Categories/Unpackaging"
+			category: "Categories/Unpackaging",
+			energy: 0
 		},
 		Desc_LiquidFuel_C: {
 			className: "Desc_LiquidFuel_C",
 			displayName: "Fuel",
-			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidFuel_Pipe",
-			fluidColor: "(B=21,G=125,R=235,A=0)",
-			category: "Categories/Fuel"
+			category: "Categories/Fuel",
+			energy: 0.75
 		},
 		Desc_IonizedFuel_C: {
 			className: "Desc_IonizedFuel_C",
 			displayName: "Ionized Fuel",
-			form: "RF_GAS",
 			icon: "IconDesc_IonizedFuel",
-			fluidColor: "(B=26,G=95,R=213,A=60)",
-			category: "Categories/Fuel"
+			category: "Categories/Fuel",
+			energy: 5
 		},
 		Desc_LiquidBiofuel_C: {
 			className: "Desc_LiquidBiofuel_C",
 			displayName: "Liquid Biofuel",
-			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidBiofuel_Pipe",
-			fluidColor: "(B=44,G=83,R=59,A=0)",
-			category: "Categories/Fuel"
+			category: "Categories/Fuel",
+			energy: 0.75
 		},
 		Desc_RocketFuel_C: {
 			className: "Desc_RocketFuel_C",
 			displayName: "Rocket Fuel",
-			form: "RF_GAS",
 			icon: "IconDesc_RocketFuelPipe",
-			fluidColor: "(B=26,G=37,R=189,A=0)",
-			category: "Categories/Fuel"
+			category: "Categories/Fuel",
+			energy: 3.6
 		},
 		Desc_LiquidTurboFuel_C: {
 			className: "Desc_LiquidTurboFuel_C",
 			displayName: "Turbofuel",
-			form: "RF_LIQUID",
 			icon: "IconDesc_LiquidTurboFuel_Pipe",
-			fluidColor: "(B=46,G=41,R=212,A=0)",
-			category: "Categories/Fuel"
+			category: "Categories/Fuel",
+			energy: 2
 		},
 		Desc_Battery_C: {
 			className: "Desc_Battery_C",
 			displayName: "Battery",
-			form: "RF_SOLID",
 			icon: "IconDesc_Battery",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/IndustrialParts"
+			category: "Categories/IndustrialParts",
+			energy: 6000
 		},
 		Desc_CoolingSystem_C: {
 			className: "Desc_CoolingSystem_C",
 			displayName: "Cooling System",
-			form: "RF_SOLID",
 			icon: "IconDesc_CoolingSystem",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/IndustrialParts"
+			category: "Categories/IndustrialParts",
+			energy: 0
 		},
 		Desc_ModularFrameFused_C: {
 			className: "Desc_ModularFrameFused_C",
 			displayName: "Fused Modular Frame",
-			form: "RF_SOLID",
 			icon: "IconDesc_FusedModularFrame",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/IndustrialParts"
+			category: "Categories/IndustrialParts",
+			energy: 0
 		},
 		Desc_AluminumPlateReinforced_C: {
 			className: "Desc_AluminumPlateReinforced_C",
 			displayName: "Heat Sink",
-			form: "RF_SOLID",
 			icon: "IconDesc_Heatsink",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/IndustrialParts"
+			category: "Categories/IndustrialParts",
+			energy: 0
 		},
 		Desc_Motor_C: {
 			className: "Desc_Motor_C",
 			displayName: "Motor",
-			form: "RF_SOLID",
 			icon: "IconDesc_Engine",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/IndustrialParts"
+			category: "Categories/IndustrialParts",
+			energy: 0
 		},
 		Desc_Rotor_C: {
 			className: "Desc_Rotor_C",
 			displayName: "Rotor",
-			form: "RF_SOLID",
 			icon: "IconDesc_Rotor",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/IndustrialParts"
+			category: "Categories/IndustrialParts",
+			energy: 0
 		},
 		Desc_Stator_C: {
 			className: "Desc_Stator_C",
 			displayName: "Stator",
-			form: "RF_SOLID",
 			icon: "IconDesc_Stator",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/IndustrialParts"
+			category: "Categories/IndustrialParts",
+			energy: 0
 		},
 		Desc_MotorLightweight_C: {
 			className: "Desc_MotorLightweight_C",
 			displayName: "Turbo Motor",
-			form: "RF_SOLID",
 			icon: "IconDesc_TurboMotor",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/IndustrialParts"
+			category: "Categories/IndustrialParts",
+			energy: 0
 		},
 		Desc_ElectromagneticControlRod_C: {
 			className: "Desc_ElectromagneticControlRod_C",
 			displayName: "Electromagnetic Control Rod",
-			form: "RF_SOLID",
 			icon: "IconDesc_ElectromagneticControlRod",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 0
 		},
 		Desc_PlutoniumCell_C: {
 			className: "Desc_PlutoniumCell_C",
 			displayName: "Encased Plutonium Cell",
-			form: "RF_SOLID",
 			icon: "IconDesc_EncasedPlutoniumCell",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 0
 		},
 		Desc_UraniumCell_C: {
 			className: "Desc_UraniumCell_C",
 			displayName: "Encased Uranium Cell",
-			form: "RF_SOLID",
 			icon: "IconDesc_NuclearCell",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 0
 		},
 		Desc_Ficsonium_C: {
 			className: "Desc_Ficsonium_C",
 			displayName: "Ficsonium",
-			form: "RF_SOLID",
 			icon: "IconDesc_FicsoniumCell",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 0
 		},
 		Desc_FicsoniumFuelRod_C: {
 			className: "Desc_FicsoniumFuelRod_C",
 			displayName: "Ficsonium Fuel Rod",
-			form: "RF_SOLID",
 			icon: "IconDesc_FicsoniumFuelRod",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 150000
 		},
 		Desc_NonFissibleUranium_C: {
 			className: "Desc_NonFissibleUranium_C",
 			displayName: "Non-Fissile Uranium",
-			form: "RF_SOLID",
 			icon: "IconDesc_NonFissileUranium",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 0
 		},
 		Desc_PlutoniumFuelRod_C: {
 			className: "Desc_PlutoniumFuelRod_C",
 			displayName: "Plutonium Fuel Rod",
-			form: "RF_SOLID",
 			icon: "IconDesc_PlutoniumFuelRod",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 1500000
 		},
 		Desc_PlutoniumPellet_C: {
 			className: "Desc_PlutoniumPellet_C",
 			displayName: "Plutonium Pellet",
-			form: "RF_SOLID",
 			icon: "IconDesc_PlutoniumPellet",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 0
 		},
 		Desc_PlutoniumWaste_C: {
 			className: "Desc_PlutoniumWaste_C",
 			displayName: "Plutonium Waste",
-			form: "RF_SOLID",
 			icon: "IconDesc_PlutoniumWaste",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 0
 		},
 		Desc_NuclearFuelRod_C: {
 			className: "Desc_NuclearFuelRod_C",
 			displayName: "Uranium Fuel Rod",
-			form: "RF_SOLID",
 			icon: "IconDesc_NuclearFuelRod",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 750000
 		},
 		Desc_NuclearWaste_C: {
 			className: "Desc_NuclearWaste_C",
 			displayName: "Uranium Waste",
-			form: "RF_SOLID",
 			icon: "IconDesc_NuclearWaste",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Nuclear"
+			category: "Categories/Nuclear",
+			energy: 0
 		},
 		Desc_AlienPowerFuel_C: {
 			className: "Desc_AlienPowerFuel_C",
 			displayName: "Alien Power Matrix",
-			form: "RF_SOLID",
 			icon: "IconDesc_AlienPowerMatrix",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/QuantumTechnology"
+			category: "Categories/QuantumTechnology",
+			energy: 0
 		},
 		Desc_DarkMatter_C: {
 			className: "Desc_DarkMatter_C",
 			displayName: "Dark Matter Crystal",
-			form: "RF_SOLID",
 			icon: "IconDesc_TimeCrystal",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/QuantumTechnology"
+			category: "Categories/QuantumTechnology",
+			energy: 0
 		},
 		Desc_DarkEnergy_C: {
 			className: "Desc_DarkEnergy_C",
 			displayName: "Dark Matter Residue",
-			form: "RF_GAS",
 			icon: "IconDesc_DarkEnergy",
-			fluidColor: "(B=249,G=175,R=253,A=150)",
-			category: "Categories/QuantumTechnology"
+			category: "Categories/QuantumTechnology",
+			energy: 0
 		},
 		Desc_QuantumEnergy_C: {
 			className: "Desc_QuantumEnergy_C",
 			displayName: "Excited Photonic Matter",
-			form: "RF_GAS",
 			icon: "IconDesc_QuantumEnergy",
-			fluidColor: "(B=232,G=245,R=118,A=90)",
-			category: "Categories/QuantumTechnology"
+			category: "Categories/QuantumTechnology",
+			energy: 0
 		},
 		Desc_TemporalProcessor_C: {
 			className: "Desc_TemporalProcessor_C",
 			displayName: "Neural-Quantum Processor",
-			form: "RF_SOLID",
 			icon: "IconDesc_TemporalProcessor",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/QuantumTechnology"
+			category: "Categories/QuantumTechnology",
+			energy: 0
 		},
 		Desc_QuantumOscillator_C: {
 			className: "Desc_QuantumOscillator_C",
 			displayName: "Superposition Oscillator",
-			form: "RF_SOLID",
 			icon: "IconDesc_SuperPositionOscillator",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/QuantumTechnology"
+			category: "Categories/QuantumTechnology",
+			energy: 0
 		},
 		Desc_TimeCrystal_C: {
 			className: "Desc_TimeCrystal_C",
 			displayName: "Time Crystal",
-			form: "RF_SOLID",
 			icon: "IconDesc_ExoticMatter",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/QuantumTechnology"
+			category: "Categories/QuantumTechnology",
+			energy: 0
 		},
 		Desc_GenericBiomass_C: {
 			className: "Desc_GenericBiomass_C",
 			displayName: "Biomass",
-			form: "RF_SOLID",
 			icon: "IconDesc_Biomass_Final",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 180
 		},
 		Desc_Fabric_C: {
 			className: "Desc_Fabric_C",
 			displayName: "Fabric",
-			form: "RF_SOLID",
 			icon: "IconDesc_Fabric",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 0
 		},
 		Desc_HatcherParts_C: {
 			className: "Desc_HatcherParts_C",
 			displayName: "Hatcher Remains",
-			form: "RF_SOLID",
 			icon: "IconDesc_HatcherPart",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 0
 		},
 		Desc_HogParts_C: {
 			className: "Desc_HogParts_C",
 			displayName: "Hog Remains",
-			form: "RF_SOLID",
 			icon: "IconDesc_HogPart",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 0
 		},
 		Desc_Leaves_C: {
 			className: "Desc_Leaves_C",
 			displayName: "Leaves",
-			form: "RF_SOLID",
 			icon: "IconDesc_Leaves",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 15
 		},
 		Desc_Mycelia_C: {
 			className: "Desc_Mycelia_C",
 			displayName: "Mycelia",
-			form: "RF_SOLID",
 			icon: "IconDesc_Mycelia",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 20
 		},
 		Desc_Biofuel_C: {
 			className: "Desc_Biofuel_C",
 			displayName: "Solid Biofuel",
-			form: "RF_SOLID",
 			icon: "IconDesc_SolidBiofuel",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 450
 		},
 		Desc_SpitterParts_C: {
 			className: "Desc_SpitterParts_C",
 			displayName: "Spitter Remains",
-			form: "RF_SOLID",
 			icon: "IconDesc_SpitterPart",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 0
 		},
 		Desc_StingerParts_C: {
 			className: "Desc_StingerParts_C",
 			displayName: "Stinger Remains",
-			form: "RF_SOLID",
 			icon: "IconDesc_StingerPart",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 0
 		},
 		Desc_Wood_C: {
 			className: "Desc_Wood_C",
 			displayName: "Wood",
-			form: "RF_SOLID",
 			icon: "IconDesc_Wood",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Biomass"
+			category: "Categories/Biomass",
+			energy: 100
 		},
 		Desc_AlienDNACapsule_C: {
 			className: "Desc_AlienDNACapsule_C",
 			displayName: "Alien DNA Capsule",
-			form: "RF_SOLID",
 			icon: "IconDesc_AlienDNA",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/AlienRemains"
+			category: "Categories/AlienRemains",
+			energy: 0
 		},
 		Desc_AlienProtein_C: {
 			className: "Desc_AlienProtein_C",
 			displayName: "Alien Protein",
-			form: "RF_SOLID",
 			icon: "IconDesc_AlienProtein",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/AlienRemains"
+			category: "Categories/AlienRemains",
+			energy: 0
 		},
 		Desc_Crystal_C: {
 			className: "Desc_Crystal_C",
 			displayName: "Blue Power Slug",
-			form: "RF_SOLID",
 			icon: "PowerSlugGreen",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/PowerShards"
+			category: "Categories/PowerShards",
+			energy: 0
 		},
 		Desc_CrystalShard_C: {
 			className: "Desc_CrystalShard_C",
 			displayName: "Power Shard",
-			form: "RF_SOLID",
 			icon: "PowerShard",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/PowerShards"
+			category: "Categories/PowerShards",
+			energy: 0
 		},
 		Desc_Crystal_mk3_C: {
 			className: "Desc_Crystal_mk3_C",
 			displayName: "Purple Power Slug",
-			form: "RF_SOLID",
 			icon: "PowerSlugPurple",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/PowerShards"
+			category: "Categories/PowerShards",
+			energy: 0
 		},
 		Desc_Crystal_mk2_C: {
 			className: "Desc_Crystal_mk2_C",
 			displayName: "Yellow Power Slug",
-			form: "RF_SOLID",
 			icon: "PowerSlugYellow",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/PowerShards"
+			category: "Categories/PowerShards",
+			energy: 0
 		},
 		Desc_OreBauxite_C: {
 			className: "Desc_OreBauxite_C",
 			displayName: "Bauxite",
-			form: "RF_SOLID",
 			icon: "IconDesc_Bauxite",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		Desc_OreGold_C: {
 			className: "Desc_OreGold_C",
 			displayName: "Caterium Ore",
-			form: "RF_SOLID",
 			icon: "IconDesc_CateriumOre",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		Desc_Coal_C: {
 			className: "Desc_Coal_C",
 			displayName: "Coal",
-			form: "RF_SOLID",
 			icon: "IconDesc_CoalOre",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 300
 		},
 		Desc_OreCopper_C: {
 			className: "Desc_OreCopper_C",
 			displayName: "Copper Ore",
-			form: "RF_SOLID",
 			icon: "IconDesc_copper_new",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		Desc_OreIron_C: {
 			className: "Desc_OreIron_C",
 			displayName: "Iron Ore",
-			form: "RF_SOLID",
 			icon: "IconDesc_iron_new",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		Desc_Stone_C: {
 			className: "Desc_Stone_C",
 			displayName: "Limestone",
-			form: "RF_SOLID",
 			icon: "Stone",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		Desc_RawQuartz_C: {
 			className: "Desc_RawQuartz_C",
 			displayName: "Raw Quartz",
-			form: "RF_SOLID",
 			icon: "IconDesc_QuartzCrystal",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		Desc_SAM_C: {
 			className: "Desc_SAM_C",
 			displayName: "SAM",
-			form: "RF_SOLID",
 			icon: "IconDesc_SameOre",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		Desc_Sulfur_C: {
 			className: "Desc_Sulfur_C",
 			displayName: "Sulfur",
-			form: "RF_SOLID",
 			icon: "Sulfur",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		Desc_OreUranium_C: {
 			className: "Desc_OreUranium_C",
 			displayName: "Uranium",
-			form: "RF_SOLID",
 			icon: "IconDesc_UraniumOre",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/RawMaterials"
+			category: "Categories/RawMaterials",
+			energy: 0
 		},
 		BP_ItemDescriptorPortableMiner_C: {
 			className: "BP_ItemDescriptorPortableMiner_C",
 			displayName: "Portable Miner",
-			form: "RF_SOLID",
 			icon: "IconDesc_PortableMiner",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Tools"
+			category: "Categories/Tools",
+			energy: 0
 		},
 		Desc_Gunpowder_C: {
 			className: "Desc_Gunpowder_C",
 			displayName: "Black Powder",
-			form: "RF_SOLID",
 			icon: "IconDesc_Gunpowder",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_NobeliskCluster_C: {
 			className: "Desc_NobeliskCluster_C",
 			displayName: "Cluster Nobelisk",
-			form: "RF_SOLID",
 			icon: "IconDesc_Cluster",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_Rebar_Explosive_C: {
 			className: "Desc_Rebar_Explosive_C",
 			displayName: "Explosive Rebar",
-			form: "RF_SOLID",
 			icon: "IconDesc_ExpRebar",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_NobeliskGas_C: {
 			className: "Desc_NobeliskGas_C",
 			displayName: "Gas Nobelisk",
-			form: "RF_SOLID",
 			icon: "IconDesc_Gas",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_CartridgeSmartProjectile_C: {
 			className: "Desc_CartridgeSmartProjectile_C",
 			displayName: "Homing Rifle Ammo",
-			form: "RF_SOLID",
 			icon: "IconDesc_HomingRifle",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_SpikedRebar_C: {
 			className: "Desc_SpikedRebar_C",
 			displayName: "Iron Rebar",
-			form: "RF_SOLID",
 			icon: "IconDesc_Rebar",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_NobeliskExplosive_C: {
 			className: "Desc_NobeliskExplosive_C",
 			displayName: "Nobelisk",
-			form: "RF_SOLID",
 			icon: "IconDesc_Explosive",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_NobeliskNuke_C: {
 			className: "Desc_NobeliskNuke_C",
 			displayName: "Nuke Nobelisk",
-			form: "RF_SOLID",
 			icon: "IconDesc_Nuke",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_NobeliskShockwave_C: {
 			className: "Desc_NobeliskShockwave_C",
 			displayName: "Pulse Nobelisk",
-			form: "RF_SOLID",
 			icon: "IconDesc_Shock",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_CartridgeStandard_C: {
 			className: "Desc_CartridgeStandard_C",
 			displayName: "Rifle Ammo",
-			form: "RF_SOLID",
 			icon: "IconDesc_Rifle",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_Rebar_Spreadshot_C: {
 			className: "Desc_Rebar_Spreadshot_C",
 			displayName: "Shatter Rebar",
-			form: "RF_SOLID",
 			icon: "IconDesc_ScatterRebar",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_GunpowderMK2_C: {
 			className: "Desc_GunpowderMK2_C",
 			displayName: "Smokeless Powder",
-			form: "RF_SOLID",
 			icon: "IconDesc_GunpowderMk2",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_Rebar_Stunshot_C: {
 			className: "Desc_Rebar_Stunshot_C",
 			displayName: "Stun Rebar",
-			form: "RF_SOLID",
 			icon: "IconDesc_StunRebar",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_CartridgeChaos_C: {
 			className: "Desc_CartridgeChaos_C",
 			displayName: "Turbo Rifle Ammo",
-			form: "RF_SOLID",
 			icon: "IconDesc_TurboRifle",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Ammunition"
+			category: "Categories/Ammunition",
+			energy: 0
 		},
 		Desc_Filter_C: {
 			className: "Desc_Filter_C",
 			displayName: "Gas Filter",
-			form: "RF_SOLID",
 			icon: "IconDesc_GasMaskFilter",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Consumables"
+			category: "Categories/Consumables",
+			energy: 0
 		},
 		Desc_HazmatFilter_C: {
 			className: "Desc_HazmatFilter_C",
 			displayName: "Iodine-Infused Filter",
-			form: "RF_SOLID",
 			icon: "IconDesc_HazmatFilter",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/Consumables"
+			category: "Categories/Consumables",
+			energy: 0
 		},
 		Desc_XmasBall2_C: {
 			className: "Desc_XmasBall2_C",
 			displayName: "Blue FICSMAS Ornament",
-			form: "RF_SOLID",
 			icon: "IconDesc_XmasBall_Blue",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_CandyCane_C: {
 			className: "Desc_CandyCane_C",
 			displayName: "Candy Cane",
-			form: "RF_SOLID",
 			icon: "IconDesc_CanePart",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_XmasBall3_C: {
 			className: "Desc_XmasBall3_C",
 			displayName: "Copper FICSMAS Ornament",
-			form: "RF_SOLID",
 			icon: "IconDesc_XmasBall_Yellow",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_Fireworks_Projectile_02_C: {
 			className: "Desc_Fireworks_Projectile_02_C",
 			displayName: "Fancy Fireworks",
-			form: "RF_SOLID",
 			icon: "IconDesc_Fireworks_02",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_Snow_C: {
 			className: "Desc_Snow_C",
 			displayName: "FICSMAS Actual Snow",
-			form: "RF_SOLID",
 			icon: "IconDesc_Snow",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_XmasBow_C: {
 			className: "Desc_XmasBow_C",
 			displayName: "FICSMAS Bow",
-			form: "RF_SOLID",
 			icon: "IconDesc_Bow",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_Gift_C: {
 			className: "Desc_Gift_C",
 			displayName: "FICSMAS Gift",
-			form: "RF_SOLID",
 			icon: "IconDesc_Gift",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_XmasBallCluster_C: {
 			className: "Desc_XmasBallCluster_C",
 			displayName: "FICSMAS Ornament Bundle",
-			form: "RF_SOLID",
 			icon: "IconDesc_Balls",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_XmasBranch_C: {
 			className: "Desc_XmasBranch_C",
 			displayName: "FICSMAS Tree Branch",
-			form: "RF_SOLID",
 			icon: "IconDesc_Branch",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_XmasStar_C: {
 			className: "Desc_XmasStar_C",
 			displayName: "FICSMAS Wonder Star",
-			form: "RF_SOLID",
 			icon: "IconDesc_Star",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_XmasWreath_C: {
 			className: "Desc_XmasWreath_C",
 			displayName: "FICSMAS Wreath",
-			form: "RF_SOLID",
 			icon: "IconDesc_WreathNoBow",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_XmasBall4_C: {
 			className: "Desc_XmasBall4_C",
 			displayName: "Iron FICSMAS Ornament",
-			form: "RF_SOLID",
 			icon: "IconDesc_XmasBall_Silver",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_XmasBall1_C: {
 			className: "Desc_XmasBall1_C",
 			displayName: "Red FICSMAS Ornament",
-			form: "RF_SOLID",
 			icon: "IconDesc_XmasBall_Red",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_SnowballProjectile_C: {
 			className: "Desc_SnowballProjectile_C",
 			displayName: "Snowball",
-			form: "RF_SOLID",
 			icon: "IconDesc_SnowballProjectile",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_Fireworks_Projectile_03_C: {
 			className: "Desc_Fireworks_Projectile_03_C",
 			displayName: "Sparkly Fireworks",
-			form: "RF_SOLID",
 			icon: "IconDesc_Fireworks_03",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		},
 		Desc_Fireworks_Projectile_01_C: {
 			className: "Desc_Fireworks_Projectile_01_C",
 			displayName: "Sweet Fireworks",
-			form: "RF_SOLID",
 			icon: "IconDesc_Fireworks_01",
-			fluidColor: "(B=255,G=255,R=255,A=0)",
-			category: "Categories/FICSMAS"
+			category: "Categories/FICSMAS",
+			energy: 0
 		}
 	},
-	productionBuildings: {
+	extractionBuildings: {
 		Build_MinerMk1_C: {
 			buildingClassName: "Build_MinerMk1_C",
 			baseProductionRate: 60,
@@ -8226,7 +8072,8 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				"Desc_OreGold_C",
 				"Desc_RawQuartz_C",
 				"Desc_Sulfur_C",
-				"Desc_OreUranium_C"
+				"Desc_OreUranium_C",
+				"Desc_SAM_C"
 			]
 		},
 		Build_MinerMk2_C: {
@@ -8242,7 +8089,8 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				"Desc_OreGold_C",
 				"Desc_RawQuartz_C",
 				"Desc_Sulfur_C",
-				"Desc_OreUranium_C"
+				"Desc_OreUranium_C",
+				"Desc_SAM_C"
 			]
 		},
 		Build_MinerMk3_C: {
@@ -8258,7 +8106,8 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				"Desc_OreGold_C",
 				"Desc_RawQuartz_C",
 				"Desc_Sulfur_C",
-				"Desc_OreUranium_C"
+				"Desc_OreUranium_C",
+				"Desc_SAM_C"
 			]
 		},
 		Build_OilPump_C: {
@@ -8285,91 +8134,362 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			]
 		}
 	},
+	powerProducers: {
+		Build_GeneratorCoal_C: {
+			buildingClassName: "Build_GeneratorCoal_C",
+			fuels: {
+				Desc_Coal_C: {
+					inputs: [
+						{
+							itemClass: "Desc_Coal_C",
+							amountPerMinute: 15
+						},
+						{
+							itemClass: "Desc_Water_C",
+							amountPerMinute: 45
+						}
+					],
+					outputs: []
+				},
+				Desc_CompactedCoal_C: {
+					inputs: [
+						{
+							itemClass: "Desc_CompactedCoal_C",
+							amountPerMinute: 7.142857142857142
+						},
+						{
+							itemClass: "Desc_Water_C",
+							amountPerMinute: 45
+						}
+					],
+					outputs: []
+				},
+				Desc_PetroleumCoke_C: {
+					inputs: [
+						{
+							itemClass: "Desc_PetroleumCoke_C",
+							amountPerMinute: 25
+						},
+						{
+							itemClass: "Desc_Water_C",
+							amountPerMinute: 45
+						}
+					],
+					outputs: []
+				}
+			}
+		},
+		Build_GeneratorFuel_C: {
+			buildingClassName: "Build_GeneratorFuel_C",
+			fuels: {
+				Desc_LiquidFuel_C: {
+					inputs: [
+						{
+							itemClass: "Desc_LiquidFuel_C",
+							amountPerMinute: 20
+						}
+					],
+					outputs: []
+				},
+				Desc_LiquidTurboFuel_C: {
+					inputs: [
+						{
+							itemClass: "Desc_LiquidTurboFuel_C",
+							amountPerMinute: 7.5
+						}
+					],
+					outputs: []
+				},
+				Desc_LiquidBiofuel_C: {
+					inputs: [
+						{
+							itemClass: "Desc_LiquidBiofuel_C",
+							amountPerMinute: 20
+						}
+					],
+					outputs: []
+				},
+				Desc_RocketFuel_C: {
+					inputs: [
+						{
+							itemClass: "Desc_RocketFuel_C",
+							amountPerMinute: 4.166666666666667
+						}
+					],
+					outputs: []
+				},
+				Desc_IonizedFuel_C: {
+					inputs: [
+						{
+							itemClass: "Desc_IonizedFuel_C",
+							amountPerMinute: 3
+						}
+					],
+					outputs: []
+				}
+			}
+		},
+		Build_GeneratorBiomass_Automated_C: {
+			buildingClassName: "Build_GeneratorBiomass_Automated_C",
+			fuels: {
+				Desc_Leaves_C: {
+					inputs: [
+						{
+							itemClass: "Desc_Leaves_C",
+							amountPerMinute: 120
+						}
+					],
+					outputs: []
+				},
+				Desc_Wood_C: {
+					inputs: [
+						{
+							itemClass: "Desc_Wood_C",
+							amountPerMinute: 18
+						}
+					],
+					outputs: []
+				},
+				Desc_Mycelia_C: {
+					inputs: [
+						{
+							itemClass: "Desc_Mycelia_C",
+							amountPerMinute: 90
+						}
+					],
+					outputs: []
+				},
+				Desc_GenericBiomass_C: {
+					inputs: [
+						{
+							itemClass: "Desc_GenericBiomass_C",
+							amountPerMinute: 10
+						}
+					],
+					outputs: []
+				},
+				Desc_Biofuel_C: {
+					inputs: [
+						{
+							itemClass: "Desc_Biofuel_C",
+							amountPerMinute: 4
+						}
+					],
+					outputs: []
+				},
+				Desc_PackagedBiofuel_C: {
+					inputs: [
+						{
+							itemClass: "Desc_PackagedBiofuel_C",
+							amountPerMinute: 2.4
+						}
+					],
+					outputs: []
+				}
+			}
+		},
+		Build_GeneratorNuclear_C: {
+			buildingClassName: "Build_GeneratorNuclear_C",
+			fuels: {
+				Desc_NuclearFuelRod_C: {
+					inputs: [
+						{
+							itemClass: "Desc_NuclearFuelRod_C",
+							amountPerMinute: 0.2
+						},
+						{
+							itemClass: "Desc_Water_C",
+							amountPerMinute: 240
+						}
+					],
+					outputs: [
+						{
+							itemClass: "Desc_NuclearWaste_C",
+							amountPerMinute: 10
+						}
+					]
+				},
+				Desc_PlutoniumFuelRod_C: {
+					inputs: [
+						{
+							itemClass: "Desc_PlutoniumFuelRod_C",
+							amountPerMinute: 0.1
+						},
+						{
+							itemClass: "Desc_Water_C",
+							amountPerMinute: 240
+						}
+					],
+					outputs: [
+						{
+							itemClass: "Desc_PlutoniumWaste_C",
+							amountPerMinute: 1
+						}
+					]
+				},
+				Desc_FicsoniumFuelRod_C: {
+					inputs: [
+						{
+							itemClass: "Desc_FicsoniumFuelRod_C",
+							amountPerMinute: 1
+						},
+						{
+							itemClass: "Desc_Water_C",
+							amountPerMinute: 240
+						}
+					],
+					outputs: []
+				}
+			}
+		}
+	},
 	buildings: {
+		Build_GeneratorCoal_C: {
+			className: "Build_GeneratorCoal_C",
+			displayName: "Coal-Powered Generator",
+			icon: "IconDesc_CoalGenerator",
+			powerConsumption: 0,
+			powerProduction: 75
+		},
 		Build_WaterPump_C: {
 			className: "Build_WaterPump_C",
 			displayName: "Water Extractor",
-			icon: "Waterpump"
+			icon: "Waterpump",
+			powerConsumption: 20,
+			powerProduction: 0
 		},
 		Build_QuantumEncoder_C: {
 			className: "Build_QuantumEncoder_C",
 			displayName: "Quantum Encoder",
-			icon: "IconDesc_QuantumEncoder"
+			icon: "IconDesc_QuantumEncoder",
+			powerConsumption: 0.1,
+			powerProduction: 0
 		},
 		Build_Converter_C: {
 			className: "Build_Converter_C",
 			displayName: "Converter",
-			icon: "IconDesc_Converter"
+			icon: "IconDesc_Converter",
+			powerConsumption: 0.1,
+			powerProduction: 0
 		},
 		Build_OilPump_C: {
 			className: "Build_OilPump_C",
 			displayName: "Oil Extractor",
-			icon: "OilPump"
+			icon: "OilPump",
+			powerConsumption: 40,
+			powerProduction: 0
 		},
 		Build_OilRefinery_C: {
 			className: "Build_OilRefinery_C",
 			displayName: "Refinery",
-			icon: "IconDesc_OilRefinery"
+			icon: "IconDesc_OilRefinery",
+			powerConsumption: 30,
+			powerProduction: 0
 		},
 		Build_FoundryMk1_C: {
 			className: "Build_FoundryMk1_C",
 			displayName: "Foundry",
-			icon: "IconDesc_Foundry"
+			icon: "IconDesc_Foundry",
+			powerConsumption: 16,
+			powerProduction: 0
 		},
 		Build_Packager_C: {
 			className: "Build_Packager_C",
 			displayName: "Packager",
-			icon: "IconDesc_Packager"
+			icon: "IconDesc_Packager",
+			powerConsumption: 10,
+			powerProduction: 0
 		},
 		Build_MinerMk2_C: {
 			className: "Build_MinerMk2_C",
 			displayName: "Miner Mk.2",
-			icon: "IconDesc_MinerMk2"
+			icon: "IconDesc_MinerMk2",
+			powerConsumption: 15,
+			powerProduction: 0
 		},
 		Build_ManufacturerMk1_C: {
 			className: "Build_ManufacturerMk1_C",
 			displayName: "Manufacturer",
-			icon: "IconDesc_Manufacturer"
+			icon: "IconDesc_Manufacturer",
+			powerConsumption: 55,
+			powerProduction: 0
 		},
 		Build_AssemblerMk1_C: {
 			className: "Build_AssemblerMk1_C",
 			displayName: "Assembler",
-			icon: "IconDesc_AssemblerMk1"
+			icon: "IconDesc_AssemblerMk1",
+			powerConsumption: 15,
+			powerProduction: 0
 		},
 		Build_HadronCollider_C: {
 			className: "Build_HadronCollider_C",
 			displayName: "Particle Accelerator",
-			icon: "IconDesc_HadronCollider"
+			icon: "IconDesc_HadronCollider",
+			powerConsumption: 0.1,
+			powerProduction: 0
 		},
 		Build_Blender_C: {
 			className: "Build_Blender_C",
 			displayName: "Blender",
-			icon: "IconDesc_Blender"
+			icon: "IconDesc_Blender",
+			powerConsumption: 75,
+			powerProduction: 0
+		},
+		Build_GeneratorNuclear_C: {
+			className: "Build_GeneratorNuclear_C",
+			displayName: "Nuclear Power Plant",
+			icon: "NuclearPowerplant",
+			powerConsumption: 0,
+			powerProduction: 2500
 		},
 		Build_FrackingExtractor_C: {
 			className: "Build_FrackingExtractor_C",
 			displayName: "Resource Well Extractor",
-			icon: "IconDesc_Extractor"
+			icon: "IconDesc_Extractor",
+			powerConsumption: 0,
+			powerProduction: 0
 		},
 		Build_MinerMk3_C: {
 			className: "Build_MinerMk3_C",
 			displayName: "Miner Mk.3",
-			icon: "IconDesc_MinerMk3"
+			icon: "IconDesc_MinerMk3",
+			powerConsumption: 45,
+			powerProduction: 0
+		},
+		Build_GeneratorFuel_C: {
+			className: "Build_GeneratorFuel_C",
+			displayName: "Fuel-Powered Generator",
+			icon: "FuelGenerator",
+			powerConsumption: 0,
+			powerProduction: 250
+		},
+		Build_GeneratorBiomass_Automated_C: {
+			className: "Build_GeneratorBiomass_Automated_C",
+			displayName: "Biomass Burner",
+			icon: "BiomassGenerator",
+			powerConsumption: 0,
+			powerProduction: 30
 		},
 		Build_MinerMk1_C: {
 			className: "Build_MinerMk1_C",
 			displayName: "Miner Mk.1",
-			icon: "IconDesc_MinerMk1"
+			icon: "IconDesc_MinerMk1",
+			powerConsumption: 5,
+			powerProduction: 0
 		},
 		Build_ConstructorMk1_C: {
 			className: "Build_ConstructorMk1_C",
 			displayName: "Constructor",
-			icon: "IconDesc_ConstructorMk1"
+			icon: "IconDesc_ConstructorMk1",
+			powerConsumption: 4,
+			powerProduction: 0
 		},
 		Build_SmelterMk1_C: {
 			className: "Build_SmelterMk1_C",
 			displayName: "Foundry",
-			icon: "IconDesc_SmelterMk1"
+			icon: "IconDesc_SmelterMk1",
+			powerConsumption: 4,
+			powerProduction: 0
 		}
 	},
 	categories: {
@@ -8506,6 +8626,34 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		},
 		IconDesc_Extractor: {
 			name: "IconDesc_Extractor",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		BiomassGenerator: {
+			name: "BiomassGenerator",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_CoalGenerator: {
+			name: "IconDesc_CoalGenerator",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		FuelGenerator: {
+			name: "FuelGenerator",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		NuclearPowerplant: {
+			name: "NuclearPowerplant",
 			resolutions: [
 				512,
 				48

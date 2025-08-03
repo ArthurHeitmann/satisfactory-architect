@@ -1,3 +1,4 @@
+import type { IVector2D } from "./components/datamodel/GraphView.svelte";
 
 export class Debouncer<T extends (...args: any[]) => void> {
 	private timeoutId: NodeJS.Timeout | null = null;
@@ -15,6 +16,7 @@ export class Debouncer<T extends (...args: any[]) => void> {
 		}
 		this.timeoutId = setTimeout(() => {
 			this.func(...args);
+			this.timeoutId = null;
 		}, this.delay);
 	}
 
@@ -23,6 +25,10 @@ export class Debouncer<T extends (...args: any[]) => void> {
 			clearTimeout(this.timeoutId);
 			this.timeoutId = null;
 		}
+	}
+
+	hasPendingCall(): boolean {
+		return this.timeoutId !== null;
 	}
 }
 
@@ -112,4 +118,70 @@ export function assertUnreachable(x: never): never {
 
 export function randomId(): string {
 	return Math.random().toString(36).substring(2, 10);
+}
+
+export function copyText(text: string) {
+	if (navigator.clipboard && window.isSecureContext) {
+		return navigator.clipboard.writeText(text);
+	} else {
+		const textArea = document.createElement("textarea");
+		textArea.value = text;
+		textArea.style.position = "fixed";
+		textArea.style.opacity = "0";
+		document.body.appendChild(textArea);
+		textArea.focus();
+		textArea.select();
+		try {
+			document.execCommand("copy");
+		} catch (err) {
+			console.error("Failed to copy text: ", err);
+		}
+		document.body.removeChild(textArea);
+	}
+}
+
+export async function getClipboardText(): Promise<string | null> {
+	if (navigator.clipboard && window.isSecureContext) {
+		try {
+			return await navigator.clipboard.readText();
+		} catch (err) {
+			console.error("Failed to read clipboard text: ", err);
+			return null;
+		}
+	} else {
+		console.error("Clipboard API not available in this context.");
+		return null;
+	}
+}
+
+export function bezierPoint(startP: IVector2D, endP: IVector2D, ctrl1: IVector2D, ctrl2: IVector2D, t: number): IVector2D {
+	const u = 1 - t;
+	return {
+		x: u * u * u * startP.x + 3 * u * u * t * ctrl1.x + 3 * u * t * t * ctrl2.x + t * t * t * endP.x,
+		y: u * u * u * startP.y + 3 * u * u * t * ctrl1.y + 3 * u * t * t * ctrl2.y + t * t * t * endP.y,
+	};
+}
+
+export function parseFloatExpr(s: string): number {
+	if (!/^[\d\-+*/().\s]+$/.test(s)) {
+		throw NaN;
+	}
+	const result = Function(`"use strict"; return (${s})`)();
+	if (typeof result !== "number" || isNaN(result) || !isFinite(result)) {
+		throw NaN;
+	}
+	return result;
+}
+
+export function isThroughputBalanced(pushed: number, pulled: number): boolean {
+	if (!pushed && !pulled) {
+		return true;
+	}
+	const diff = Math.abs(pushed - pulled);
+	if (diff < 5) {
+		if (diff / Math.max(pushed, pulled) < 0.015) {
+			return true;
+		}
+	}
+	return false;
 }

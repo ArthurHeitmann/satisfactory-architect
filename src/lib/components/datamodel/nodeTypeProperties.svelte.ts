@@ -1,6 +1,7 @@
 import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
 import { assertUnreachable } from "$lib/utilties";
 import type { AppState } from "./AppState.svelte";
+import type { GraphEdge } from "./GraphEdge.svelte";
 import type { GraphNodeType, GraphNode, GraphNodeResourceJointProperties, ProductionDetails } from "./GraphNode.svelte";
 import { resourceJointNodeRadius, splitterMergerNodeRadius } from "./constants";
 
@@ -8,6 +9,7 @@ const draggableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
 const selectableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
 const deletableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
 const attachableTypes: GraphNodeType[] = ["resource-joint", "splitter", "merger"];
+const rotatableEdgeNodes: GraphNodeType[] = ["splitter", "merger"];
 
 const nodeRadius: Partial<Record<GraphNodeType, number>> = {
 	"resource-joint": resourceJointNodeRadius,
@@ -48,6 +50,13 @@ export function canUseInvertedEdgeControlPoint(node: GraphNode): boolean {
 	return !node.properties.locked;
 }
 
+export function userCanChangeOrientationVector(node: GraphNode, edge: GraphEdge): boolean {
+	if (edge.properties.displayType === "straight") {
+		return false;
+	}
+	return rotatableEdgeNodes.includes(node.properties.type);
+}
+
 export function getNodeRadius(node: GraphNode): number {
 	const radius = nodeRadius[node.properties.type];
 	return radius ?? 0;
@@ -64,6 +73,10 @@ export function getProductionNodeDisplayName(details: ProductionDetails, appStat
 		case "extraction":
 			const part = satisfactoryDatabase.parts[details.partClassName];
 			return part.displayName ?? details.partClassName;
+		case "power-production":
+			const powerBuilding = satisfactoryDatabase.buildings[details.powerBuildingClassName];
+			const fuelRecipe = satisfactoryDatabase.parts[details.fuelClassName];
+			return `${powerBuilding?.displayName ?? details.powerBuildingClassName} (${fuelRecipe?.displayName ?? details.fuelClassName})`;
 		case "factory-reference":
 			const page = appState.pages.find(p => p.id === details.factoryId);
 			if (!page) {

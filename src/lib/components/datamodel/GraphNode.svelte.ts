@@ -4,7 +4,7 @@ import { assertUnreachable, floorToNearest, roundToNearest, ceilToNearest } from
 import { SvelteSet } from "svelte/reactivity";
 import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import { Vector2D, type IVector2D } from "./GraphView.svelte";
-import type { Id, IdGen } from "./IdGen";
+import type { Id, IdGen, IdMapper, PasteSource } from "./IdGen";
 import { gridSize, NodePriorities, productionNodeIconSize, productionNodeVerticalPadding, productionNodeHorizontalPadding } from "./constants";
 import { getNodeRadius, getProductionNodeDisplayName } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, applyJsonToSet, type JsonSerializable } from "./StateHistory.svelte";
@@ -25,13 +25,23 @@ export interface ProductionExtractionDetails {
 	type: "extraction";
 	partClassName: string;
 	buildingClassName: string;
-	purityModifier?: number;
+	purityModifier?: 0.5 | 1 | 2;
+}
+export interface PowerProductionDetails {
+	type: "power-production";
+	powerBuildingClassName: string;
+	fuelClassName: string;
 }
 export interface ProductionFactoryInOutDetails {
 	type: "factory-output" | "factory-input";
 	partClassName: string;
 }
-export type ProductionDetails = ProductionRecipeDetails | ProductionExtractionDetails | ProductionFactoryInOutDetails | GraphNodeFactoryReferenceProperties;
+export type ProductionDetails =
+	ProductionRecipeDetails |
+	ProductionExtractionDetails |
+	ProductionFactoryInOutDetails |
+	GraphNodeFactoryReferenceProperties |
+	PowerProductionDetails;
 export interface GraphNodeProductionProperties extends GraphNodePropertiesBase {
 	type: "production";
 	details: ProductionDetails;
@@ -60,7 +70,10 @@ export interface GraphNodeFactoryReferenceProperties extends GraphNodeProperties
 	jointsToExternalNodes: Record<Id, Id>;
 }
 export type NewNodeDetails = ProductionDetails | GraphNodeSplitterMergerProperties;
-export type GraphNodeProperties = GraphNodeProductionProperties | GraphNodeResourceJointProperties | GraphNodeSplitterMergerProperties;
+export type GraphNodeProperties =
+	GraphNodeProductionProperties |
+	GraphNodeResourceJointProperties |
+	GraphNodeSplitterMergerProperties;
 export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> implements JsonSerializable<PageContext> {
 	readonly id: Id;
 	readonly context: PageContext;
@@ -139,6 +152,15 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 					itemClass: details.partClassName,
 					amountPerMinute: 60
 				} ];
+				break;
+			case "power-production":
+				const powerBuilding = satisfactoryDatabase.powerProducers[details.powerBuildingClassName];
+				const fuel = powerBuilding?.fuels[details.fuelClassName];
+				if (!powerBuilding || !fuel) {
+					throw new Error(`Power building with class name ${details.powerBuildingClassName} or fuel ${details.fuelClassName} does not exist.`);
+				}
+				inputs = fuel.inputs.map(input => ({...input}));
+				outputs = fuel.outputs.map(output => ({...output}));
 				break;
 			case "factory-reference":
 				const page = context.appState.pages.find(p => p.id === details.factoryId);
@@ -270,6 +292,39 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			properties: $state.snapshot(this.properties),
 			size: this.size,
 		};
+	}
+
+	afterPaste(mapper: IdMapper, pasteSource: PasteSource) {
+		const newEdges = Array.from(this.edges.values()
+			.filter(id => mapper.hasOldId(id))
+			.map(id => mapper.mapId(id)));
+		this.edges.clear();
+		for (const newId of newEdges) {
+			this.edges.add(newId);
+		}
+		const newParentNode = this.parentNode ? mapper.mapId(this.parentNode) : null;
+		this.parentNode = newParentNode;
+		const newChildren = Array.from(this.children.values()
+			.map(id => mapper.mapId(id)));
+		this.children.clear();
+		for (const newId of newChildren) {
+			this.children.add(newId);
+		}
+		if (this.properties.type === "production") {
+			for (const joint of this.properties.resourceJoints) {
+				joint.id = mapper.mapId(joint.id);
+			}
+			if (pasteSource === "external") {
+				if (this.properties.details.type === "factory-reference") {
+					this.properties.details.factoryId = mapper.mapId(this.properties.details.factoryId);
+					const newJointsToExternalNodes = Object.fromEntries(
+						Object.entries(this.properties.details.jointsToExternalNodes)
+							.map(([jointId, extNodeId]) => [mapper.mapId(jointId), mapper.mapId(extNodeId)])
+					);
+					this.properties.details.jointsToExternalNodes = newJointsToExternalNodes;
+				}
+			}
+		}
 	}
 
 	onDragStart(): void {

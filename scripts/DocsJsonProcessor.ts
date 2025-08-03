@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, copyFileSync, writeFileSync } from "fs";
 import { basename, join } from "path";
 import argsParser from "args-parser";
 import { parseUeData } from "./ue_data_parser";
-import { SFBuilding, SFIcon, SFPart, SFProductionBuilding, SFRecipe, SFRecipePart, SatisfactoryDatabase } from "../src/lib/satisfactoryDatabaseTypes";
+import { SFPowerFuel, SFPowerProducer, SFBuilding, SFIcon, SFPart, SFExtractionBuilding, SFRecipe, SFRecipePart, SatisfactoryDatabase } from "../src/lib/satisfactoryDatabaseTypes";
 import { gameCategories } from "./categories";
 
 function parseFullName(fullName: string): string {
@@ -14,6 +14,9 @@ function parseFullName(fullName: string): string {
 }
 
 function parseRecipePartList(listString: string, duration: number): SFRecipePart[] {
+	if (!listString) {
+		return [];
+	}
 	const list = parseUeData(listString) as any[];
 	return list.map((item: any) => {
 		let amount = item.Amount as number;
@@ -77,7 +80,7 @@ async function main() {
 			if (!className.startsWith("Recipe_")) {
 				continue;
 			}
-			if (!classDef["mProducedIn"] || !classDef["mIngredients"] || !classDef["mProduct"] || !classDef["mManufactoringDuration"]) {
+			if (!classDef["mProducedIn"] || !classDef["mProduct"] || !classDef["mManufactoringDuration"]) {
 				continue;
 			}
 			let allProducedIn = parseUeData(classDef["mProducedIn"]) as string[];
@@ -125,7 +128,7 @@ async function main() {
 	}
 	// resource extractors
 	const visitedResources = new Set<string>();
-	const productionBuildings = new Map<string, SFProductionBuilding>();
+	const extractionBuildings = new Map<string, SFExtractionBuilding>();
 	for (const classDefs of jsonData) {
 		for (const classDef of classDefs["Classes"]) {
 			const className = classDef["ClassName"];
@@ -149,6 +152,9 @@ async function main() {
 					}
 				}
 			}
+			if (classDef.SAMReference) {
+				resources.push(parseFullName(classDef.SAMReference));
+			}
 			let productionRate = Number(classDef["mItemsPerCycle"]) / Number(classDef["mExtractCycleTime"]);
 			if (!productionRate) {
 				continue;
@@ -158,7 +164,7 @@ async function main() {
 			}
 			productionRate *= 60;
 
-			productionBuildings.set(className, {
+			extractionBuildings.set(className, {
 				buildingClassName: className,
 				baseProductionRate: productionRate,
 				outputs: resources,
@@ -168,6 +174,80 @@ async function main() {
 				referencedParts.add(resource);
 				referencedBuildings.add(className);
 			}
+		}
+	}
+	// power producers
+	const energyValues = new Map<string, number>();
+	for (const classDefs of jsonData) {
+		for (const classDef of classDefs["Classes"]) {
+			if ("mEnergyValue" in classDef) {
+				const className = classDef["ClassName"];
+				const energyValue = Number(classDef["mEnergyValue"]);
+				if (energyValue > 0) {
+					energyValues.set(className, energyValue);
+				}
+			}
+		}
+	}
+	const powerProducers = new Map<string, SFPowerProducer>();
+	for (const classDefs of jsonData) {
+		for (const classDef of classDefs["Classes"]) {
+			const building = classDef["ClassName"];
+			if (!building.startsWith("Build_") || !classDef["mFuel"]) {
+				continue;
+			}
+			const supplementalToPowerRatio = Number(classDef["mSupplementalToPowerRatio"]);
+			const powerProduction = Number(classDef["mPowerProduction"]);
+			let input2Rate = powerProduction * 60 * supplementalToPowerRatio;
+			if (input2Rate >= 1000) {
+				input2Rate = input2Rate / 1000;
+			}
+			const fuels: SFPowerFuel[] = [];
+			for (const fuel of classDef["mFuel"]) {
+				const input1Class = fuel["mFuelClass"] as string;
+				const input2Class = fuel["mSupplementalResourceClass"] as string;
+				const outputClass = fuel["mByproduct"] as string;
+				const outputAmount = Number(fuel["mByproductAmount"]) || 0;
+				const inputs: SFRecipePart[] = [];
+				const outputs: SFRecipePart[] = [];
+				const input1Energy = energyValues.get(input1Class);
+				if (!input1Energy) {
+					console.warn(`No energy value found for input: ${input1Class}`);
+					continue;
+				}
+				let inputRate = powerProduction / input1Energy * 60;
+				if (inputRate >= 1000) {
+					inputRate = inputRate / 1000;
+				}
+				inputs.push({
+					itemClass: input1Class,
+					amountPerMinute: inputRate,
+				});
+				referencedParts.add(input1Class);
+				if (input2Class) {
+					inputs.push({
+						itemClass: input2Class,
+						amountPerMinute: input2Rate,
+					});
+					referencedParts.add(input2Class);
+				}
+				if (outputClass) {
+					outputs.push({
+						itemClass: outputClass,
+						amountPerMinute: outputAmount * inputRate,
+					});
+					referencedParts.add(outputClass);
+				}
+				fuels.push({
+					inputs: inputs,
+					outputs: outputs,
+				});
+			}
+			powerProducers.set(building, {
+				buildingClassName: building,
+				fuels: Object.fromEntries(fuels.map(fuel => [fuel.inputs[0].itemClass, fuel])),
+			});
+			referencedBuildings.add(building);
 		}
 	}
 
@@ -190,10 +270,9 @@ async function main() {
 			const part: SFPart = {
 				className: className,
 				displayName: classDef["mDisplayName"],
-				form: classDef["mForm"] as string,
 				icon: splitIconName(icon)?.iconName ?? "",
-				fluidColor: classDef["mFluidColor"] as string,
 				category: gameCategories.partCategories[className] || "",
+				energy: Number(classDef["mEnergyValue"]) || 0,
 			};
 			if (!part.category) {
 				if (className.includes("Nobelisk")) {
@@ -229,6 +308,8 @@ async function main() {
 				className: className,
 				displayName: "",
 				icon: "",
+				powerConsumption: 0,
+				powerProduction: 0,
 			};
 			if (!building.displayName && classDef["mDisplayName"]) {
 				building.displayName = classDef["mDisplayName"];
@@ -238,6 +319,12 @@ async function main() {
 				building.icon = splitIconName(icon)?.iconName ?? "";
 				usedIcons.add(icon);
 				usedIcons.add(icon);
+			}
+			if (!building.powerConsumption && classDef["mPowerConsumption"]) {
+				building.powerConsumption = Number(classDef["mPowerConsumption"]);
+			}
+			if (!building.powerProduction && classDef["mPowerProduction"]) {
+				building.powerProduction = Number(classDef["mPowerProduction"]);
 			}
 			buildings.set(building.className, building);
 		}
@@ -328,7 +415,7 @@ async function main() {
 		}
 		return a.displayName.localeCompare(b.displayName) || 0;
 	});
-	const sortedProductionBuildings = Array.from(productionBuildings.entries()).sort((a, b) => {
+	const sortedProductionBuildings = Array.from(extractionBuildings.entries()).sort((a, b) => {
 		const aDisplayName = buildings.get(a[0])?.displayName || a[0];
 		const bDisplayName = buildings.get(b[0])?.displayName || b[0];
 		return aDisplayName.localeCompare(bDisplayName) || 0;
@@ -345,7 +432,8 @@ async function main() {
 	const outputData: SatisfactoryDatabase = {
 		recipes: Object.fromEntries(sortedRecipes.map((recipe) => [recipe.className, recipe])),
 		parts: Object.fromEntries(sortedParts.map((part) => [part.className, part])),
-		productionBuildings: Object.fromEntries(sortedProductionBuildings.map(([className, building]) => [className, building])),
+		extractionBuildings: Object.fromEntries(sortedProductionBuildings.map(([className, building]) => [className, building])),
+		powerProducers: Object.fromEntries(powerProducers.entries()),
 		buildings: Object.fromEntries(buildings.entries()),
 		categories: Object.fromEntries(sortedCategories),
 		icons: Object.fromEntries(icons.entries()),

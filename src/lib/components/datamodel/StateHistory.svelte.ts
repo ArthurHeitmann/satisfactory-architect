@@ -1,7 +1,7 @@
 import { EventStream } from "$lib/EventStream.svelte";
 import { Debouncer } from "$lib/utilties";
-import { untrack } from "svelte";
 import type { SvelteMap, SvelteSet } from "svelte/reactivity";
+import { globals, trackStateChanges } from "./globals.svelte";
 
 export type JsonPrimitive = string | number | boolean;
 export type JsonElement = JsonPrimitive | JsonElement[] | { [key: string]: JsonElement };
@@ -19,8 +19,7 @@ export class StateHistory<Context> {
 	private serializer: JsonSerializable<Context>;
 	private context: Context;
 	private static readonly PUSH_DEBOUNCE_MS = 500;
-	private static readonly AFTER_RESTORE_DEBOUNCE_MS = 100;
-	enabled: boolean = true;
+	private static readonly AFTER_RESTORE_DEBOUNCE_MS = 50;
 	canUndo: boolean = $state(false);
 	canRedo: boolean = $state(false);
 	readonly onHistoryChange = new EventStream();
@@ -29,22 +28,20 @@ export class StateHistory<Context> {
 		this.serializer = serializer;
 		this.context = context;
 		this.pushDebounced = new Debouncer(this.pushState.bind(this), StateHistory.PUSH_DEBOUNCE_MS);
-		$effect(() => {
-			const state = this.serializer.toJSON();
-			if (Date.now() - this.lastRestoreAt < StateHistory.AFTER_RESTORE_DEBOUNCE_MS) {
-				return;
-			}
-			untrack(() => this.onData(state));
-		});
 	}
-
-	private onData(state: any): void {
-		if (this.enabled) {
-			this.pushDebounced.call(state);
+	
+	onDataChange(): void {
+		const state = this.serializer.toJSON();
+		if (Date.now() - this.lastRestoreAt < StateHistory.AFTER_RESTORE_DEBOUNCE_MS) {
+			return;
 		}
+		this.pushDebounced.call(state);
 	}
 
 	undo(): void {
+		if (this.pushDebounced.hasPendingCall()) {
+			this.pushState(this.serializer.toJSON());
+		}
 		if (this.index > 0) {
 			this.index -= 1;
 			this.restoreState();
@@ -73,6 +70,9 @@ export class StateHistory<Context> {
 	}
 
 	private pushState(state: any): void {
+		if (!trackStateChanges()) {
+			return;
+		}
 		if (this.index < this.history.length - 1) {
 			this.history = this.history.slice(0, this.index + 1);
 		}

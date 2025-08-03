@@ -44,6 +44,11 @@
 					icon: building?.icon,
 				};
 			}
+			case "power-production":
+				const building = satisfactoryDatabase.buildings[details.powerBuildingClassName];
+				return {
+					icon: building?.icon,
+				};
 			default:
 				return {
 					icon: undefined,
@@ -122,9 +127,7 @@
 			x="0"
 			y="-15"
 			text-anchor="middle"
-			font-size="10px"
-			font-family="monospace"
-			style="pointer-events: none;"
+			style="pointer-events: none; font-size: 11px; font-family: monospace;"
 		>
 			n {node.id}
 		</text>
