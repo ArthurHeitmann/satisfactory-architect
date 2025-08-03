@@ -1,4 +1,4 @@
-import type { IVector2D } from "./components/datamodel/GraphView.svelte";
+import type { IVector2D } from "./datamodel/GraphView.svelte";
 
 export class Debouncer<T extends (...args: any[]) => void> {
 	private timeoutId: NodeJS.Timeout | null = null;

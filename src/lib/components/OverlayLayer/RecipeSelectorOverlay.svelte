@@ -3,8 +3,8 @@
 	import { getContext, onDestroy, onMount } from "svelte";
 	import RecipeSelector from "../RecipeSelector.svelte";
 	import { roundToNearest } from "$lib/utilties";
-	import { gridSize } from "../datamodel/constants";
-	import type { NewNodeDetails } from "../datamodel/GraphNode.svelte";
+	import { gridSize } from "../../datamodel/constants";
+	import type { NewNodeDetails } from "../../datamodel/GraphNode.svelte";
 
 	interface Props {
 		event: ShowProductionSelectorEvent;

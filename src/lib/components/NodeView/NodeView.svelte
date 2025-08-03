@@ -2,19 +2,19 @@
 	import { getContext, onDestroy, onMount } from "svelte";
 	import RecipeNodeView from "./ProductionNodeView.svelte";
 	import UserEvents, { type CursorEvent, type DragEvent } from "../UserEvents.svelte";
-	import { isNodeSelectable, isNodeDraggable, isNodeDeletable, getNodeRadius, isResourceNodeSplittable } from "../datamodel/nodeTypeProperties.svelte";
+	import { isNodeSelectable, isNodeDraggable, isNodeDeletable, getNodeRadius, isResourceNodeSplittable } from "../../datamodel/nodeTypeProperties.svelte";
 	import ResourceJointNodeView from "./ResourceJointNodeView.svelte";
 	import type { ContextMenuItem, EventStream, ShowContextMenuEvent, ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
 	import { assertUnreachable, pluralStr } from "$lib/utilties";
-	import { gridSize } from "../datamodel/constants";
-	import type { Id } from "../datamodel/IdGen";
+	import { gridSize } from "../../datamodel/constants";
+	import type { Id } from "../../datamodel/IdGen";
 	import ProductionNodeView from "./ProductionNodeView.svelte";
 	import SplitterMergerNodeView from "./SplitterMergerNodeView.svelte";
-	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties, GraphNodeSplitterMergerProperties, JointDragType } from "../datamodel/GraphNode.svelte";
-	import type { GraphPage } from "../datamodel/GraphPage.svelte";
-	import type { IVector2D } from "../datamodel/GraphView.svelte";
+	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties, GraphNodeSplitterMergerProperties, JointDragType } from "../../datamodel/GraphNode.svelte";
+	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
+	import type { IVector2D } from "../../datamodel/GraphView.svelte";
     import { fade } from "svelte/transition";
-    import { blockStateChanges, globals, unblockStateChanges } from "../datamodel/globals.svelte";
+    import { blockStateChanges, globals, unblockStateChanges } from "../../datamodel/globals.svelte";
 
 	interface Props {
 		node: GraphNode;

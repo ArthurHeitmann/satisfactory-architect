@@ -1,4 +1,4 @@
-import type { NewNodeDetails } from "./components/datamodel/GraphNode.svelte";
+import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
 
 export type EventType = "" | "showContextMenu" | "showProductionSelector";
 

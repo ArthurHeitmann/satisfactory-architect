@@ -32,6 +32,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	readonly nodes: SvelteMap<Id, GraphNode>;
 	readonly edges: SvelteMap<Id, GraphEdge>;
 	readonly selectedNodes: SvelteSet<Id>;
+	readonly selectedEdges: SvelteSet<Id>;
 	readonly history: StateHistory<PageContext>;
 	readonly highlightedNodes: Record<NodeHighlightType, SvelteSet<Id>>;
 	userEventsPriorityNodeId: Id | null;
@@ -45,6 +46,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		this.nodes = new SvelteMap(nodes.map((n) => [n.id, n]));
 		this.edges = new SvelteMap(edges.map((e) => [e.id, e]));
 		this.selectedNodes = new SvelteSet();
+		this.selectedEdges = new SvelteSet();
 		this.history = new StateHistory(this, this.context);
 		this.highlightedNodes = {
 			attachable: new SvelteSet(),
@@ -128,6 +130,18 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			this.removeNode(nodeId);
 		}
 		this.selectedNodes.clear();
+	}
+
+	removeSelectedEdges(): void {
+		for (const edgeId of this.selectedEdges) {
+			this.removeEdge(edgeId);
+		}
+		this.selectedEdges.clear();
+	}
+
+	removeSelectedNodesAndEdges(): void {
+		this.removeSelectedNodes();
+		this.removeSelectedEdges();
 	}
 
 	addChildrenToNode(parentNode: GraphNode, ...childNodes: GraphNode[]): void {
@@ -356,6 +370,24 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		}
 	}
 
+	selectEdge(edge: GraphEdge): void {
+		this.selectedEdges.clear();
+		this.selectedEdges.add(edge.id);
+	}
+
+	toggleEdgeSelection(edge: GraphEdge): void {
+		if (this.selectedEdges.has(edge.id)) {
+			this.selectedEdges.delete(edge.id);
+		} else {
+			this.selectedEdges.add(edge.id);
+		}
+	}
+
+	clearAllSelection(): void {
+		this.selectedNodes.clear();
+		this.selectedEdges.clear();
+	}
+
 	screenToPageCoords(screen: IVector2D): IVector2D {
 		const graphX = (screen.x - this.view.offset.x) / this.view.scale;
 		const graphY = (screen.y - this.view.offset.y) / this.view.scale;
@@ -418,7 +450,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		};
 		copyText(JSON.stringify(json));
 		if (mode === "cut") {
-			this.removeSelectedNodes();
+			this.removeSelectedNodesAndEdges();
 		}
 	}
 

@@ -4,17 +4,17 @@
 	import NodeView from "./NodeView/NodeView.svelte";
 	import UserEvents, { type CursorEvent } from "./UserEvents.svelte";
 	import OverlayLayer from "./OverlayLayer/OverlayLayer.svelte";
-	import { gridSize } from "./datamodel/constants";
-	import { globals } from "./datamodel/globals.svelte";
-	import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
-	import type { GraphPage } from "./datamodel/GraphPage.svelte";
+	import { gridSize } from "../datamodel/constants";
+	import { globals } from "../datamodel/globals.svelte";
+	import type { NewNodeDetails } from "../datamodel/GraphNode.svelte";
+	import type { GraphPage } from "../datamodel/GraphPage.svelte";
     import { EventStream, type ContextMenuItem } from "$lib/EventStream.svelte";
-    import type { IVector2D } from "./datamodel/GraphView.svelte";
-    import type { Id } from "./datamodel/IdGen";
+    import type { IVector2D } from "../datamodel/GraphView.svelte";
+    import type { Id } from "../datamodel/IdGen";
     import { assertUnreachable, getClipboardText, pluralStr } from "$lib/utilties";
-    import { isNodeSelectable } from "./datamodel/nodeTypeProperties.svelte";
+    import { isNodeSelectable } from "../datamodel/nodeTypeProperties.svelte";
     import { fade } from "svelte/transition";
-    import { calculateThroughputs } from "./datamodel/throughputsCalculator";
+    import { calculateThroughputs } from "../datamodel/throughputsCalculator";
 
 	interface Props {
 		page: GraphPage;
@@ -57,21 +57,19 @@
 		};
 	});
 	const initiallySelectedNodeIds = new Set<Id>();
-
 	function onKeyDown(key: string, event: KeyboardEvent) {
 		if (event.ctrlKey && key === "z") {
 			page.history.undo();
 		} else if (event.ctrlKey && key === "y") {
 			page.history.redo();
 		} else if (key === "Delete" || key === "Backspace") {
-			page.removeSelectedNodes();
+			page.removeSelectedNodesAndEdges();
 		} else if (event.ctrlKey && key === "c") {
 			page.copyOrCutSelection("copy");
 		} else if (event.ctrlKey && key === "x") {
 			page.copyOrCutSelection("cut");
 		}
 	}
-
 	function onClick(event: CursorEvent) {
 		if (!event.hasPrimaryButton) {
 			return;
@@ -79,7 +77,7 @@
 		if (event.target !== svg) {
 			return;
 		}
-		page.selectedNodes.clear();
+		page.clearAllSelection();
 	}
 
 	function onContextMenu(event: MouseEvent) {
@@ -252,7 +250,7 @@
 						initiallySelectedNodeIds.add(node);
 					}
 				} else {
-					page.selectedNodes.clear();
+					page.clearAllSelection();
 				}
 			}
 		} : null}

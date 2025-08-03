@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { getContext } from "svelte";
-	import { blockStateChanges, globals, unblockStateChanges } from "../datamodel/globals.svelte";
-	import type { GraphEdge } from "../datamodel/GraphEdge.svelte";
-	import type { GraphPage } from "../datamodel/GraphPage.svelte";
+	import { blockStateChanges, globals, unblockStateChanges } from "../../datamodel/globals.svelte";
+	import type { GraphEdge } from "../../datamodel/GraphEdge.svelte";
+	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
     import type { ContextMenuItem, EventStream } from "$lib/EventStream.svelte";
     import { assertUnreachable, bezierPoint, floatToString, isThroughputBalanced } from "$lib/utilties";
-    import { updateEdgeOffsets } from "../datamodel/straightEdgeRouting";
-    import type { IVector2D } from "../datamodel/GraphView.svelte";
-    import { userCanChangeOrientationVector } from "../datamodel/nodeTypeProperties.svelte";
+    import { updateEdgeOffsets } from "../../datamodel/straightEdgeRouting";
+    import type { IVector2D } from "../../datamodel/GraphView.svelte";
+    import { userCanChangeOrientationVector } from "../../datamodel/nodeTypeProperties.svelte";
     import UserEvents, { type DragEvent } from "../UserEvents.svelte";
-    import type { LayoutOrientation } from "../datamodel/GraphNode.svelte";
+    import type { LayoutOrientation } from "../../datamodel/GraphNode.svelte";
 
 	interface Props {
 		edge: GraphEdge;
@@ -20,6 +20,19 @@
 
 	const eventStream = getContext("event-stream") as EventStream;
 	const page = getContext("graph-page") as GraphPage;
+	
+	const isSelected = $derived(page.selectedEdges.has(edge.id));
+	
+	function onClick(event: MouseEvent) {
+		event.stopPropagation();
+		if (event.shiftKey) {
+			page.toggleEdgeSelection(edge);
+		} else {
+			page.clearAllSelection();
+			page.selectEdge(edge);
+		}
+	}
+
 	const {pathD, midPoint} = $derived.by(() => {
 		const fallback = {pathD: "", midPoint: null};
 		if (!edge.pathPoints)
@@ -122,10 +135,11 @@
 		}
 		return {canRotateStart, startButtonPosition, canRotateEnd, endButtonPosition};
 	});
-
 	const isBalanced = $derived(edge.properties.isDrainLine || isThroughputBalanced(edge.pushThroughput, edge.pullThroughput));
 	const color = $derived.by(() => {
-		if (isBalanced) {
+		if (isSelected) {
+			return "var(--edge-selected-stroke-color)";
+		} else if (isBalanced) {
 			return "var(--edge-stroke-color)";
 		} else {
 			const mixPercent = (edge.pushThroughput - edge.pullThroughput) / Math.max(edge.pushThroughput, edge.pullThroughput);
@@ -211,10 +225,10 @@
 	}
 </script>
 
-{#if pathD}
-	<g
+{#if pathD}	<g
 		class="edge-view"
 		class:isRotating
+		class:selected={isSelected}
 		oncontextmenu={(event) => {
 			event.preventDefault();
 			eventStream.emit({
@@ -222,8 +236,8 @@
 				x: event.clientX,
 				y: event.clientY,
 				items: contextMenuItems,
-			});
-		}}
+			});		}}
+		onclick={onClick}
 	>
 		<path
 			class="edge-view-hover-area"
@@ -284,7 +298,7 @@
 		{/if}
 	</g>
 {/if}
-		
+
 <style lang="scss">
 	path {
 		fill: none;
@@ -307,6 +321,10 @@
 		stroke: var(--edge-hover-stroke-color);
 	}
 
+	.edge-view.selected .edge-view-path {
+		stroke-width: 3;
+	}
+	
 	.edge-throughput-text, .edge-id-text {
 		font-size: 10px;
 	}

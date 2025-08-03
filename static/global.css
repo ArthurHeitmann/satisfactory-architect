@@ -39,6 +39,7 @@
   --node-in-out-text-color: var(--text);
   --edge-stroke-color: var(--background-400);
   --edge-hover-stroke-color: var(--background-500);
+  --edge-selected-stroke-color: var(--primary);
   --recipe-selector-background-color: var(--background);
   --recipe-selector-tile-color: var(--background);
   --recipe-selector-tile-hover-color: var(--background-100);
@@ -97,6 +98,7 @@
   --node-in-out-text-color: var(--text);
   --edge-stroke-color: var(--background-400);
   --edge-hover-stroke-color: var(--background-500);
+  --edge-selected-stroke-color: var(--primary);
   --recipe-selector-background-color: var(--background-100);
   --recipe-selector-tile-color: var(--background-100);
   --recipe-selector-tile-hover-color: var(--background-200);

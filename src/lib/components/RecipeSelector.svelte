@@ -185,10 +185,10 @@
 	import type { SFPart, SFRecipe, SFRecipePart } from "$lib/satisfactoryDatabaseTypes";
 	import MergerIcon from "./icons/MergerIcon.svelte";
 	import SplitterIcon from "./icons/SplitterIcon.svelte";
-	import type { GraphNode, GraphNodeProductionProperties, NewNodeDetails, PowerProductionDetails } from "./datamodel/GraphNode.svelte";
-    import type { GraphPage } from "./datamodel/GraphPage.svelte";
-    import type { AppState } from "./datamodel/AppState.svelte";
-    import { getProductionNodeDisplayName } from "./datamodel/nodeTypeProperties.svelte";
+	import type { GraphNode, GraphNodeProductionProperties, NewNodeDetails, PowerProductionDetails } from "../datamodel/GraphNode.svelte";
+    import type { GraphPage } from "../datamodel/GraphPage.svelte";
+    import type { AppState } from "../datamodel/AppState.svelte";
+    import { getProductionNodeDisplayName } from "../datamodel/nodeTypeProperties.svelte";
     import { floatToString } from "$lib/utilties";
 
 	interface Props {

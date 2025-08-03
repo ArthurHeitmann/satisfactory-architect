@@ -3,13 +3,13 @@
 	import type { SFPowerFuel, SFRecipe, SFRecipePart } from "$lib/satisfactoryDatabaseTypes";
 	import { getContext } from "svelte";
 	import SfIconView from "../SFIconView.svelte";
-	import { getNodeRadius, isNodeSelectable } from "../datamodel/nodeTypeProperties.svelte";
-	import { globals } from "../datamodel/globals.svelte";
+	import { getNodeRadius, isNodeSelectable } from "../../datamodel/nodeTypeProperties.svelte";
+	import { globals } from "../../datamodel/globals.svelte";
 	import SvgInput from "../SvgInput.svelte";
 	import { assertUnreachable, floatToString, isThroughputBalanced } from "$lib/utilties";
-	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "../datamodel/GraphNode.svelte";
-	import type { GraphPage } from "../datamodel/GraphPage.svelte";
-    import type { Id } from "../datamodel/IdGen";
+	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "../../datamodel/GraphNode.svelte";
+	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
+    import type { Id } from "../../datamodel/IdGen";
 
 	interface Props {
 		node: GraphNode<GraphNodeResourceJointProperties>;
