@@ -33,13 +33,14 @@
 		if (!iconData) {
 			return "";
 		}
-		if (quality === "max") {
-			const preview = iconPreviews[icon];
-			if (preview) {
-				return preview;
-			}
+		const preview = iconPreviews[icon];
+		if (preview) {
+			return preview;
 		}
 		return "";
+	});
+	const showOriginal = $derived.by(() => {
+		return quality === "max" || !imagePreviewSrc;
 	});
 
 	onMount(() => {
@@ -66,16 +67,18 @@
 			height={size}
 		/>
 	{/if}
-	<image
-		href={imageSrc}
-		x={x}
-		y={y}
-		width={size}
-		height={size}
-		onload={onImageLoad}
-	/>
+	{#if showOriginal}
+		<image
+			href={imageSrc}
+			x={x}
+			y={y}
+			width={size}
+			height={size}
+			onload={onImageLoad}
+		/>
+	{/if}
 {:else}
-	<div class="wrapper">
+	<div class="wrapper" style="width: {size}px; height: {size}px;">
 		{#if showPreview}
 			<img
 				class="preview"
@@ -85,13 +88,15 @@
 				loading="lazy"
 			/>
 		{/if}
-		<img
-			src={imageSrc}
-			width={size}
-			height={size}
-			loading="lazy"
-			onload={onImageLoad}
-		/>
+		{#if showOriginal}
+			<img
+				src={imageSrc}
+				width={size}
+				height={size}
+				loading="lazy"
+				onload={onImageLoad}
+			/>
+		{/if}
 	</div>
 {/if}
 

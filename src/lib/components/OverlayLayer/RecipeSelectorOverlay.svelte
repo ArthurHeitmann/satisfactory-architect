@@ -41,6 +41,7 @@
 	style="--x: {event.x}px; --y: {event.y}px; --width: {cssWidth};"
 >
 	<RecipeSelector
+		page={event.page}
 		requiredInputsClassName={event.requiredInputsClassName}
 		requiredOutputsClassName={event.requiredOutputsClassName}
 		onRecipeSelected={onRecipeSelected}

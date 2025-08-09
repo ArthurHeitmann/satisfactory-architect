@@ -14,7 +14,7 @@ export class GraphView {
 	}
 
 	static newDefault(): GraphView {
-		return new GraphView({ x: 0, y: 0 }, 1, false);
+		return new GraphView({ x: 0, y: 0 }, 1, true);
 	}
 
 	static fromJSON(json: any): GraphView {

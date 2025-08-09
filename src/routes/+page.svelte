@@ -1,15 +1,16 @@
 
 <script lang="ts">
     import { browser } from "$app/environment";
+    import OverlayLayer from "$lib/components/OverlayLayer/OverlayLayer.svelte";
+    import PageView from "$lib/components/PageView/PageView.svelte";
 	import { AppState } from "$lib/datamodel/AppState.svelte";
     import { StorageKeys } from "$lib/datamodel/constants";
-    import { globals } from "$lib/datamodel/globals.svelte";
+    import { darkTheme, globals } from "$lib/datamodel/globals.svelte";
 	import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-    import GraphPageView from "$lib/components/GraphPageView.svelte";
+    import { EventStream } from "$lib/EventStream.svelte";
 	import { loadFormLocalStorage, localStorageState } from "$lib/localStorageState.svelte";
 	import { onMount, setContext } from "svelte";
 
-	const darkTheme = localStorageState(StorageKeys.darkTheme, true);
 	onMount(() => {
 		const applyTheme = (isDark: boolean) => {
 			if (isDark) {
@@ -34,15 +35,15 @@
 				app.addPage(GraphPage.newDefault(app));
 				app.pages[1].name = `Page ${app.pages.length}`;
 				const page = app.pages[0];
-				page.makeProductionNode(
+				page.makeNewNode(
 					{type: "recipe", recipeClassName: "Recipe_ModularFrameHeavy_C"},
 					{x: 300, y: 300},
 				);
-				page.makeProductionNode(
+				page.makeNewNode(
 					{type: "recipe", recipeClassName: "Recipe_UnpackageAlumina_C"},
 					{x: 600, y: 500},
 				);
-				page.makeProductionNode(
+				page.makeNewNode(
 					{type: "recipe", recipeClassName: "Recipe_PackagedAlumina_C"},
 					{x: 900, y: 300},
 				);
@@ -50,6 +51,9 @@
 			return app;
 		}
 	})();
+
+	const eventStream = new EventStream();
+	setContext("overlay-layer-event-stream", eventStream);
 
 	function onMouseEvent(event: MouseEvent) {
 		globals.mousePosition.x = event.clientX;
@@ -72,6 +76,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Satisfactory Architect</title>
+	<meta name="description" content="A tool for planning, managing and visualizing Satisfactory factories." />
+</svelte:head>
+
 <svelte:window
 	onbeforeunload={onBeforeUnload}
 	onmousedown={onMouseEvent}
@@ -80,37 +89,33 @@
 	ontouchmove={onTouchEvent}
 />
 
-<div class="home">
-	<div class="page-view">
-		{#key app.currentPage.id}
-			<GraphPageView page={app.currentPage} />
-		{/key}
-	</div>
-	<div class="bottom-bar">
-		{#each app.pages as page (page.id)}
+<OverlayLayer eventStream={eventStream}>
+	<div class="home">
+		<div class="page-view">
+			{#key app.currentPage.id}
+				<PageView page={app.currentPage} />
+			{/key}
+		</div>
+		<div class="bottom-bar">
+			{#each app.pages as page (page.id)}
+				<button
+					class="page-button"
+					onclick={() => app.setCurrentPage(page)}
+					disabled={currentPageId === page.id}
+				>
+					{page.name}
+				</button>
+			{/each}
 			<button
 				class="page-button"
-				onclick={() => app.setCurrentPage(page)}
-				disabled={currentPageId === page.id}
+				onclick={() => app.addPage(GraphPage.newDefault(app, `Page ${app.pages.length + 1}`))}
 			>
-				{page.name}
+				➕ Add Page
 			</button>
-		{/each}
-		<button
-			class="page-button"
-			onclick={() => app.addPage(GraphPage.newDefault(app, `Page ${app.pages.length + 1}`))}
-		>
-			➕ Add Page
-		</button>
-		<div class="spacer"></div>
-		<button class=toggle-button onclick={() => app.currentPage.view.enableGridSnap = !app.currentPage.view.enableGridSnap} class:active={app.currentPage.view.enableGridSnap}>
-			{app.currentPage.view.enableGridSnap ? "Disable Grid Snap" : "Enable Grid Snap"}
-		</button>
-		<button class=toggle-button onclick={() => $darkTheme = !$darkTheme}>
-			{$darkTheme ? "☀️ Light Theme" : "🌙 Dark Theme"}
-		</button>
+			<div class="spacer"></div>
+		</div>
 	</div>
-</div>
+</OverlayLayer>
 
 <style lang="scss">
 	:global(:root) {
@@ -163,25 +168,5 @@
 
 	.spacer {
 		flex-grow: 1;
-	}
-
-	.toggle-button {
-		padding: 5px 10px;
-		background-color: var(--background-200);
-		border: none;
-		border-radius: 4px;
-
-		&:hover {
-			background-color: var(--background-300);
-		}
-
-		&:active {
-			background-color: var(--background-400);
-		}
-
-		&:global(.active) {
-			background-color: var(--primary);
-			color: white;
-		}
 	}
 </style>

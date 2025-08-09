@@ -8,7 +8,7 @@ export type JsonElement = JsonPrimitive | JsonElement[] | { [key: string]: JsonE
 
 export interface JsonSerializable<Context> {
 	applyJson(json: any, context: Context): void;
-	toJSON(): any;
+	get asJson(): any;
 }
 
 export class StateHistory<Context> {
@@ -31,7 +31,7 @@ export class StateHistory<Context> {
 	}
 	
 	onDataChange(): void {
-		const state = this.serializer.toJSON();
+		const state = this.serializer.asJson;
 		if (Date.now() - this.lastRestoreAt < StateHistory.AFTER_RESTORE_DEBOUNCE_MS) {
 			return;
 		}
@@ -40,7 +40,7 @@ export class StateHistory<Context> {
 
 	undo(): void {
 		if (this.pushDebounced.hasPendingCall()) {
-			this.pushState(this.serializer.toJSON());
+			this.pushState(this.serializer.asJson);
 		}
 		if (this.index > 0) {
 			this.index -= 1;

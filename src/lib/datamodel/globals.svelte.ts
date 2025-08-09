@@ -1,3 +1,5 @@
+import { localStorageState } from "$lib/localStorageState.svelte";
+import { StorageKeys } from "./constants";
 
 export const globals = $state({
 	mousePosition: {
@@ -19,3 +21,5 @@ export function unblockStateChanges() {
 export function trackStateChanges(): boolean {
 	return stateChangeBlockers === 0;
 }
+
+export const darkTheme = localStorageState(StorageKeys.darkTheme, true);

@@ -5,9 +5,9 @@ import type { GraphEdge } from "./GraphEdge.svelte";
 import type { GraphNodeType, GraphNode, GraphNodeResourceJointProperties, ProductionDetails } from "./GraphNode.svelte";
 import { resourceJointNodeRadius, splitterMergerNodeRadius } from "./constants";
 
-const draggableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
-const selectableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
-const deletableTypes: GraphNodeType[] = ["production", "splitter", "merger"];
+const draggableTypes: GraphNodeType[] = ["production", "splitter", "merger", "text-note"];
+const selectableTypes: GraphNodeType[] = ["production", "splitter", "merger", "text-note"];
+const deletableTypes: GraphNodeType[] = ["production", "splitter", "merger", "text-note"];
 const attachableTypes: GraphNodeType[] = ["resource-joint", "splitter", "merger"];
 const rotatableEdgeNodes: GraphNodeType[] = ["splitter", "merger"];
 

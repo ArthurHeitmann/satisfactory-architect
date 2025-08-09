@@ -1,13 +1,13 @@
 import { EventStream } from "$lib/EventStream.svelte";
-import { assertUnreachable, copyText } from "$lib/utilties";
+import { assertUnreachable, copyText, roundToNearest } from "$lib/utilties";
 import { untrack } from "svelte";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
 import { type IdGen, type Id, IdMapper, type PasteSource } from "./IdGen";
 import { dataModelVersion, NodePriorities } from "./constants";
 import { isNodeAttachable } from "./nodeTypeProperties.svelte";
 import { applyJsonToMap, applyJsonToSet, StateHistory, type JsonSerializable } from "./StateHistory.svelte";
-import { GraphEdge } from "./GraphEdge.svelte";
-import { type LayoutOrientation, GraphNode, type GraphNodeResourceJointProperties, type NewNodeDetails, type GraphNodeSplitterMergerProperties, type ProductionDetails, type JointDragType } from "./GraphNode.svelte";
+import { GraphEdge, type GraphEdgeProperties } from "./GraphEdge.svelte";
+import { type LayoutOrientation, GraphNode, type GraphNodeResourceJointProperties, type NewNodeDetails, type GraphNodeSplitterMergerProperties, type ProductionDetails, type JointDragType, type GraphNodeTextNoteProperties } from "./GraphNode.svelte";
 import { GraphView, type IVector2D } from "./GraphView.svelte";
 import type { AppState } from "./AppState.svelte";
 
@@ -16,13 +16,14 @@ export type PageContext = {
 	page: GraphPage,
 };
 
-export const oppositeLayoutOrientation: Record<LayoutOrientation, LayoutOrientation> = {
+const oppositeLayoutOrientation: Record<LayoutOrientation, LayoutOrientation> = {
 	"top": "bottom",
 	"bottom": "top",
 	"left": "right",
 	"right": "left",
 };
 export type NodeHighlightType = "attachable" | "hovered";
+export type ToolMode = "select-nodes"|"select-edges"|"add-note";
 export class GraphPage implements JsonSerializable<PageContext> {
 	readonly context: PageContext;
 	readonly idGen: IdGen;
@@ -31,13 +32,16 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	readonly view: GraphView;
 	readonly nodes: SvelteMap<Id, GraphNode>;
 	readonly edges: SvelteMap<Id, GraphEdge>;
+	toolMode: ToolMode;
 	readonly selectedNodes: SvelteSet<Id>;
 	readonly selectedEdges: SvelteSet<Id>;
 	readonly history: StateHistory<PageContext>;
 	readonly highlightedNodes: Record<NodeHighlightType, SvelteSet<Id>>;
 	userEventsPriorityNodeId: Id | null;
+	svgElement: Element | null;
+	asJson: any;
 
-	constructor(appState: AppState, id: Id, name: string, view: GraphView, nodes: GraphNode[], edges: GraphEdge[]) {
+	constructor(appState: AppState, id: Id, name: string, view: GraphView, nodes: GraphNode[], edges: GraphEdge[], toolMode: ToolMode) {
 		this.context = { appState, page: this };
 		this.idGen = appState.idGen;
 		this.id = id;
@@ -45,6 +49,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		this.view = view;
 		this.nodes = new SvelteMap(nodes.map((n) => [n.id, n]));
 		this.edges = new SvelteMap(edges.map((e) => [e.id, e]));
+		this.toolMode = $state(toolMode);
 		this.selectedNodes = new SvelteSet();
 		this.selectedEdges = new SvelteSet();
 		this.history = new StateHistory(this, this.context);
@@ -53,16 +58,18 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			hovered: new SvelteSet(),
 		};
 		this.userEventsPriorityNodeId = $state(null);
+		this.svgElement = null;
+		this.asJson = $derived(this.toJSON());
 	}
 
 	static newDefault(appState: AppState, name: string = "New Page"): GraphPage {
 		const view = GraphView.newDefault();
-		return new GraphPage(appState, appState.idGen.nextId(), name, view, [], []);
+		return new GraphPage(appState, appState.idGen.nextId(), name, view, [], [], "select-nodes");
 	}
 
 	static fromJSON(appState: AppState, json: any): GraphPage {
 		const view = GraphView.fromJSON(json.view);
-		const page = new GraphPage(appState, json.id, json.name, view, [], []);
+		const page = new GraphPage(appState, json.id, json.name, view, [], [], json.toolMode);
 		const nodes = Object.values(json.nodes).map((n: any) => GraphNode.fromJSON(n, page.context));
 		for (const node of nodes) {
 			page.nodes.set(node.id, node);
@@ -75,25 +82,35 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	}
 
 	applyJson(json: any): void {
-		// if (json.version !== dataModelVersion) {
-		// 	throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
-		// }
+		if (json.version !== dataModelVersion) {
+			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
+		}
 		this.name = json.name;
 		applyJsonToMap(json.nodes, this.nodes, GraphNode.fromJSON, this.context);
 		applyJsonToMap(json.edges, this.edges, GraphEdge.fromJSON, this.context);
 		applyJsonToSet(json.selectedNodes, this.selectedNodes);
+		applyJsonToSet(json.selectedEdges, this.selectedEdges);
 	}
 
-	toJSON(): any {
+	private toJSON(): any {
 		return {
 			version: dataModelVersion,
+			type: "graph-page",
 			id: this.id,
 			name: this.name,
 			view: untrack(() => this.view.toJSON()),
-			nodes: Object.fromEntries(this.nodes.entries().map(([k, n]) => [k, n.toJSON()])),
-			edges: Object.fromEntries(this.edges.entries().map(([k, e]) => [k, e.toJSON()])),
+			nodes: Object.fromEntries(this.nodes.entries().map(([k, n]) => [k, n.asJson])),
+			edges: Object.fromEntries(this.edges.entries().map(([k, e]) => [k, e.asJson])),
+			toolMode: untrack(() => this.toolMode),
 			selectedNodes: Array.from(this.selectedNodes),
+			selectedEdges: Array.from(this.selectedEdges),
 		};
+	}
+
+	afterPaste(mapper: IdMapper, pasteSource: PasteSource) {
+		for (const item of [...this.nodes.values(), ...this.edges.values()]) {
+			item.afterPaste(mapper, pasteSource);
+		}
 	}
 
 	addNodes(...nodes: GraphNode[]): void {
@@ -312,8 +329,14 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			}
 		);
 		this.addNodes(newNode);
+		const properties: GraphEdgeProperties = {
+			displayType: "curved",
+			isDrainLine: false,
+			startOrientation: null,
+			endOrientation: null,
+		};
 		this.addEdgeBetweenNodes(
-			new GraphEdge(this.context, this.idGen.nextId(), "item-flow", "", "", { displayType: "curved", isDrainLine: false }),
+			new GraphEdge(this.context, this.idGen.nextId(), "item-flow", "", "", properties),
 			jointType === "input" ? newNode : node,
 			jointType === "input" ? node : newNode
 		);
@@ -389,14 +412,21 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	}
 
 	screenToPageCoords(screen: IVector2D): IVector2D {
-		const graphX = (screen.x - this.view.offset.x) / this.view.scale;
-		const graphY = (screen.y - this.view.offset.y) / this.view.scale;
+		let offset: IVector2D;
+		if (this.svgElement) {
+			const rect = this.svgElement.getBoundingClientRect();
+			offset = { x: rect.left, y: rect.top };
+		} else {
+			offset = { x: 0, y: 0 };
+		}
+		const graphX = (screen.x - offset.x - this.view.offset.x) / this.view.scale;
+		const graphY = (screen.y - offset.y - this.view.offset.y) / this.view.scale;
 		return { x: graphX, y: graphY };
 	}
 
-	makeProductionNode(productionDetails: NewNodeDetails, position: IVector2D): GraphNode {
-		if (productionDetails.type === "splitter" || productionDetails.type === "merger") {
-			const node = new GraphNode<GraphNodeSplitterMergerProperties>(
+	makeNewNode(newNodeDetails: NewNodeDetails, position: IVector2D): GraphNode {
+		if (newNodeDetails.type === "splitter" || newNodeDetails.type === "merger" || newNodeDetails.type === "text-note") {
+			const node = new GraphNode(
 				this.idGen.nextId(),
 				this.context,
 				{x: 0, y: 0},
@@ -404,20 +434,19 @@ export class GraphPage implements JsonSerializable<PageContext> {
 				[],
 				null,
 				[],
-				productionDetails,
+				newNodeDetails,
 			);
 			node.onDragStart();
 			this.moveNode(node, position.x, position.y);
 			this.addNodes(node);
 			return node;
-		}
-		else {
+		} else {
 			const {parent, children} = GraphNode.makeProductionNode(
 				this.idGen,
 				this.context,
 				{x: 0, y: 0},
 				[],
-				productionDetails as ProductionDetails,
+				newNodeDetails as ProductionDetails,
 			);
 			parent.onDragStart();
 			this.moveNode(parent, position.x, position.y);
@@ -445,8 +474,8 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		const json = {
 			type: "factory-data",
 			version: dataModelVersion,
-			nodes: allNodes.map((n) => n.toJSON()),
-			edges: selectedEdges.map((e) => e.toJSON()),
+			nodes: allNodes.map((n) => n.asJson),
+			edges: selectedEdges.map((e) => e.asJson),
 		};
 		copyText(JSON.stringify(json));
 		if (mode === "cut") {
@@ -496,6 +525,12 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			}
 			nodesCenter.x /= count;
 			nodesCenter.y /= count;
+			if (this.view.enableGridSnap) {
+				centerPoint.x = roundToNearest(centerPoint.x, this.view.gridSnap);
+				centerPoint.y = roundToNearest(centerPoint.y, this.view.gridSnap);
+				nodesCenter.x = roundToNearest(nodesCenter.x, this.view.gridSnap);
+				nodesCenter.y = roundToNearest(nodesCenter.y, this.view.gridSnap);
+			}
 			const deltaX = centerPoint.x - nodesCenter.x;
 			const deltaY = centerPoint.y - nodesCenter.y;
 			for (const node of nodes) {

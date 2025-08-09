@@ -14,8 +14,8 @@ export type GraphEdgeDisplayType = "straight" | "curved" | "angled";
 export interface GraphEdgeProperties {
 	displayType: GraphEdgeDisplayType;
 	straightLineOffsets?: number[];
-	startOrientation?: LayoutOrientation;
-	endOrientation?: LayoutOrientation;
+	startOrientation: LayoutOrientation|null;
+	endOrientation: LayoutOrientation|null;
 	isDrainLine: boolean;
 }
 
@@ -31,6 +31,7 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 	readonly properties: GraphEdgeProperties;
 	pushThroughput: number;
 	pullThroughput: number;
+	readonly asJson: any;
 
 	readonly startNode: GraphNode|undefined;
 	readonly endNode: GraphNode|undefined;
@@ -65,6 +66,7 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 		this.properties = $state(properties);
 		this.pushThroughput = $state(0);
 		this.pullThroughput = $state(0);
+		this.asJson = $derived(this.toJSON());
 		
 		this.startNode = $derived(this.context.page.nodes.get(this.startNodeId));
 		this.endNode = $derived(this.context.page.nodes.get(this.endNodeId));
@@ -282,7 +284,11 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 			}
 			const { startPoint, endPoint } = this.pathPoints;
 			const { startOffset, endOffset } = this.orientationVectors;
-			return makeStraightEdgePoints(startPoint, endPoint, startOffset, endOffset, this.straightEdgeCount);
+			let offsets = this.properties.straightLineOffsets;
+			if (!offsets || offsets.length + 2 !== this.straightEdgeCount) {
+				offsets = Array(Math.max(0, this.straightEdgeCount - 2)).fill(0);
+			}
+			return makeStraightEdgePoints(startPoint, endPoint, startOffset, endOffset, this.straightEdgeCount, offsets);
 		});
 	}
 
@@ -297,7 +303,7 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 		applyJsonToObject(json.properties, this.properties as Record<string, any>);
 	}
 
-	toJSON(): any {
+	private toJSON(): any {
 		return {
 			id: this.id,
 			type: this.type,

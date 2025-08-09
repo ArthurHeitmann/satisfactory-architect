@@ -46,36 +46,38 @@ interface LinkedNode {
 export function calculateThroughputs(page: GraphPage) {
 	console.time("calculateThroughputs");
 	blockStateChanges();
-	for (const edge of page.edges.values()) {
-		edge.pushThroughput = 0;
-		edge.pullThroughput = 0;
-	}
+	try {
+		for (const edge of page.edges.values()) {
+			edge.pushThroughput = 0;
+			edge.pullThroughput = 0;
+		}
 
-	const nodes: Map<Id, Node> = new Map();
-	const pushNodes: Node[] = [];
-	const pullNodes: Node[] = [];
-	const autoNodes: Node[] = [];
-	const edges: LinkedNode[] = [];
-	generateNodeNetwork(page, nodes, pushNodes, pullNodes, autoNodes, edges);
-	for (const node of pushNodes) {
-		const result = exploreThroughputOf(node, "push", 0, []);
-		dumpLeftOverThroughput(node, "push", result);
+		const nodes: Map<Id, Node> = new Map();
+		const pushNodes: Node[] = [];
+		const pullNodes: Node[] = [];
+		const autoNodes: Node[] = [];
+		const edges: LinkedNode[] = [];
+		generateNodeNetwork(page, nodes, pushNodes, pullNodes, autoNodes, edges);
+		for (const node of pushNodes) {
+			const result = exploreThroughputOf(node, "push", 0, []);
+			dumpLeftOverThroughput(node, "push", result);
+		}
+		for (const node of pullNodes) {
+			const result = exploreThroughputOf(node, "pull", 0, []);
+			dumpLeftOverThroughput(node, "pull", result);
+		}
+		for (const node of autoNodes) {
+			autoSetMultiplier(page, node);
+			exploreThroughputOf(node, node.consumeAll!, 0, []);
+		}
+		for (const edge of edges) {
+			edge.edge.pushThroughput = edge.throughput.pushed;
+			edge.edge.pullThroughput = edge.throughput.pulled;
+		}
+	} finally {
+		unblockStateChanges();
+		console.timeEnd("calculateThroughputs");
 	}
-	for (const node of pullNodes) {
-		const result = exploreThroughputOf(node, "pull", 0, []);
-		dumpLeftOverThroughput(node, "pull", result);
-	}
-	for (const node of autoNodes) {
-		autoSetMultiplier(page, node);
-		exploreThroughputOf(node, node.consumeAll!, 0, []);
-	}
-	for (const edge of edges) {
-		edge.edge.pushThroughput = edge.throughput.pushed;
-		edge.edge.pullThroughput = edge.throughput.pulled;
-	}
-	
-	unblockStateChanges();
-	console.timeEnd("calculateThroughputs");
 }
 
 interface ExploreResult {

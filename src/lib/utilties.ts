@@ -102,6 +102,16 @@ export function floatToString(value: number, precision: number = 2): string {
 	return value.toFixed(precision).replace(/\.?0+$/, "");
 }
 
+export function formatPower(mw: number): string {
+	if (mw >= 1000) {
+		return `${floatToString(mw / 1000, 2)} GW`;
+	}
+	if (mw >= 1) {
+		return `${Math.round(mw)} MW`;
+	}
+	return `${floatToString(mw, 2)} MW`;
+}
+
 export function angleBetweenPoints(
 	centerPoint: { x: number; y: number },
 	outerPoint: { x: number; y: number }
@@ -184,4 +194,71 @@ export function isThroughputBalanced(pushed: number, pulled: number): boolean {
 		}
 	}
 	return false;
+}
+
+export function getThroughputColor(isBalanced: boolean, pushThroughput: number, pullThroughput: number): string {
+	if (isBalanced) {
+		return "var(--edge-stroke-color)";
+	} else {
+		const mixPercent = (pushThroughput - pullThroughput) / Math.max(pushThroughput, pullThroughput);
+		const minPercent = 0.2;
+		const mixPercentAbs = Math.min(1.0, Math.abs(mixPercent) * 2 + minPercent);
+		if (mixPercent < 0) {
+			return `color-mix(in srgb, var(--underflow-color) ${mixPercentAbs * 100}%, var(--edge-stroke-color))`;
+		} else if (mixPercent > 0) {
+			return `color-mix(in srgb, var(--overflow-color) ${mixPercentAbs * 100}%, var(--edge-stroke-color))`;
+		} else {
+			return "var(--edge-stroke-color)";
+		}
+	}
+}
+
+export function targetsInput(event: Event): boolean {
+	const target = event.target as Element|null;
+	if (target?.tagName === "INPUT" || target?.tagName === "TEXTAREA")
+		return true;
+	const contentEditable = target?.getAttribute("contenteditable");
+	if (contentEditable === "true" || contentEditable === "plaintext-only")
+		return true;
+	return false;
+}
+
+export function saveFileToDisk(filename: string, content: string): void {
+	const blob = new Blob([content], { type: "application/json" });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = filename;
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+}
+
+export function loadFileFromDisk(): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = ".json";
+		input.style.display = "none";
+		document.body.appendChild(input);
+		input.addEventListener("change", async (event) => {
+			const file = (event.target as HTMLInputElement).files?.[0];
+			if (!file) {
+				reject(new Error("No file selected"));
+				return;
+			}
+			const reader = new FileReader();
+			reader.onload = () => {
+				resolve(reader.result as string);
+			};
+			reader.onerror = () => {
+				reject(new Error("Failed to read file"));
+			};
+			reader.readAsText(file);
+		});
+		document.body.appendChild(input);
+		input.click();
+		document.body.removeChild(input);
+	});
 }

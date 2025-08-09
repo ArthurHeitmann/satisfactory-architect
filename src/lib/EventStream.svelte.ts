@@ -1,4 +1,6 @@
+import type { SvgPresetName } from "./components/icons/svgPresets";
 import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
+import type { GraphPage } from "./datamodel/GraphPage.svelte";
 
 export type EventType = "" | "showContextMenu" | "showProductionSelector";
 
@@ -34,25 +36,30 @@ export interface ShowContextMenuEvent extends EventBase {
 	onClick?: (item: string) => void;
 	items: ContextMenuItem[];
 }
-
-interface ContextMenuItem1 {
-	label: string;
-	hint?: string;
-	value: string;
-	disabled?: boolean;
-	icon?: string;
-}
-interface ContextMenuItem2 {
+export type ContextMenuItemAction  = {value: string} | {onClick: () => void};
+export interface ContextMenuTextItemBase {
 	label: string;
 	hint?: string;
 	disabled?: boolean;
-	icon?: string;
-	onClick: () => void;
+	icon?: SvgPresetName;
 }
-export type ContextMenuItem = ContextMenuItem1 | ContextMenuItem2;
+export interface ContextMenuIconButtonBase<T> {
+	icon: SvgPresetName;
+	disabled?: boolean;
+	value: T;
+}
+export type ContextMenuTextItem = ContextMenuTextItemBase & ContextMenuItemAction;
+export type ContextMenuIconButton<T> = ContextMenuIconButtonBase<T> & ContextMenuItemAction;
+export interface ContextMenuItemButtonRow<T = any> {
+	items: ContextMenuIconButton<T>[];
+	currentValue: T;
+	onClick: (item: T) => void;
+}
+export type ContextMenuItem = ContextMenuTextItem | ContextMenuItemButtonRow;
 
 export interface ShowProductionSelectorEvent extends EventBase {
 	type: "showProductionSelector";
+	page: GraphPage;
 	onSelect: (result: NewNodeDetails) => void;
 	onCancel?: () => void;
 	x: number;

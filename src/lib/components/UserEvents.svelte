@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { roundToNearest } from "$lib/utilties";
+	import { roundToNearest, targetsInput } from "$lib/utilties";
 	import type { Snippet } from "svelte";
 
 	export interface DragEvent {
@@ -25,7 +25,8 @@
 
 	interface Props {
 		children: Snippet<[{ listeners: Record<string, any>, isDragging: boolean }]>;
-		id: string;
+		id?: string;
+		canStartDrag?: ((event: DragEvent) => boolean) | null;
 		onDrag?: ((event: DragEvent) => void) | null;
 		onDragStart?: ((event: DragEvent) => void) | null;
 		onDragEnd?: ((event: DragEvent) => void) | null;
@@ -48,7 +49,8 @@
 
 	let {
 		children,
-		id,
+		id = undefined,
+		canStartDrag = null,
 		onDrag = null,
 		onDragStart = null,
 		onDragEnd = null,
@@ -81,7 +83,21 @@
 	let dragStartButton: number = 0;
 
 	function handleDragStart(clientX: number, clientY: number, event: MouseEvent | TouchEvent) {
-		hasDragStarted = dragStartThreshold === 0;
+		if (canStartDrag) {
+			if (!canStartDrag({
+				deltaX: 0,
+				deltaY: 0,
+				totalDeltaX: 0,
+				totalDeltaY: 0,
+				cursorEvent: eventToCursorEvent(event),
+			})) {
+				return;
+			}
+		}
+		hasDragStarted = true;
+		if (dragStartThreshold !== 0) {
+			hasDragStarted = false;
+		}
 		isDragging = true;
 		lastX = clientX;
 		lastY = clientY;
@@ -376,16 +392,6 @@
 	function isTouchEvent(): boolean {
 		return Date.now() - lastTouchAt < 500;
 	};
-
-	function targetsInput(event: UIEvent): boolean {
-		const target = event.target as Element|null;
-		if (target?.tagName === "INPUT" || target?.tagName === "TEXTAREA")
-			return true;
-		const contentEditable = target?.getAttribute("contenteditable");
-		if (contentEditable === "true" || contentEditable === "plaintext-only")
-			return true;
-		return false;
-	}
 
 	function eventToCursorEvent(event: MouseEvent | TouchEvent | UIEvent, button?: number): CursorEvent {
 		if (!(event instanceof MouseEvent) && !(event instanceof TouchEvent)) {

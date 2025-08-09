@@ -16,7 +16,7 @@
 		node,
 	}: Props = $props();
 
-	const page = getContext("graph-page") as GraphPage;
+	const page = $derived(node.context.page);
 
 	const isSelected = $derived(page.selectedNodes.has(node.id));
 	const highlightAttachable = $derived(page.highlightedNodes.attachable.has(node.id));

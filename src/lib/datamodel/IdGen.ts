@@ -9,11 +9,23 @@ export class IdGen {
 	}
 
 	static fromJson(json: any): IdGen {
-		return new IdGen(Number(json));
+		const num = Number(json);
+		if (isNaN(num)) {
+			throw new Error("Invalid ID: not a number");
+		}
+		return new IdGen(num);
 	}
 
-	toJSON(): number {
-		return this.currentId;
+	replaceFromJson(json: any): void {
+		const num = Number(json);
+		if (isNaN(num)) {
+			throw new Error("Invalid ID: not a number");
+		}
+		this.currentId = num;
+	}
+
+	toJSON(): string {
+		return this.currentId.toString();
 	}
 
 	nextId(): Id {

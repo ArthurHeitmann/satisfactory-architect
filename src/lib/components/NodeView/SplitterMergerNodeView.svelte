@@ -19,7 +19,7 @@
 		node,
 	}: Props = $props();
 
-	const page = getContext("graph-page") as GraphPage;
+	const page = $derived(node.context.page);
 
 	const isSelected = $derived(page.selectedNodes.has(node.id));
 	const isSelectable = $derived(isNodeSelectable(node));
@@ -27,7 +27,7 @@
 	const highlightHovered = $derived(page.highlightedNodes.hovered.has(node.id));
 
 	const partIcon = satisfactoryDatabase.parts[node.properties.resourceClassName]?.icon;
-	const outerRadius = getNodeRadius(node) + 1;
+	const outerRadius = getNodeRadius(node);
 	const innerRadius = outerRadius - 4;
 	const connectionsPath = $derived.by(() => {
 		const nodePos = node.position;
@@ -92,6 +92,8 @@
 		}
 		return path;
 	});
+
+	const displayName = node.properties.type === "splitter" ? "Splitter" : "Merger";
 </script>
 
 <g
@@ -100,6 +102,7 @@
 	class:selected={isSelected}
 	class:highlight-attachable={highlightAttachable}
 	class:highlight-hovered={highlightHovered}
+	data-tooltip={displayName}
 >
 	<circle r={outerRadius} />
 	<path
@@ -131,7 +134,7 @@
 		circle {
 			fill: var(--node-background-color);
 			stroke: var(--node-border-color);
-			stroke-width: var(--rounded-border-width);
+			stroke-width: 2px;
 			transition: stroke 0.1s ease-in-out;
 		}
 

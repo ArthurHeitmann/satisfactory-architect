@@ -10,19 +10,20 @@
 	import type { Id } from "../../datamodel/IdGen";
 	import ProductionNodeView from "./ProductionNodeView.svelte";
 	import SplitterMergerNodeView from "./SplitterMergerNodeView.svelte";
-	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties, GraphNodeSplitterMergerProperties, JointDragType } from "../../datamodel/GraphNode.svelte";
+	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties, GraphNodeSplitterMergerProperties, GraphNodeTextNoteProperties, JointDragType } from "../../datamodel/GraphNode.svelte";
 	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
 	import type { IVector2D } from "../../datamodel/GraphView.svelte";
     import { fade } from "svelte/transition";
     import { blockStateChanges, globals, unblockStateChanges } from "../../datamodel/globals.svelte";
+    import TextNoteNodeView from "./TextNoteNodeView.svelte";
 
 	interface Props {
 		node: GraphNode;
 	}
 	const { node }: Props = $props();
 
-	const page = getContext("graph-page") as GraphPage;
 	const eventStream = getContext("event-stream") as EventStream;
+	const page = $derived(node.context.page);
 	
 	const isSelectable = isNodeSelectable(node);
 	const isDraggable = isNodeDraggable(node);
@@ -42,61 +43,34 @@
 
 	const contextMenuItems = $derived.by(() => {
 		const items: ContextMenuItem[] = [];
-		if (node.properties.type === "production" && node.properties.details.type === "factory-reference") {
-			items.push({
-				label: "Update in-/outputs",
-				onClick: node.updateExternalFactoryJoints.bind(node),
-			});
-		}
-		if (node.properties.type === "production") {
-			if (node.properties.details.type === "factory-input" || node.properties.details.type === "factory-output") {
-				items.push({
-					label: (node.properties.autoMultiplier ? "Manual" : "Auto") + " rate",
-					onClick: () => {
-						const properties = node.properties as GraphNodeProductionProperties;
-						properties.autoMultiplier = !properties.autoMultiplier;
-					},
-				});
-			}
-			if (node.properties.details.type === "extraction") {
-				const details = node.properties.details;
-				items.push({
-					label: "Make impure",
-					onClick: () => details.purityModifier = 0.5,
-				});
-				items.push({
-					label: "Make normal",
-					onClick: () => details.purityModifier = 1,
-				});
-				items.push({
-					label: "Make pure",
-					onClick: () => details.purityModifier = 2,
-				});
-			}
-		}
 		if (isDeletable) {
 			if (isSelected && (page.selectedNodes.size > 1 || !page.selectedNodes.has(node.id))) {
 				const selectedCount = page.selectedNodes.size;
 				items.push({
-					label: `Delete ${pluralStr("node", selectedCount)}`,
+					label: `Delete ${pluralStr("Node", selectedCount)}`,
+					icon: "delete",
 					hint: "Del",
 					onClick: () => page.removeSelectedNodes(),
 				});
+			} else {
+				items.push({
+					label: "Delete Node",
+					icon: "delete",
+					hint: "Del",
+					onClick: () => page.removeNode(node.id),
+				});
 			}
-			items.push({
-				label: "Delete Node",
-				hint: "Del",
-				onClick: () => page.removeNode(node.id),
-			});
 		}
 		if (isSelected) {
 			items.push({
-				label: `Copy ${pluralStr("node", page.selectedNodes.size)}`,
+				label: `Copy ${page.selectedNodes.size === 1 ? "Node" : pluralStr("Node", page.selectedNodes.size)}`,
+				icon: "copy",
 				hint: "Ctrl+C",
 				onClick: () => page.copyOrCutSelection("copy"),
 			});
 			items.push({
-				label: `Cut ${pluralStr("node", page.selectedNodes.size)}`,
+				label: `Cut ${page.selectedNodes.size === 1 ? "Node" : pluralStr("Node", page.selectedNodes.size)}`,
+				icon: "cut",
 				hint: "Ctrl+X",
 				onClick: () => page.copyOrCutSelection("cut"),
 			});
@@ -132,15 +106,51 @@
 		}
 		if (supportsNewIncomingConnection) {
 			items.push({
-				label: "Add incoming connection",
+				label: "Add Incoming Connection",
+				icon: "arrow-right-base-right",
 				onClick: startNewIncomingConnection,
 			});
 		}
 		if (supportsNewOutgoingConnection) {
 			items.push({
-				label: "Add outgoing connection",
+				label: "Add Outgoing Connection",
+				icon: "arrow-right-base-left",
 				onClick: startNewOutgoingConnection,
 			});
+		}
+		if (node.properties.type === "production" && node.properties.details.type === "factory-reference") {
+			items.push({
+				label: "Update In-/Outputs",
+				icon: "refresh",
+				onClick: node.updateExternalFactoryJoints.bind(node),
+			});
+		}
+		if (node.properties.type === "production") {
+			if (node.properties.details.type === "factory-input" || node.properties.details.type === "factory-output") {
+				items.push({
+					label: (node.properties.autoMultiplier ? "Manual" : "Auto") + " Rate",
+					icon: "infinity",
+					onClick: () => {
+						const properties = node.properties as GraphNodeProductionProperties;
+						properties.autoMultiplier = !properties.autoMultiplier;
+					},
+				});
+			}
+			// if (node.properties.details.type === "extraction") {
+			// 	const details = node.properties.details;
+			// 	items.push({
+			// 		label: "Make impure",
+			// 		onClick: () => details.purityModifier = 0.5,
+			// 	});
+			// 	items.push({
+			// 		label: "Make normal",
+			// 		onClick: () => details.purityModifier = 1,
+			// 	});
+			// 	items.push({
+			// 		label: "Make pure",
+			// 		onClick: () => details.purityModifier = 2,
+			// 	});
+			// }
 		}
 		return items;
 	});
@@ -301,6 +311,7 @@
 				blockStateChanges();
 				eventStream.emit({
 					type: "showProductionSelector",
+					page: page,
 					x: e.clientX,
 					y: e.clientY,
 					autofocus: !e.isTouchEvent,
@@ -309,7 +320,7 @@
 					onSelect: (details) => {
 						unblockStateChanges();
 						const point = page.screenToPageCoords({x: e.clientX, y: e.clientY});
-						const newNode = page.makeProductionNode(details, point);
+						const newNode = page.makeNewNode(details, point);
 						let destJoint: GraphNode | null = null;
 						for (const jointId of newNode.children) {
 							const joint = page.nodes.get(jointId);
@@ -335,6 +346,19 @@
 						}
 						node.edges.clear();
 						page.removeNode(node.id);
+						for (let i = 0; i < 5; i++) {
+							const destJointPos = destJoint.getAbsolutePosition(page);
+							const posDelta = {
+								x: node.position.x - destJointPos.x,
+								y: node.position.y - destJointPos.y,
+							};
+							if (posDelta.x === 0 && posDelta.y === 0) {
+								break;
+							}
+							newNode.onDragStart();
+							newNode.move(posDelta.x, posDelta.y, 0);
+							newNode.reorderRecipeJoints(page);
+						}
 					},
 					onCancel: () => {
 						unblockStateChanges();
@@ -399,6 +423,7 @@
 			if (event.hasShiftKey) {
 				page.toggleNodeSelection(node);
 			} else if (!isSelected) {
+				page.clearAllSelection();
 				page.selectNode(node);
 			}
 		}
@@ -440,6 +465,8 @@
 				<ResourceJointNodeView node={node as GraphNode<GraphNodeResourceJointProperties>} />
 			{:else if node.properties.type === "splitter" || node.properties.type === "merger"}
 				<SplitterMergerNodeView node={node as GraphNode<GraphNodeSplitterMergerProperties>} />
+			{:else if node.properties.type === "text-note"}
+				<TextNoteNodeView node={node as GraphNode<GraphNodeTextNoteProperties>} />
 			{:else}
 				<circle
 					class="node-view"

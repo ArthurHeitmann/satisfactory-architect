@@ -73,6 +73,7 @@
 					type: "extraction",
 					partClassName: output,
 					buildingClassName: productionBuilding.buildingClassName,
+					purityModifier: 1,
 				};
 				categories[categoryName].push({
 					key: `${productionBuilding.buildingClassName} ${output}`,
@@ -182,16 +183,14 @@
 	import { innerWidth } from "svelte/reactivity/window";
 	import SfIconView from "./SFIconView.svelte";
 	import { getContext, onMount } from "svelte";
-	import type { SFPart, SFRecipe, SFRecipePart } from "$lib/satisfactoryDatabaseTypes";
-	import MergerIcon from "./icons/MergerIcon.svelte";
-	import SplitterIcon from "./icons/SplitterIcon.svelte";
 	import type { GraphNode, GraphNodeProductionProperties, NewNodeDetails, PowerProductionDetails } from "../datamodel/GraphNode.svelte";
     import type { GraphPage } from "../datamodel/GraphPage.svelte";
     import type { AppState } from "../datamodel/AppState.svelte";
-    import { getProductionNodeDisplayName } from "../datamodel/nodeTypeProperties.svelte";
     import { floatToString } from "$lib/utilties";
+    import PresetSvg from "./icons/PresetSvg.svelte";
 
 	interface Props {
+		page: GraphPage;
 		requiredInputsClassName?: string;
 		requiredOutputsClassName?: string;
 		onRecipeSelected: (details: NewNodeDetails) => void;
@@ -200,6 +199,7 @@
 		autofocusSearch?: boolean;
 	}
 	let {
+		page,
 		requiredInputsClassName = "",
 		requiredOutputsClassName = "",
 		onRecipeSelected,
@@ -207,9 +207,7 @@
 		cssWidth = $bindable(""),
 		autofocusSearch = false,
 	}: Props = $props();
-
-	const page = getContext("graph-page") as GraphPage;
-	const appState = getContext("app-state") as AppState;
+	const appState = $derived(page.context.appState);
 
 	let searchQuery = $derived("");
 
@@ -448,9 +446,9 @@
 									<SfIconView icon={recipe.icon.name} size={iconSize} />
 								{:else if "component" in recipe.icon}
 									{#if recipe.icon.component === "splitter"}
-										<SplitterIcon size={iconSize} fill="var(--text)" />
+										<PresetSvg name="splitter" size={iconSize} color="var(--text)" />
 									{:else if recipe.icon.component === "merger"}
-										<MergerIcon size={iconSize} fill="var(--text)" />
+										<PresetSvg name="merger" size={iconSize} color="var(--text)" />
 									{/if}
 								{/if}
 								{#if recipe.iconSmall}

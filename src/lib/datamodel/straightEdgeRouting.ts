@@ -193,6 +193,7 @@ export function makeStraightEdgePoints(
 	startDir: IVector2D,
 	endDir: IVector2D,
 	edgeCount: number,
+	offsets: number[],
 ): IVector2D[] {
 	const prim: Axis = startDir.x != 0 ? "x" : "y";
 	const startPoint = new Vec2DExt(startPos, prim);
@@ -219,34 +220,34 @@ export function makeStraightEdgePoints(
 		case 3:
 			p = startPoint.copy();
 			if (startDirE.prim === -endDirE.prim)
-				p.prim = p.prim + primDiff / 2;
+				p.prim = p.prim + primDiff / 2 + offsets[0];
 			else if (Math.sign(startDirE.prim) === Math.sign(primDiff))
-				p.prim = endPoint.prim + endDirE.prim * gapSize;
+				p.prim = endPoint.prim + endDirE.prim * gapSize + offsets[0];
 			else
-				p.prim = p.prim + startDirE.prim * gapSize;
+				p.prim = p.prim + startDirE.prim * gapSize + offsets[0];
 			pushPoint(p);
 			p.sec = endPoint.sec;
 			pushPoint(p);
 			break;
 		case 4:
 			p = startPoint.copy();
-			p.prim = p.prim + startDirE.prim * gapSize;
+			p.prim = p.prim + startDirE.prim * gapSize + offsets[0];
 			pushPoint(p);
-			p.sec = endPoint.sec + endDirE.sec * gapSize;
+			p.sec = endPoint.sec + endDirE.sec * gapSize + offsets[1];
 			pushPoint(p);
 			p.prim = endPoint.prim;
 			pushPoint(p);
 			break;
 		case 5:
 			p = startPoint.copy();
-			p.prim = p.prim + startDirE.prim * gapSize;
+			p.prim = p.prim + startDirE.prim * gapSize + offsets[0];
 			pushPoint(p);
 			if (startPoint.sec !== endPoint.sec)
-				p.sec = p.sec + secDiff / 2;
+				p.sec = p.sec + secDiff / 2 + offsets[1];
 			else
-				p.sec = p.sec + gapSize;
+				p.sec = p.sec + gapSize + offsets[1];
 			pushPoint(p);
-			p.prim = endPoint.prim + endDirE.prim * gapSize;
+			p.prim = endPoint.prim + endDirE.prim * gapSize + offsets[2];
 			pushPoint(p);
 			p.sec = endPoint.sec;
 			pushPoint(p);

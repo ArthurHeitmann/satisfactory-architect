@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, copyFileSync, writeFileSync } from "fs";
 import { basename, join } from "path";
 import argsParser from "args-parser";
 import { parseUeData } from "./ue_data_parser";
-import { SFPowerFuel, SFPowerProducer, SFBuilding, SFIcon, SFPart, SFExtractionBuilding, SFRecipe, SFRecipePart, SatisfactoryDatabase } from "../src/lib/satisfactoryDatabaseTypes";
+import { SFPowerFuel, SFPowerProducer, SFBuilding, SFIcon, SFPart, SFExtractionBuilding, SFRecipe, SFRecipePart, SatisfactoryDatabase, SFVariablePowerConsumption } from "../src/lib/satisfactoryDatabaseTypes";
 import { gameCategories } from "./categories";
 
 function parseFullName(fullName: string): string {
@@ -73,6 +73,7 @@ async function main() {
 	const referencedParts = new Set<string>();
 	const referencedBuildings = new Set<string>();
 	const referencedCategories = new Set<string>();
+	const variablePowerConsumptions = new Map<string, { min: number, max: number }>();
 	// recipes
 	for (const classDefs of jsonData) {
 		for (const classDef of classDefs["Classes"]) {
@@ -116,7 +117,16 @@ async function main() {
 				}
 			}
 			recipes.set(recipe.className, recipe);
-			
+
+			const variablePowerConsumptionConstant = Number(classDef["mVariablePowerConsumptionConstant"]);
+			const variablePowerConsumptionFactor = Number(classDef["mVariablePowerConsumptionFactor"]);
+			if (variablePowerConsumptionFactor > 1 && !isNaN(variablePowerConsumptionConstant)) {
+				variablePowerConsumptions.set(recipe.className, {
+					min: variablePowerConsumptionConstant,
+					max: variablePowerConsumptionConstant + variablePowerConsumptionFactor
+				});
+			}
+
 			for (const part of [...recipe.inputs, ...recipe.outputs]) {
 				referencedParts.add(part.itemClass);
 			}
@@ -288,6 +298,7 @@ async function main() {
 	}
 
 	const buildings = new Map<string, SFBuilding>();
+	const variablePowerBuildings = new Set<string>();
 	// buildings
 	for (const classDefs of jsonData) {
 		for (const classDef of classDefs["Classes"]) {
@@ -327,10 +338,33 @@ async function main() {
 				building.powerProduction = Number(classDef["mPowerProduction"]);
 			}
 			buildings.set(building.className, building);
+
+			if ("mEstimatedMininumPowerConsumption" in classDef) {
+				variablePowerBuildings.add(className);
+			}
 		}
 	}
 	const referencedBuildBuildings = Array.from(referencedBuildings.values()).filter((building) => building.startsWith("Build_"));
 	console.log(`Found ${buildings.size}/${referencedBuildBuildings.length} buildings.`);
+	// update variable power consumptions in recipes
+	const averagePowerFactors = {
+		"Build_HadronCollider_C": 2/3,
+		"Build_QuantumEncoder_C": 0.5,
+		"Build_Converter_C": 0.625,
+	};
+	for (const recipe of recipes.values()) {
+		if (!variablePowerBuildings.has(recipe.producedIn)) {
+			continue;
+		}
+		const variablePowerConsumption = variablePowerConsumptions.get(recipe.className);
+		if (!variablePowerConsumption) {
+			continue;
+		}
+		recipe.customPowerConsumption = {
+			max: variablePowerConsumption.max,
+			average: variablePowerConsumption.max * (averagePowerFactors[recipe.producedIn] ?? 0.5),
+		};
+	}
 
 	const categories: Record<string, string> = {};
 	for (const categoryKey of referencedCategories) {

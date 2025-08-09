@@ -6,7 +6,7 @@
 	import { getNodeRadius, isNodeSelectable } from "../../datamodel/nodeTypeProperties.svelte";
 	import { globals } from "../../datamodel/globals.svelte";
 	import SvgInput from "../SvgInput.svelte";
-	import { assertUnreachable, floatToString, isThroughputBalanced } from "$lib/utilties";
+	import { assertUnreachable, floatToString, getThroughputColor, isThroughputBalanced } from "$lib/utilties";
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "../../datamodel/GraphNode.svelte";
 	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
     import type { Id } from "../../datamodel/IdGen";
@@ -18,7 +18,7 @@
 		node,
 	}: Props = $props();
 
-	const page = getContext("graph-page") as GraphPage;
+	const page = $derived(node.context.page);
 	const { productionRate, setProductionRate, isEditable } = $derived.by(() => {
 		const parent = node.parentNode ? page.nodes.get(node.parentNode) : undefined;
 		const parentProperties = parent?.properties;
@@ -83,14 +83,17 @@
 				const factoryId = parentDetails.factoryId;
 				const externalNodeId = parentDetails.jointsToExternalNodes[node.id];
 				const externalNodeProperties = getExternalNodeProperties(factoryId, externalNodeId);
+				isEditable = externalNodeProperties ? !externalNodeProperties.autoMultiplier : false;
 				if (externalNodeProperties) {
 					productionRate = externalNodeProperties.multiplier;
-					setProductionRate = ((value: number) => {
-						const externalNodeProperties = getExternalNodeProperties(factoryId, externalNodeId);
-						if (externalNodeProperties) {
-							externalNodeProperties.multiplier = value;
-						}
-					});
+					if (isEditable) {
+						setProductionRate = ((value: number) => {
+							const externalNodeProperties = getExternalNodeProperties(factoryId, externalNodeId);
+							if (externalNodeProperties) {
+								externalNodeProperties.multiplier = value;
+							}
+						});
+					}
 				}
 				break;
 		}
@@ -102,28 +105,35 @@
 		};
 	});
 
-	const suggestedThroughput = $derived.by(() => {
+	const {suggestedThroughput, throughputColor} = $derived.by(() => {
+		const fallback = {suggestedThroughput: 0, throughputColor: ""};
 		if (node.edges.size === 0) {
-			return 0;
+			return fallback;
 		}
-		let throughputSum = 0;
+		let totalPushed = 0;
+		let totalPulled = 0;
 		for (const edgeId of node.edges.values()) {
 			const edge = page.edges.get(edgeId);
 			if (edge === undefined) {
 				continue;
 			}
-			if (node.properties.jointType === "input") {
-				throughputSum += edge.pushThroughput;
-			} else if (node.properties.jointType === "output") {
-				throughputSum += edge.pullThroughput;
-			} else {
-				assertUnreachable(node.properties.jointType);
-			}
+			totalPushed += edge.pushThroughput;
+			totalPulled += edge.pullThroughput;
 		}
-		if (isThroughputBalanced(throughputSum, productionRate ?? 0)) {
-			return 0;
+		
+		let suggestedThroughput: number;
+		if (node.properties.jointType === "input") {
+			suggestedThroughput = totalPushed;
+		} else if (node.properties.jointType === "output") {
+			suggestedThroughput = totalPulled;
+		} else {
+			assertUnreachable(node.properties.jointType);
 		}
-		return throughputSum;
+		if (isThroughputBalanced(suggestedThroughput, productionRate ?? 0)) {
+			return fallback;
+		}
+		const throughputColor = getThroughputColor(false, totalPushed, totalPulled);
+		return { suggestedThroughput, throughputColor };
 	});
 
 	const isSelected = $derived(page.selectedNodes.has(node.id));
@@ -137,12 +147,12 @@
 	const innerRadius = outerRadius - 4;
 	const inputWidth = outerRadius * 2.2;
 	
-	const [suggestionOffset, suggestionTextAlign] = (() => {
-		const offset = outerRadius + 6;
+	const [suggestionAbsOffset, suggestionRelOffset] = (() => {
+		const offset = outerRadius - 3;
 		if (node.properties.jointType === "input") {
-			return [-offset, "end"];
+			return [-offset, "-100%"];
 		} else if (node.properties.jointType === "output") {
-			return [offset, "start"];
+			return [offset, "-0%"];
 		} else {
 			assertUnreachable(node.properties.jointType);
 		}
@@ -155,6 +165,8 @@
 	class:selected={isSelected}
 	class:highlight-attachable={highlightAttachable}
 	class:highlight-hovered={highlightHovered}
+	class:locked={node.properties.locked}
+	data-tooltip={node.properties.locked ? resource?.displayName : undefined}
 >
 	<circle r={outerRadius} />
 	<SfIconView
@@ -182,23 +194,25 @@
 		/>
 	{/if}
 	{#if setProductionRate && suggestedThroughput !== 0}
-		<text
-			x={suggestionOffset}
-			y={0}
-			text-anchor={suggestionTextAlign}
-			dominant-baseline="middle"
-			style="font-size: 10px; line-height: 10px;"
-			onmousedown={(e) => {
-				e.stopPropagation();
-				setProductionRate(suggestedThroughput);
-			}}
-			ontouchstart={(e) => {
-				e.stopPropagation();
-				setProductionRate(suggestedThroughput);
-			}}
-		>
-			{floatToString(suggestedThroughput, 3)}
-		</text>
+			<foreignObject
+				x={suggestionAbsOffset}
+				y={-outerRadius/2}
+			>
+				<div
+					class="rate-suggestion"
+					style="--throughput-color: {throughputColor}; transform: translate({suggestionRelOffset}, -100%);"
+					onmousedown={(e) => {
+						e.stopPropagation();
+						setProductionRate(suggestedThroughput);
+					}}
+					ontouchstart={(e) => {
+						e.stopPropagation();
+						setProductionRate(suggestedThroughput);
+					}}
+				>
+					{floatToString(suggestedThroughput, 3)}
+				</div>
+			</foreignObject>
 	{/if}
 	{#if globals.debugShowNodeIds}
 		<text
@@ -214,31 +228,51 @@
 
 <style lang="scss">
 	.resource-joint-node-view {
-		cursor: cell;
-
 		circle {
 			fill: var(--node-background-color);
 			stroke: var(--node-border-color);
 			stroke-width: var(--rounded-border-width);
 			transition: stroke 0.1s ease-in-out;
 		}
-	}
 
-	:global(.resource-joint-node-view.selectable:hover:not(:where(.selected, .highlight-hovered))) {
-		circle {
-			stroke: var(--node-border-hover-color);
+		&.locked :global(:not(:where(text, foreignObject, foreignObject *))) {
+			cursor: cell;
+		}
+		
+		&.selectable:hover:not(:where(.selected, .highlight-hovered)) {
+			circle {
+				stroke: var(--node-border-hover-color);
+			}
+		}
+	
+		&:where(.highlight-attachable) {
+			circle {
+				stroke: var(--node-border-highlight-color);
+			}
+		}
+	
+		&:where(.selected, .highlight-hovered) {
+			circle {
+				stroke: var(--node-border-selected-color);
+			}
 		}
 	}
 
-	:global(.resource-joint-node-view:where(.highlight-attachable)) {
-		circle {
-			stroke: var(--node-border-highlight-color);
-		}
-	}
 
-	:global(.resource-joint-node-view:where(.selected, .highlight-hovered)) {
-		circle {
-			stroke: var(--node-border-selected-color);
+	.rate-suggestion {
+		cursor: pointer;
+		width: max-content;
+		background: var(--throughput-color);
+		color: var(--edge-background-color-text);
+		font-size: 9px;
+		font-weight: bold;
+		padding: 2px 4px;
+		height: 13px;
+		line-height: 9px;
+		border-radius: 5px;
+
+		&:hover {
+			filter: brightness(1.1);
 		}
 	}
 </style>

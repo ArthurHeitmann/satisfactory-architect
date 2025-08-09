@@ -9,10 +9,7 @@ import { gridSize, NodePriorities, productionNodeIconSize, productionNodeVertica
 import { getNodeRadius, getProductionNodeDisplayName } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, applyJsonToSet, type JsonSerializable } from "./StateHistory.svelte";
 
-export type GraphNodeType = "production" | "resource-joint" | "splitter" | "merger" | "factory-reference";
-export interface GraphNodePropertiesBase {
-	type: GraphNodeType;
-}
+export type GraphNodeType = "production" | "resource-joint" | "splitter" | "merger" | "factory-reference" | "text-note";
 export interface ResourceJointInfo {
 	id: Id;
 	type: "input" | "output";
@@ -25,7 +22,7 @@ export interface ProductionExtractionDetails {
 	type: "extraction";
 	partClassName: string;
 	buildingClassName: string;
-	purityModifier?: 0.5 | 1 | 2;
+	purityModifier: 0.5 | 1 | 2;
 }
 export interface PowerProductionDetails {
 	type: "power-production";
@@ -36,13 +33,18 @@ export interface ProductionFactoryInOutDetails {
 	type: "factory-output" | "factory-input";
 	partClassName: string;
 }
+export interface GraphNodeFactoryReferenceProperties {
+	type: "factory-reference";
+	factoryId: Id;
+	jointsToExternalNodes: Record<Id, Id>;
+}
 export type ProductionDetails =
 	ProductionRecipeDetails |
 	ProductionExtractionDetails |
 	ProductionFactoryInOutDetails |
 	GraphNodeFactoryReferenceProperties |
 	PowerProductionDetails;
-export interface GraphNodeProductionProperties extends GraphNodePropertiesBase {
+export interface GraphNodeProductionProperties {
 	type: "production";
 	details: ProductionDetails;
 	multiplier: number;
@@ -51,7 +53,7 @@ export interface GraphNodeProductionProperties extends GraphNodePropertiesBase {
 }
 export type LayoutOrientation = "top" | "bottom" | "left" | "right";
 export type JointDragType = "drag-to-connect" | "click-to-connect";
-export interface GraphNodeResourceJointProperties extends GraphNodePropertiesBase {
+export interface GraphNodeResourceJointProperties {
 	type: "resource-joint";
 	resourceClassName: string;
 	jointType: "input" | "output";
@@ -60,20 +62,20 @@ export interface GraphNodeResourceJointProperties extends GraphNodePropertiesBas
 	jointDragType?: JointDragType;
 	dragStartNodeId?: Id;
 }
-export interface GraphNodeSplitterMergerProperties extends GraphNodePropertiesBase {
+export interface GraphNodeSplitterMergerProperties {
 	type: "splitter" | "merger";
 	resourceClassName: string;
 }
-export interface GraphNodeFactoryReferenceProperties extends GraphNodePropertiesBase {
-	type: "factory-reference";
-	factoryId: Id;
-	jointsToExternalNodes: Record<Id, Id>;
+export interface GraphNodeTextNoteProperties {
+	type: "text-note";
+	content: string;
 }
-export type NewNodeDetails = ProductionDetails | GraphNodeSplitterMergerProperties;
+export type NewNodeDetails = ProductionDetails | GraphNodeSplitterMergerProperties | GraphNodeTextNoteProperties;
 export type GraphNodeProperties =
 	GraphNodeProductionProperties |
 	GraphNodeResourceJointProperties |
-	GraphNodeSplitterMergerProperties;
+	GraphNodeSplitterMergerProperties |
+	GraphNodeTextNoteProperties;
 export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> implements JsonSerializable<PageContext> {
 	readonly id: Id;
 	readonly context: PageContext;
@@ -85,6 +87,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 	readonly children: SvelteSet<Id>;
 	readonly properties: T;
 	size: IVector2D;
+	readonly asJson: any;
 
 	constructor(id: Id, context: PageContext, position: IVector2D, priority: number, edges: Id[], parentNode: Id|null, children: Id[], properties: T, size?: IVector2D) {
 		this.id = id;
@@ -104,6 +107,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			};
 		}
 		this.size = $state(size);
+		this.asJson = $derived(this.toJSON());
 	}
 
 	static makeProductionNode(
@@ -281,7 +285,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		applyJsonToObject(json.properties, this.properties as Record<string, any>);
 	}
 
-	toJSON(): any {
+	private toJSON(): any {
 		return {
 			id: this.id,
 			position: this.position.toJSON(),

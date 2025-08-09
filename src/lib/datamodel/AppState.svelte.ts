@@ -3,14 +3,15 @@ import { Debouncer } from "$lib/utilties";
 import { dataModelVersion, StorageKeys } from "./constants";
 import { globals, trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
-import { IdGen, type Id } from "./IdGen";
+import { IdGen, IdMapper, type Id, type PasteSource } from "./IdGen";
 
 export class AppState {
 	readonly idGen: IdGen;
 	private currentPageId: Id;
-	currentPage: GraphPage;
+	readonly currentPage: GraphPage;
 	pages: GraphPage[];
 	private debouncedSave: Debouncer<(json: any) => void>;
+	readonly asJson: any;
 
 	constructor(idGen: IdGen, currentPageId: Id, pages: GraphPage[]) {
 		this.idGen = idGen;
@@ -19,6 +20,8 @@ export class AppState {
 		this.currentPage = $derived(this.pages.find((p) => p.id === this.currentPageId)!);
 		
 		this.debouncedSave = new Debouncer(this.saveToLocalStorage.bind(this), 1500);
+		this.asJson = $derived(this.toJSON());
+
 		$effect(() => {
 			const json = this.toJSON();
 			this.debouncedSave.call(json);
@@ -35,9 +38,9 @@ export class AppState {
 	}
 
 	static fromJSON(json: any): AppState {
-		// if (json.version !== dataModelVersion) {
-		// 	throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
-		// }
+		if (json.version !== dataModelVersion) {
+			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
+		}
 		const idGen = IdGen.fromJson(json.idGen);
 		const state = new AppState(idGen, json.currentPageId, []);
 		const pages = json.pages.map((p: any) => GraphPage.fromJSON(state, p));
@@ -47,13 +50,55 @@ export class AppState {
 		return state;
 	}
 
-	toJSON(): any {
-		return {
+	replaceFromJSON(json: any): void {
+		if (json.version !== dataModelVersion) {
+			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
+		}
+		if (json.type !== "app-state") {
+			throw new Error(`Invalid JSON type: ${json.type}. Expected: app-state`);
+		}
+		this.idGen.replaceFromJson(json.idGen);
+		this.currentPageId = json.currentPageId;
+		this.pages = json.pages.map((p: any) => GraphPage.fromJSON(this, p));
+		console.log("AppState replaced from JSON");
+	}
+
+	insertPagesFromJSON(json: any): void {
+		if (json.version !== dataModelVersion) {
+			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
+		}
+		if (json.type !== "app-state") {
+			throw new Error(`Invalid JSON type: ${json.type}. Expected: app-state`);
+		}
+		const idMapper = new IdMapper(this.idGen);
+		const pasteSource: PasteSource = "external";
+		const allJsonNodes = json.pages.flatMap((p: any) => Object.values(p.nodes));
+		const allJsonEdges = json.pages.flatMap((p: any) => Object.values(p.edges));
+		for (const item of [...json.pages, ...allJsonNodes, ...allJsonEdges]) {
+			if ("id" in item) {
+				item.id = idMapper.mapId(item.id);
+			}
+		}
+		const newPages = (json.pages as any[]).map((p: any) => GraphPage.fromJSON(this, p));
+		for (const page of newPages) {
+			this.addPage(page);
+			page.afterPaste(idMapper, pasteSource);
+		}
+	}
+
+	toJSON(filterPageIds?: Id[]): any {
+		const state = {
 			version: dataModelVersion,
+			type: "app-state",
 			idGen: this.idGen.toJSON(),
 			currentPageId: this.currentPageId,
-			pages: this.pages.map((p) => p.toJSON()),
+			pages: this.pages.map((p) => p.asJson),
 		};
+		if (filterPageIds) {
+			state.pages = state.pages.filter((p: any) => filterPageIds.includes(p.id));
+			state.currentPageId = filterPageIds[0];
+		}
+		return state;
 	}
 
 	addPage(page: GraphPage): void {

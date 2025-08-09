@@ -67,7 +67,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_QuantumEncoder_C",
 			category: "Categories/SpaceElevator",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 2000,
+				average: 1000
+			}
 		},
 		Recipe_SpaceElevatorPart_7_C: {
 			className: "Recipe_SpaceElevatorPart_7_C",
@@ -271,7 +275,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/SpaceElevator",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 1500,
+				average: 1000
+			}
 		},
 		Recipe_SpaceElevatorPart_1_C: {
 			className: "Recipe_SpaceElevatorPart_1_C",
@@ -666,7 +674,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/Ingots",
-			priority: 2
+			priority: 2,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_FicsiteIngot_CAT_C: {
 			className: "Recipe_FicsiteIngot_CAT_C",
@@ -689,7 +701,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/Ingots",
-			priority: 1
+			priority: 1,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_FicsiteIngot_Iron_C: {
 			className: "Recipe_FicsiteIngot_Iron_C",
@@ -712,7 +728,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/Ingots",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_IngotIron_C: {
 			className: "Recipe_IngotIron_C",
@@ -3078,7 +3098,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/AdvancedRefinement",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 750,
+				average: 500
+			}
 		},
 		Recipe_Alternate_Diamond_Cloudy_C: {
 			className: "Recipe_Alternate_Diamond_Cloudy_C",
@@ -3101,7 +3125,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/AdvancedRefinement",
-			priority: 1
+			priority: 1,
+			customPowerConsumption: {
+				max: 750,
+				average: 500
+			}
 		},
 		Recipe_Alternate_Diamond_OilBased_C: {
 			className: "Recipe_Alternate_Diamond_OilBased_C",
@@ -3120,7 +3148,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/AdvancedRefinement",
-			priority: 2
+			priority: 2,
+			customPowerConsumption: {
+				max: 750,
+				average: 500
+			}
 		},
 		Recipe_Alternate_Diamond_Petroleum_C: {
 			className: "Recipe_Alternate_Diamond_Petroleum_C",
@@ -3139,7 +3171,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/AdvancedRefinement",
-			priority: 3
+			priority: 3,
+			customPowerConsumption: {
+				max: 750,
+				average: 500
+			}
 		},
 		Recipe_Alternate_Diamond_Pink_C: {
 			className: "Recipe_Alternate_Diamond_Pink_C",
@@ -3162,7 +3198,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/AdvancedRefinement",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Alternate_Diamond_Turbo_C: {
 			className: "Recipe_Alternate_Diamond_Turbo_C",
@@ -3185,7 +3225,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/AdvancedRefinement",
-			priority: 4
+			priority: 4,
+			customPowerConsumption: {
+				max: 750,
+				average: 500
+			}
 		},
 		Recipe_NitricAcid_C: {
 			className: "Recipe_NitricAcid_C",
@@ -3775,7 +3819,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/Unpackaging",
-			priority: 15
+			priority: 15,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Nitrogen_Caterium_C: {
 			className: "Recipe_Nitrogen_Caterium_C",
@@ -3798,7 +3846,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/Unpackaging",
-			priority: 14
+			priority: 14,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_UnpackageNitrogen_C: {
 			className: "Recipe_UnpackageNitrogen_C",
@@ -4009,7 +4061,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/Fuel",
-			priority: 1
+			priority: 1,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_LiquidBiofuel_C: {
 			className: "Recipe_LiquidBiofuel_C",
@@ -4837,7 +4893,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/Nuclear",
-			priority: 1
+			priority: 1,
+			customPowerConsumption: {
+				max: 750,
+				average: 500
+			}
 		},
 		Recipe_UraniumCell_C: {
 			className: "Recipe_UraniumCell_C",
@@ -4926,7 +4986,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/Nuclear",
-			priority: 2
+			priority: 2,
+			customPowerConsumption: {
+				max: 1500,
+				average: 1000
+			}
 		},
 		Recipe_FicsoniumFuelRod_C: {
 			className: "Recipe_FicsoniumFuelRod_C",
@@ -4961,7 +5025,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_QuantumEncoder_C",
 			category: "Categories/Nuclear",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 2000,
+				average: 1000
+			}
 		},
 		Recipe_NonFissileUranium_C: {
 			className: "Recipe_NonFissileUranium_C",
@@ -5108,7 +5176,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/Nuclear",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 750,
+				average: 500
+			}
 		},
 		Recipe_NuclearFuelRod_C: {
 			className: "Recipe_NuclearFuelRod_C",
@@ -5201,7 +5273,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_QuantumEncoder_C",
 			category: "Categories/QuantumTechnology",
-			priority: 2
+			priority: 2,
+			customPowerConsumption: {
+				max: 2000,
+				average: 1000
+			}
 		},
 		Recipe_DarkMatter_C: {
 			className: "Recipe_DarkMatter_C",
@@ -5224,7 +5300,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/QuantumTechnology",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 1500,
+				average: 1000
+			}
 		},
 		Recipe_Alternate_DarkMatter_Crystallization_C: {
 			className: "Recipe_Alternate_DarkMatter_Crystallization_C",
@@ -5243,7 +5323,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/QuantumTechnology",
-			priority: 999
+			priority: 999,
+			customPowerConsumption: {
+				max: 1500,
+				average: 1000
+			}
 		},
 		Recipe_Alternate_DarkMatter_Trap_C: {
 			className: "Recipe_Alternate_DarkMatter_Trap_C",
@@ -5266,7 +5350,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_HadronCollider_C",
 			category: "Categories/QuantumTechnology",
-			priority: 999
+			priority: 999,
+			customPowerConsumption: {
+				max: 1500,
+				average: 1000
+			}
 		},
 		Recipe_DarkEnergy_C: {
 			className: "Recipe_DarkEnergy_C",
@@ -5285,7 +5373,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/QuantumTechnology",
-			priority: 2
+			priority: 2,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_QuantumEnergy_C: {
 			className: "Recipe_QuantumEnergy_C",
@@ -5299,7 +5391,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/QuantumTechnology",
-			priority: 1
+			priority: 1,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_TemporalProcessor_C: {
 			className: "Recipe_TemporalProcessor_C",
@@ -5334,7 +5430,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_QuantumEncoder_C",
 			category: "Categories/QuantumTechnology",
-			priority: 1
+			priority: 1,
+			customPowerConsumption: {
+				max: 2000,
+				average: 1000
+			}
 		},
 		Recipe_SuperpositionOscillator_C: {
 			className: "Recipe_SuperpositionOscillator_C",
@@ -5369,7 +5469,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_QuantumEncoder_C",
 			category: "Categories/QuantumTechnology",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 2000,
+				average: 1000
+			}
 		},
 		Recipe_TimeCrystal_C: {
 			className: "Recipe_TimeCrystal_C",
@@ -5388,7 +5492,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/QuantumTechnology",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Biomass_AlienProtein_C: {
 			className: "Recipe_Biomass_AlienProtein_C",
@@ -5716,7 +5824,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_QuantumEncoder_C",
 			category: "Categories/PowerShards",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 2000,
+				average: 1000
+			}
 		},
 		Recipe_Bauxite_Caterium_C: {
 			className: "Recipe_Bauxite_Caterium_C",
@@ -5739,7 +5851,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 13
+			priority: 13,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Bauxite_Copper_C: {
 			className: "Recipe_Bauxite_Copper_C",
@@ -5762,7 +5878,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 12
+			priority: 12,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Caterium_Copper_C: {
 			className: "Recipe_Caterium_Copper_C",
@@ -5785,7 +5905,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 8
+			priority: 8,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Caterium_Quartz_C: {
 			className: "Recipe_Caterium_Quartz_C",
@@ -5808,7 +5932,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 9
+			priority: 9,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Coal_Iron_C: {
 			className: "Recipe_Coal_Iron_C",
@@ -5831,7 +5959,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 5
+			priority: 5,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Coal_Limestone_C: {
 			className: "Recipe_Coal_Limestone_C",
@@ -5854,7 +5986,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 4
+			priority: 4,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Alternate_Coal_2_C: {
 			className: "Recipe_Alternate_Coal_2_C",
@@ -5915,7 +6051,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 2
+			priority: 2,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Copper_Sulfur_C: {
 			className: "Recipe_Copper_Sulfur_C",
@@ -5938,7 +6078,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 1
+			priority: 1,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Iron_Limestone_C: {
 			className: "Recipe_Iron_Limestone_C",
@@ -5961,7 +6105,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 0
+			priority: 0,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Limestone_Sulfur_C: {
 			className: "Recipe_Limestone_Sulfur_C",
@@ -5984,7 +6132,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 3
+			priority: 3,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Quartz_Bauxite_C: {
 			className: "Recipe_Quartz_Bauxite_C",
@@ -6007,7 +6159,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 11
+			priority: 11,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Quartz_Coal_C: {
 			className: "Recipe_Quartz_Coal_C",
@@ -6030,7 +6186,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 10
+			priority: 10,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Sulfur_Coal_C: {
 			className: "Recipe_Sulfur_Coal_C",
@@ -6053,7 +6213,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 7
+			priority: 7,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Sulfur_Iron_C: {
 			className: "Recipe_Sulfur_Iron_C",
@@ -6076,7 +6240,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 6
+			priority: 6,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Uranium_Bauxite_C: {
 			className: "Recipe_Uranium_Bauxite_C",
@@ -6099,7 +6267,11 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			],
 			producedIn: "Build_Converter_C",
 			category: "Categories/RawMaterials",
-			priority: 16
+			priority: 16,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
 		},
 		Recipe_Alternate_AutomatedMiner_C: {
 			className: "Recipe_Alternate_AutomatedMiner_C",

@@ -3,6 +3,11 @@ export interface SFRecipePart {
 	amountPerMinute: number;
 }
 
+export interface SFVariablePowerConsumption {
+	max: number;
+	average: number;
+}
+
 export interface SFRecipe {
 	className: string;
 	recipeDisplayName: string;
@@ -11,6 +16,7 @@ export interface SFRecipe {
 	producedIn: string;
 	category: string;
 	priority: number;
+	customPowerConsumption?: SFVariablePowerConsumption;
 }
 
 export interface SFPart {
