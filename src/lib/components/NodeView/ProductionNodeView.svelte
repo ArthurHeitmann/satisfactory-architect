@@ -49,6 +49,11 @@
 				return {
 					icon: building?.icon,
 				};
+			case "factory-reference":
+				const factoryPage = page.context.appState.pages.find(p => p.id === details.factoryId);
+				return {
+					icon: factoryPage?.icon,
+				};
 			default:
 				return {
 					icon: undefined,
@@ -113,11 +118,9 @@
 	{#if factoryName}
 		<text
 			x="0"
-			y={productionNodeIconSize / 2 + 5}
+			y={productionNodeIconSize / 2 + 12}
 			text-anchor="middle"
-			font-size="12px"
-			font-family="monospace"
-			style="pointer-events: none;"
+			style="pointer-events: none; font-size: 11px;"
 		>
 			{factoryName}
 		</text>

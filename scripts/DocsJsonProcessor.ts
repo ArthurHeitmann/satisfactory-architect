@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, copyFileSync, writeFileSync } from "fs";
-import { basename, join } from "path";
+import { basename, dirname, join } from "path";
 import argsParser from "args-parser";
 import { parseUeData } from "./ue_data_parser";
 import { SFPowerFuel, SFPowerProducer, SFBuilding, SFIcon, SFPart, SFExtractionBuilding, SFRecipe, SFRecipePart, SatisfactoryDatabase, SFVariablePowerConsumption } from "../src/lib/satisfactoryDatabaseTypes";
@@ -99,13 +99,17 @@ async function main() {
 			}
 			const duration = Number(classDef["mManufactoringDuration"]);
 			const outputs = parseRecipePartList(classDef["mProduct"] as string, duration);
+			const category =
+				gameCategories.partCategories[className] ||
+				gameCategories.partCategories[outputs[0].itemClass] ||
+				"";
 			const recipe: SFRecipe = {
 				className: className,
 				recipeDisplayName: parseFullName(classDef["mDisplayName"]),
 				inputs: parseRecipePartList(classDef["mIngredients"] as string, duration),
 				outputs: outputs,
 				producedIn: producedIn,
-				category: gameCategories.partCategories[outputs[0].itemClass] || "",
+				category: category,
 				priority: Number(classDef["mManufacturingMenuPriority"]) || 0,
 			};
 			if (!recipe.category) {
@@ -145,7 +149,7 @@ async function main() {
 			if (!("mAllowedResources" in classDef)) {
 				continue;
 			}
-			const resources: string[] = [];
+			let resources: string[] = [];
 			if (classDef.mAllowedResources) {
 				const allowedResources = (parseUeData(classDef["mAllowedResources"]) as string[]).map(parseFullName);
 				resources.push(...allowedResources);
@@ -165,6 +169,9 @@ async function main() {
 			if (classDef.SAMReference) {
 				resources.push(parseFullName(classDef.SAMReference));
 			}
+			if (className.startsWith("Build_MinerMk")) {
+				resources = resources.filter((res) => res !== "Desc_LiquidOil_C");
+			}
 			let productionRate = Number(classDef["mItemsPerCycle"]) / Number(classDef["mExtractCycleTime"]);
 			if (!productionRate) {
 				continue;
@@ -177,6 +184,7 @@ async function main() {
 			extractionBuildings.set(className, {
 				buildingClassName: className,
 				baseProductionRate: productionRate,
+				supportsPurity: className !== "Build_WaterPump_C",
 				outputs: resources,
 			});
 			for (const resource of resources) {
@@ -376,7 +384,12 @@ async function main() {
 	const icons = new Map<string, SFIcon>();
 	// icons
 	if (extractedFilesPath && imgSavePath) {
+		const additionalIconFolders = [
+			["Patterns", "Icons"],
+			["Assets", "MonochromeIcons"],
+		];
 		const imgPaths = new Map<string, string>();
+		const additionalImgs = new Map<string, {path: string, maxSize: number}>();
 		for (const file of readdirSync(extractedFilesPath, { recursive: true, withFileTypes: true })) {
 			if (!file.isFile()) {
 				continue;
@@ -384,11 +397,39 @@ async function main() {
 			const filePath = join(file.parentPath, file.name);
 			const imgName = basename(filePath).split(".")[0];
 			if (!usedIcons.has(imgName)) {
+				const parentFolder = dirname(filePath);
+				const parentParentFolder = dirname(parentFolder);
+				const parentName = basename(parentFolder);
+				const parentParentName = basename(parentParentFolder);
+				if (additionalIconFolders.some(([folder, subfolder]) => parentParentName === folder && parentName === subfolder)) {
+					let additionalIconName = imgName;
+					let size = 128;
+					if (/_\d{2,3}$/.test(additionalIconName)) {
+						const matches = additionalIconName.match(/(^.*)_(\d{2,3})$/)!;
+						additionalIconName = matches[1];
+						size = Number(matches[2]);
+					}
+					if (additionalIconName === "TXUI_MIcon_None") {
+						continue;
+					}
+					if (additionalImgs.has(additionalIconName)) {
+						const existing = additionalImgs.get(additionalIconName)!;
+						if (size > existing.maxSize) {
+							existing.path = filePath;
+							existing.maxSize = size;
+						}
+					} else {
+						additionalImgs.set(additionalIconName, { path: filePath, maxSize: size });
+					}
+				}
 				continue;
 			}
 			imgPaths.set(imgName, filePath);
 		}
-		console.log(`Found ${imgPaths.size}/${usedIcons.size} used icons in extracted files.`);
+		for (const [iconName, { path, maxSize }] of additionalImgs) {
+			imgPaths.set(`${iconName}_${maxSize}`, path);
+		}
+		console.log(`Found ${imgPaths.size}/${usedIcons.size} used icons in extracted files. (${additionalImgs.size} additional icons).`);
 
 		for (const [icon, filePath] of imgPaths) {
 			const { iconName, resolution } = splitIconName(icon) || {};

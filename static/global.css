@@ -7,164 +7,191 @@
 /* https://www.realtimecolors.com/?colors=0f0f0f-f0f0f0-ce5f27-efc0a9-df6020&fonts=Inter-Inter */
 
 :root.light-theme, :root:not(.dark-theme) {
-  --text: #0f0f0f;
-  --background: #f0f0f0;
-  --background-50: #f2f2f2;
-  --background-100: #e6e6e6;
-  --background-150: #d9d9d9;
-  --background-200: #cccccc;
-  --background-300: #b3b3b3;
-  --background-400: #999999;
-  --background-500: #808080;
-  --background-600: #666666;
-  --background-700: #4d4d4d;
-  --background-800: #333333;
-  --background-900: #1a1a1a;
-  --background-950: #0d0d0d;
-  --primary: #ce5f27;
-  --secondary: #efc0a9;
-  --accent: #df6020;
-  --underflow-color: #E8CD0F;
-  --overflow-color: #D81B6F;
-  --edge-drag-handle-color: var(--primary);
+	--text: #0f0f0f;
+	--background: #f0f0f0;
+	--background-50: #f2f2f2;
+	--background-100: #e6e6e6;
+	--background-150: #d9d9d9;
+	--background-200: #cccccc;
+	--background-300: #b3b3b3;
+	--background-400: #999999;
+	--background-500: #808080;
+	--background-600: #666666;
+	--background-700: #4d4d4d;
+	--background-800: #333333;
+	--background-900: #1a1a1a;
+	--background-950: #0d0d0d;
+	--primary: #df6020;
+	--secondary: #efc0a9;
+	--underflow-color: #E14434;
+	--overflow-color: #3D74B6;
+	--edge-drag-handle-color: var(--primary);
 
-  --grid-background-color: var(--background);
-  --selection-area-background-color: color-mix(in srgb, var(--primary) 15%, transparent);
-  --selection-area-border-color: var(--primary);
-  --node-background-color: var(--background-50);
-  --node-border-color: var(--background-200);
-  --node-border-hover-color: var(--background-300);
-  --node-border-highlight-color: var(--secondary);
-  --node-border-selected-color: var(--primary);
-  --node-main-text-color: var(--text);
-  --node-editable-text-color: var(--text);
-  --node-in-out-text-color: var(--text);
-  --edge-stroke-color: var(--background-400);
-  --edge-hover-brightness: 0.9;
-  --edge-selected-brightness: 1.0;
-  --edge-background-color-text: var(--background);
-  --recipe-selector-background-color: var(--background);
-  --recipe-selector-tile-color: var(--background);
-  --recipe-selector-tile-hover-color: var(--background-100);
-  --recipe-selector-tile-active-color: var(--background-200);
-  --recipe-selector-tile-border-color: var(--background-100);
-  --recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px white) drop-shadow(0px 0px 5px white);
-  --recipe-selector-border-color: var(--background-100);
-  --context-menu-background-color: var(--background);
-  --context-menu-border-color: var(--background-100);
-  --context-menu-item-color: transparent;
-  --context-menu-item-hover-color: var(--background-100);
-  --context-menu-item-active-color: var(--background-200);
-  --text-shadow: 
-			0 0 2px white,
-			0 0 2px white,
-			0 0 3px white,
-			0 0 3px white,
-			0 0 3px white,
-			0 0 3px white,
-			0 0 3px white,
-			0 0 3px white,
-			0 0 3px white,
-			0 0 3px white,
-			0 0 6px white;
-  
-  --toolbar-background-color: var(--background-100);
-  --toolbar-border-color: var(--background-200);
-  
-  --toggle-button-hover-background-color: var(--background-200);
-  --toggle-button-active-background-color: var(--background-300);
-  --toggle-button-selected-background-color: var(--primary);
-  --toggle-button-selected-text-color: var(--background);
-  --toggle-button-disabled-text-color: var(--background-500);
+	--grid-background-color: var(--background);
+	--selection-area-background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+	--selection-area-border-color: var(--primary);
+	--node-background-color: var(--background-50);
+	--node-border-color: var(--background-200);
+	--node-border-hover-color: var(--background-300);
+	--node-border-highlight-color: var(--secondary);
+	--node-border-selected-color: var(--primary);
+	--node-main-text-color: var(--text);
+	--node-editable-text-color: var(--text);
+	--node-in-out-text-color: var(--text);
+	--edge-stroke-color: var(--background-400);
+	--edge-hover-brightness: 0.9;
+	--edge-selected-brightness: 1.0;
+	--edge-background-color-text: var(--background);
+	--recipe-selector-background-color: var(--background);
+	--recipe-selector-tile-color: var(--background);
+	--recipe-selector-tile-hover-color: var(--background-100);
+	--recipe-selector-tile-active-color: var(--background-200);
+	--recipe-selector-tile-border-color: var(--background-100);
+	--recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px white) drop-shadow(0px 0px 5px white);
+	--recipe-selector-border-color: var(--background-100);
+	--context-menu-background-color: var(--background);
+	--context-menu-border-color: var(--background-100);
+	--context-menu-item-color: transparent;
+	--context-menu-item-hover-color: var(--background-100);
+	--context-menu-item-active-color: var(--background-200);
+	--text-shadow: 
+		0 0 2px white,
+		0 0 2px white,
+		0 0 3px white,
+		0 0 3px white,
+		0 0 3px white,
+		0 0 3px white,
+		0 0 3px white,
+		0 0 3px white,
+		0 0 3px white,
+		0 0 3px white,
+		0 0 6px white;
+	
+	--toolbar-background-color: var(--background-100);
+	--toolbar-border-color: var(--background-200);
+	
+	--toggle-button-hover-background-color: var(--background-200);
+	--toggle-button-active-background-color: var(--background-300);
+	--toggle-button-selected-background-color: var(--primary);
+	--toggle-button-selected-text-color: var(--background);
+	--toggle-button-disabled-text-color: var(--background-500);
 
-  --properties-toolbar-background-color: var(--background-100);
-  --properties-toolbar-border-color: var(--background-200);
+	--properties-toolbar-background-color: var(--background-100);
+	--properties-toolbar-border-color: var(--background-200);
 
-  --tooltip-background-color: var(--background-100);
-  --tooltip-border-color: var(--background-200);
+	--tooltip-background-color: var(--background-100);
+	--tooltip-border-color: var(--background-200);
 
-  --grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiNkNmQ2ZDYiLz4NCjwvc3ZnPg==");
+	--popup-block-area-background-color: color-mix(in srgb, var(--background-500) 50%, transparent);
+	--popup-background-color: var(--background-200);
+	--popup-border-color: var(--background-300);
+	--popup-button-background-color: var(--background-300);
+	--popup-button-hover-background-color: var(--background-400);
+	--popup-button-active-background-color: var(--background-500);
+	
+	--pages-bar-border-color: var(--background-200);
+	--pages-bar-background-color: var(--background-100);
+	--pages-bar-button-hover-background-color: var(--background-200);
+	--pages-bar-button-active-background-color: var(--background-300);
+	--pages-bar-button-selected-background-color: var(--primary);
+	--pages-bar-button-selected-text-color: var(--background);
+
+	--grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiNkNmQ2ZDYiLz4NCjwvc3ZnPg==");
 }
 :root.dark-theme {
-  --text: #f0f0f0;
-  --background: #0f0f0f;
-  --background-50: #0d0d0d;
-  --background-100: #1a1a1a;
-  --background-200: #333333;
-  --background-250: #404040;
-  --background-300: #4d4d4d;
-  --background-400: #666666;
-  --background-500: #808080;
-  --background-600: #999999;
-  --background-700: #b3b3b3;
-  --background-800: #cccccc;
-  --background-900: #e6e6e6;
-  --background-950: #f2f2f2;
-  --primary: #d86931;
-  --secondary: #562710;
-  --accent: #df6020;
-  --underflow-color: #c0ab0c;
-  --overflow-color: #D81B6F;
+	--text: #f0f0f0;
+	--background: #0f0f0f;
+	--background-50: #0d0d0d;
+	--background-100: #1a1a1a;
+	--background-200: #333333;
+	--background-250: #404040;
+	--background-300: #4d4d4d;
+	--background-400: #666666;
+	--background-500: #808080;
+	--background-600: #999999;
+	--background-700: #b3b3b3;
+	--background-800: #cccccc;
+	--background-900: #e6e6e6;
+	--background-950: #f2f2f2;
+	--primary: #d86931;
+	--secondary: #562710;
+	--underflow-color: #E14434;
+	--overflow-color: #3D74B6;
 
-  --grid-background-color: var(--background);
-  --selection-area-background-color: color-mix(in srgb, var(--primary) 15%, transparent);
-  --selection-area-border-color: var(--primary);
-  --node-background-color: var(--background-100);
-  --node-border-color: var(--background-200);
-  --node-border-hover-color: var(--background-300);
-  --node-border-highlight-color: var(--secondary);
-  --node-border-selected-color: var(--primary);
-  --node-main-text-color: var(--text);
-  --node-editable-text-color: var(--text);
-  --node-in-out-text-color: var(--text);
-  --edge-stroke-color: var(--background-400);
-  --edge-hover-brightness: 1.2;
-  --edge-selected-brightness: 1.5;
-  --edge-background-color-text: var(--text);
-  --edge-drag-handle-color: var(--primary);
-  --recipe-selector-background-color: var(--background-100);
-  --recipe-selector-tile-color: var(--background-100);
-  --recipe-selector-tile-hover-color: var(--background-200);
-  --recipe-selector-tile-active-color: var(--background-300);
-  --recipe-selector-tile-border-color: var(--background-300);
-  --recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 4px black);
-  --recipe-selector-border-color: var(--background-200);
-  --context-menu-background-color: var(--background-100);
-  --context-menu-border-color: var(--background-200);
-  --context-menu-item-color: transparent;
-  --context-menu-item-hover-color: var(--background-200);
-  --context-menu-item-active-color: var(--background-300);
-  --text-shadow: 
-			0 0 2px black,
-			0 0 2px black,
-			0 0 3px black,
-			0 0 3px black,
-			0 0 4px black,
-			0 0 4px black,
-			0 0 6px black;
-  
-  --toolbar-background-color: var(--background-200);
-  --toolbar-border-color: var(--background-300);
-  
-  --toggle-button-hover-background-color: var(--background-300);
-  --toggle-button-active-background-color: var(--background-400);
-  --toggle-button-selected-background-color: var(--primary);
-  --toggle-button-selected-text-color: var(--text);
-  --toggle-button-disabled-text-color: var(--background-500);
-  
-  --properties-toolbar-background-color: var(--background-100);
-  --properties-toolbar-border-color: var(--background-200);
-  
-  --tooltip-background-color: var(--background-100);
-  --tooltip-border-color: var(--background-200);
+	--grid-background-color: var(--background);
+	--selection-area-background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+	--selection-area-border-color: var(--primary);
+	--node-background-color: var(--background-100);
+	--node-border-color: var(--background-200);
+	--node-border-hover-color: var(--background-300);
+	--node-border-highlight-color: var(--secondary);
+	--node-border-selected-color: var(--primary);
+	--node-main-text-color: var(--text);
+	--node-editable-text-color: var(--text);
+	--node-in-out-text-color: var(--text);
+	--edge-stroke-color: var(--background-400);
+	--edge-hover-brightness: 1.2;
+	--edge-selected-brightness: 1.5;
+	--edge-background-color-text: var(--text);
+	--edge-drag-handle-color: var(--primary);
+	--recipe-selector-background-color: var(--background-100);
+	--recipe-selector-tile-color: var(--background-100);
+	--recipe-selector-tile-hover-color: var(--background-200);
+	--recipe-selector-tile-active-color: var(--background-300);
+	--recipe-selector-tile-border-color: var(--background-300);
+	--recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 4px black);
+	--recipe-selector-border-color: var(--background-200);
+	--context-menu-background-color: var(--background-100);
+	--context-menu-border-color: var(--background-200);
+	--context-menu-item-color: transparent;
+	--context-menu-item-hover-color: var(--background-200);
+	--context-menu-item-active-color: var(--background-300);
+	--text-shadow: 
+		0 0 2px black,
+		0 0 2px black,
+		0 0 3px black,
+		0 0 3px black,
+		0 0 4px black,
+		0 0 4px black,
+		0 0 6px black;
+	
+	--toolbar-background-color: var(--background-200);
+	--toolbar-border-color: var(--background-300);
+	
+	--toggle-button-hover-background-color: var(--background-300);
+	--toggle-button-active-background-color: var(--background-400);
+	--toggle-button-selected-background-color: var(--primary);
+	--toggle-button-selected-text-color: var(--text);
+	--toggle-button-disabled-text-color: var(--background-500);
+	
+	--properties-toolbar-background-color: var(--background-100);
+	--properties-toolbar-border-color: var(--background-200);
+	
+	--tooltip-background-color: var(--background-100);
+	--tooltip-border-color: var(--background-200);
+	
+	--popup-block-area-background-color: color-mix(in srgb, var(--background) 70%, transparent);
+	--popup-background-color: var(--background-200);
+	--popup-border-color: var(--background-300);
+	--popup-button-background-color: var(--background-300);
+	--popup-button-hover-background-color: var(--background-400);
+	--popup-button-active-background-color: var(--background-500);
 
-  --grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiMyNDI0MjQiLz4NCjwvc3ZnPg==");
+	--pages-bar-border-color: var(--background-200);
+	--pages-bar-background-color: var(--background-100);
+	--pages-bar-button-hover-background-color: var(--background-200);
+	--pages-bar-button-active-background-color: var(--background-300);
+	--pages-bar-button-selected-background-color: var(--primary);
+	--pages-bar-button-selected-text-color: var(--text);
+
+	--grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiMyNDI0MjQiLz4NCjwvc3ZnPg==");
 }
 
 :root {
-  --rounded-border-radius: 4px;
-  --rounded-border-radius-big: 8px;
-  --rounded-border-width: 2px;
+	--rounded-border-radius: 4px;
+	--rounded-border-radius-big: 8px;
+	--rounded-border-width: 2px;
+	overscroll-behavior: none;
 }
 
 *, *::before, *::after {
@@ -194,7 +221,7 @@ text {
 
 
 button {
-  cursor: pointer;
+	cursor: pointer;
 	user-select: none;
 }
 

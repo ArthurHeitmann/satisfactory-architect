@@ -2,7 +2,7 @@
     import type { GraphNodeProductionProperties, LayoutOrientation, ProductionExtractionDetails } from "$lib/datamodel/GraphNode.svelte";
     import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
     import type { Id } from "$lib/datamodel/IdGen";
-    import { floatToString, formatPower, loadFileFromDisk, saveFileToDisk } from "$lib/utilties";
+    import { floatToString, formatPower, loadFileFromDisk, openLinkInNewTab, saveFileToDisk, showConfirmationPrompt } from "$lib/utilties";
     import { getContext, untrack } from "svelte";
     import PresetSvg from "../icons/PresetSvg.svelte";
     import type { SvgPresetName } from "../icons/svgPresets";
@@ -64,7 +64,11 @@
 			.filter(properties => properties.type === "production")
 			.map(properties => properties as GraphNodeProductionProperties)
 			.filter(properties => properties.details.type === "extraction")
-			.map(properties => properties.details as ProductionExtractionDetails);
+			.map(properties => properties.details as ProductionExtractionDetails)
+			.filter(details => {
+				const building = satisfactoryDatabase.extractionBuildings[details.buildingClassName];
+				return building && building.supportsPurity;
+			});
 		return aggregateValues(
 			Array.from(purityValues),
 			v => v.purityModifier,
@@ -243,14 +247,14 @@
 			y: 30,
 			items: [
 				{
-					label: "Save As",
+					label: "Save All Pages",
 					icon: "save-as",
-					onClick: saveAs,
+					onClick: saveAllPages,
 				},
 				{
-					label: "Export Page",
+					label: "Save Current Page",
 					icon: "export",
-					onClick: exportPage,
+					onClick: saveCurrentPage,
 				},
 				{
 					label: "Load File",
@@ -266,6 +270,11 @@
 					label: $darkTheme ? "Use Light Theme" : "Use Dark Theme",
 					icon: $darkTheme ? "light-theme" : "dark-theme",
 					onClick: () => $darkTheme = !$darkTheme,
+				},
+				{
+					label: "View on GitHub",
+					icon: "github",
+					onClick: () => openLinkInNewTab("https://github.com/ArthurHeitmann/satisfactory-architect"),
 				},
 				{
 					label: "Debug",
@@ -294,12 +303,12 @@
 		});
 	}
 
-	function saveAs() {
+	function saveAllPages() {
 		const jsonData = JSON.stringify(appState.toJSON());
 		saveFileToDisk("save.json", jsonData);
 	}
 
-	function exportPage() {
+	function saveCurrentPage() {
 		const jsonData = JSON.stringify(appState.toJSON([page.id]));
 		saveFileToDisk(`${page.name}.json`, jsonData);
 	}
@@ -312,6 +321,13 @@
 			jsonData = JSON.parse(text);
 		} catch (error) {
 			console.error("Failed to parse JSON from file", error);
+			return;
+		}
+		const answer = await showConfirmationPrompt(eventStream, {
+			message: "After loading this file, any unsaved changes will be lost. \nDo you want to continue?",
+			confirmLabel: "Load",
+		});
+		if (answer !== true) {
 			return;
 		}
 		appState.replaceFromJSON(jsonData);
@@ -413,6 +429,7 @@
 		{v: "straight" as const, display: {icon: "straight-line"}},
 		{v: "curved" as const, display: {icon: "curved-line"}},
 		{v: "angled" as const, display: {icon: "angled-line"}},
+		{v: "teleport" as const, display: {icon: "teleport-line"}},
 	])}
 	{@render optionButtons(aggIsDrainLine, "", true, [
 		{v: true, display: {text: "Overflow Only"}},

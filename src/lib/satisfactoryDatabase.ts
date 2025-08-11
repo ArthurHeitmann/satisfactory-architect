@@ -1229,7 +1229,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_Blender_C",
-			category: "Categories/Compounds",
+			category: "Categories/AdvancedRefinement",
 			priority: 0
 		},
 		Recipe_AluminumSheet_C: {
@@ -1296,48 +1296,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_AssemblerMk1_C",
 			category: "Categories/StandardParts",
 			priority: 18
-		},
-		Recipe_CopperSheet_C: {
-			className: "Recipe_CopperSheet_C",
-			recipeDisplayName: "Copper Sheet",
-			inputs: [
-				{
-					itemClass: "Desc_CopperIngot_C",
-					amountPerMinute: 20
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CopperSheet_C",
-					amountPerMinute: 10
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/StandardParts",
-			priority: 11
-		},
-		Recipe_Alternate_SteamedCopperSheet_C: {
-			className: "Recipe_Alternate_SteamedCopperSheet_C",
-			recipeDisplayName: "Alternate: Steamed Copper Sheet",
-			inputs: [
-				{
-					itemClass: "Desc_CopperIngot_C",
-					amountPerMinute: 22.5
-				},
-				{
-					itemClass: "Desc_Water_C",
-					amountPerMinute: 22.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_CopperSheet_C",
-					amountPerMinute: 22.5
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/StandardParts",
-			priority: 1
 		},
 		Recipe_EncasedIndustrialBeam_C: {
 			className: "Recipe_EncasedIndustrialBeam_C",
@@ -2005,94 +1963,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			category: "Categories/Electronics",
 			priority: 10
 		},
-		Recipe_Cable_C: {
-			className: "Recipe_Cable_C",
-			recipeDisplayName: "Cable",
-			inputs: [
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Cable_C",
-					amountPerMinute: 30
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/Electronics",
-			priority: 3
-		},
-		Recipe_Alternate_CoatedCable_C: {
-			className: "Recipe_Alternate_CoatedCable_C",
-			recipeDisplayName: "Alternate: Coated Cable",
-			inputs: [
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 37.5
-				},
-				{
-					itemClass: "Desc_HeavyOilResidue_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Cable_C",
-					amountPerMinute: 67.5
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Electronics",
-			priority: 0
-		},
-		Recipe_Alternate_Cable_1_C: {
-			className: "Recipe_Alternate_Cable_1_C",
-			recipeDisplayName: "Alternate: Insulated Cable",
-			inputs: [
-				{
-					itemClass: "Desc_Wire_C",
-					amountPerMinute: 45
-				},
-				{
-					itemClass: "Desc_Rubber_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Cable_C",
-					amountPerMinute: 100
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Electronics",
-			priority: 1
-		},
-		Recipe_Alternate_Cable_2_C: {
-			className: "Recipe_Alternate_Cable_2_C",
-			recipeDisplayName: "Alternate: Quickwire Cable",
-			inputs: [
-				{
-					itemClass: "Desc_HighSpeedWire_C",
-					amountPerMinute: 7.5
-				},
-				{
-					itemClass: "Desc_Rubber_C",
-					amountPerMinute: 5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Cable_C",
-					amountPerMinute: 27.5
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Electronics",
-			priority: 2
-		},
 		Recipe_CircuitBoard_C: {
 			className: "Recipe_CircuitBoard_C",
 			recipeDisplayName: "Circuit Board",
@@ -2512,7 +2382,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Communications",
+			category: "Categories/Electronics",
 			priority: 11
 		},
 		Recipe_CrystalOscillator_C: {
@@ -2705,7 +2575,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Communications",
+			category: "Categories/Electronics",
 			priority: 12
 		},
 		Recipe_Alternate_SuperStateComputer_C: {
@@ -2966,7 +2836,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_Packager_C",
-			category: "Categories/AdvancedRefinement",
+			category: "Categories/Unpackaging",
 			priority: 8
 		},
 		Recipe_Alternate_SloppyAlumina_C: {
@@ -3231,6 +3101,87 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				average: 500
 			}
 		},
+		Recipe_IonizedFuel_C: {
+			className: "Recipe_IonizedFuel_C",
+			recipeDisplayName: "Ionized Fuel",
+			inputs: [
+				{
+					itemClass: "Desc_RocketFuel_C",
+					amountPerMinute: 40
+				},
+				{
+					itemClass: "Desc_CrystalShard_C",
+					amountPerMinute: 2.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IonizedFuel_C",
+					amountPerMinute: 40
+				},
+				{
+					itemClass: "Desc_CompactedCoal_C",
+					amountPerMinute: 5
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Fuel",
+			priority: 6
+		},
+		Recipe_UnpackageIonizedFuel_C: {
+			className: "Recipe_UnpackageIonizedFuel_C",
+			recipeDisplayName: "Unpackage Ionized Fuel",
+			inputs: [
+				{
+					itemClass: "Desc_PackagedIonizedFuel_C",
+					amountPerMinute: 40
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IonizedFuel_C",
+					amountPerMinute: 80
+				},
+				{
+					itemClass: "Desc_GasTank_C",
+					amountPerMinute: 40
+				}
+			],
+			producedIn: "Build_Packager_C",
+			category: "Categories/Unpackaging",
+			priority: 7
+		},
+		Recipe_Alternate_IonizedFuel_Dark_C: {
+			className: "Recipe_Alternate_IonizedFuel_Dark_C",
+			recipeDisplayName: "Alternate: Dark-Ion Fuel",
+			inputs: [
+				{
+					itemClass: "Desc_PackagedRocketFuel_C",
+					amountPerMinute: 240
+				},
+				{
+					itemClass: "Desc_DarkMatter_C",
+					amountPerMinute: 80
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_IonizedFuel_C",
+					amountPerMinute: 200
+				},
+				{
+					itemClass: "Desc_CompactedCoal_C",
+					amountPerMinute: 40
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/AdvancedRefinement",
+			priority: 1,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
 		Recipe_NitricAcid_C: {
 			className: "Recipe_NitricAcid_C",
 			recipeDisplayName: "Nitric Acid",
@@ -3278,7 +3229,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_Packager_C",
-			category: "Categories/AdvancedRefinement",
+			category: "Categories/Unpackaging",
 			priority: 11
 		},
 		Recipe_SulfuricAcid_C: {
@@ -3324,7 +3275,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_Packager_C",
-			category: "Categories/AdvancedRefinement",
+			category: "Categories/Unpackaging",
 			priority: 9
 		},
 		Recipe_FluidCanister_C: {
@@ -3496,7 +3447,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Packaging",
+			category: "Categories/Fuel",
 			priority: 2
 		},
 		Recipe_PackagedOilResidue_C: {
@@ -3795,85 +3746,8 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Unpackaging",
+			category: "Categories/OilProducts",
 			priority: 7
-		},
-		Recipe_Nitrogen_Bauxite_C: {
-			className: "Recipe_Nitrogen_Bauxite_C",
-			recipeDisplayName: "Nitrogen Gas (Bauxite)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 100
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_NitrogenGas_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/Unpackaging",
-			priority: 15,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Nitrogen_Caterium_C: {
-			className: "Recipe_Nitrogen_Caterium_C",
-			recipeDisplayName: "Nitrogen Gas (Caterium)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 120
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_NitrogenGas_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/Unpackaging",
-			priority: 14,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_UnpackageNitrogen_C: {
-			className: "Recipe_UnpackageNitrogen_C",
-			recipeDisplayName: "Unpackage Nitrogen Gas",
-			inputs: [
-				{
-					itemClass: "Desc_PackagedNitrogenGas_C",
-					amountPerMinute: 60
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_NitrogenGas_C",
-					amountPerMinute: 240
-				},
-				{
-					itemClass: "Desc_GasTank_C",
-					amountPerMinute: 60
-				}
-			],
-			producedIn: "Build_Packager_C",
-			category: "Categories/Unpackaging",
-			priority: 10
 		},
 		Recipe_UnpackageWater_C: {
 			className: "Recipe_UnpackageWater_C",
@@ -3960,7 +3834,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_Packager_C",
-			category: "Categories/Fuel",
+			category: "Categories/Unpackaging",
 			priority: 4
 		},
 		Recipe_Alternate_DilutedFuel_C: {
@@ -3985,87 +3859,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_Blender_C",
 			category: "Categories/Fuel",
 			priority: 0
-		},
-		Recipe_IonizedFuel_C: {
-			className: "Recipe_IonizedFuel_C",
-			recipeDisplayName: "Ionized Fuel",
-			inputs: [
-				{
-					itemClass: "Desc_RocketFuel_C",
-					amountPerMinute: 40
-				},
-				{
-					itemClass: "Desc_CrystalShard_C",
-					amountPerMinute: 2.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IonizedFuel_C",
-					amountPerMinute: 40
-				},
-				{
-					itemClass: "Desc_CompactedCoal_C",
-					amountPerMinute: 5
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
-			category: "Categories/Fuel",
-			priority: 6
-		},
-		Recipe_UnpackageIonizedFuel_C: {
-			className: "Recipe_UnpackageIonizedFuel_C",
-			recipeDisplayName: "Unpackage Ionized Fuel",
-			inputs: [
-				{
-					itemClass: "Desc_PackagedIonizedFuel_C",
-					amountPerMinute: 40
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IonizedFuel_C",
-					amountPerMinute: 80
-				},
-				{
-					itemClass: "Desc_GasTank_C",
-					amountPerMinute: 40
-				}
-			],
-			producedIn: "Build_Packager_C",
-			category: "Categories/Fuel",
-			priority: 7
-		},
-		Recipe_Alternate_IonizedFuel_Dark_C: {
-			className: "Recipe_Alternate_IonizedFuel_Dark_C",
-			recipeDisplayName: "Alternate: Dark-Ion Fuel",
-			inputs: [
-				{
-					itemClass: "Desc_PackagedRocketFuel_C",
-					amountPerMinute: 240
-				},
-				{
-					itemClass: "Desc_DarkMatter_C",
-					amountPerMinute: 80
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_IonizedFuel_C",
-					amountPerMinute: 200
-				},
-				{
-					itemClass: "Desc_CompactedCoal_C",
-					amountPerMinute: 40
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/Fuel",
-			priority: 1,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
 		},
 		Recipe_LiquidBiofuel_C: {
 			className: "Recipe_LiquidBiofuel_C",
@@ -4110,7 +3903,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_Packager_C",
-			category: "Categories/Fuel",
+			category: "Categories/Unpackaging",
 			priority: 3
 		},
 		Recipe_RocketFuel_C: {
@@ -4160,7 +3953,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_Packager_C",
-			category: "Categories/Fuel",
+			category: "Categories/Unpackaging",
 			priority: 6
 		},
 		Recipe_Alternate_RocketFuel_Nitro_C: {
@@ -4241,7 +4034,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_Packager_C",
-			category: "Categories/Fuel",
+			category: "Categories/Unpackaging",
 			priority: 5
 		},
 		Recipe_Alternate_TurboBlendFuel_C: {
@@ -4802,6 +4595,182 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			producedIn: "Build_ManufacturerMk1_C",
 			category: "Categories/IndustrialParts",
 			priority: 10
+		},
+		Recipe_Cable_C: {
+			className: "Recipe_Cable_C",
+			recipeDisplayName: "Cable",
+			inputs: [
+				{
+					itemClass: "Desc_Wire_C",
+					amountPerMinute: 60
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Cable_C",
+					amountPerMinute: 30
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/Electronics",
+			priority: 3
+		},
+		Recipe_Alternate_CoatedCable_C: {
+			className: "Recipe_Alternate_CoatedCable_C",
+			recipeDisplayName: "Alternate: Coated Cable",
+			inputs: [
+				{
+					itemClass: "Desc_Wire_C",
+					amountPerMinute: 37.5
+				},
+				{
+					itemClass: "Desc_HeavyOilResidue_C",
+					amountPerMinute: 15
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Cable_C",
+					amountPerMinute: 67.5
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Other",
+			priority: 0
+		},
+		Recipe_Alternate_Cable_1_C: {
+			className: "Recipe_Alternate_Cable_1_C",
+			recipeDisplayName: "Alternate: Insulated Cable",
+			inputs: [
+				{
+					itemClass: "Desc_Wire_C",
+					amountPerMinute: 45
+				},
+				{
+					itemClass: "Desc_Rubber_C",
+					amountPerMinute: 30
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Cable_C",
+					amountPerMinute: 100
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Electronics",
+			priority: 1
+		},
+		Recipe_Alternate_Cable_2_C: {
+			className: "Recipe_Alternate_Cable_2_C",
+			recipeDisplayName: "Alternate: Quickwire Cable",
+			inputs: [
+				{
+					itemClass: "Desc_HighSpeedWire_C",
+					amountPerMinute: 7.5
+				},
+				{
+					itemClass: "Desc_Rubber_C",
+					amountPerMinute: 5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Cable_C",
+					amountPerMinute: 27.5
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Electronics",
+			priority: 2
+		},
+		Recipe_CopperSheet_C: {
+			className: "Recipe_CopperSheet_C",
+			recipeDisplayName: "Copper Sheet",
+			inputs: [
+				{
+					itemClass: "Desc_CopperIngot_C",
+					amountPerMinute: 20
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_CopperSheet_C",
+					amountPerMinute: 10
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/StandardParts",
+			priority: 11
+		},
+		Recipe_Alternate_SteamedCopperSheet_C: {
+			className: "Recipe_Alternate_SteamedCopperSheet_C",
+			recipeDisplayName: "Alternate: Steamed Copper Sheet",
+			inputs: [
+				{
+					itemClass: "Desc_CopperIngot_C",
+					amountPerMinute: 22.5
+				},
+				{
+					itemClass: "Desc_Water_C",
+					amountPerMinute: 22.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_CopperSheet_C",
+					amountPerMinute: 22.5
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Other",
+			priority: 1
+		},
+		Recipe_Fabric_C: {
+			className: "Recipe_Fabric_C",
+			recipeDisplayName: "Fabric",
+			inputs: [
+				{
+					itemClass: "Desc_Mycelia_C",
+					amountPerMinute: 15
+				},
+				{
+					itemClass: "Desc_GenericBiomass_C",
+					amountPerMinute: 75
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Fabric_C",
+					amountPerMinute: 15
+				}
+			],
+			producedIn: "Build_AssemblerMk1_C",
+			category: "Categories/Biomass",
+			priority: 5
+		},
+		Recipe_Alternate_PolyesterFabric_C: {
+			className: "Recipe_Alternate_PolyesterFabric_C",
+			recipeDisplayName: "Alternate: Polyester Fabric",
+			inputs: [
+				{
+					itemClass: "Desc_PolymerResin_C",
+					amountPerMinute: 30
+				},
+				{
+					itemClass: "Desc_Water_C",
+					amountPerMinute: 30
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Fabric_C",
+					amountPerMinute: 30
+				}
+			],
+			producedIn: "Build_OilRefinery_C",
+			category: "Categories/Other",
+			priority: 2
 		},
 		Recipe_ElectromagneticControlRod_C: {
 			className: "Recipe_ElectromagneticControlRod_C",
@@ -5498,6 +5467,526 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				average: 250
 			}
 		},
+		Recipe_Bauxite_Caterium_C: {
+			className: "Recipe_Bauxite_Caterium_C",
+			recipeDisplayName: "Bauxite (Caterium)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 150
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreBauxite_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 13,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Bauxite_Copper_C: {
+			className: "Recipe_Bauxite_Copper_C",
+			recipeDisplayName: "Bauxite (Copper)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreCopper_C",
+					amountPerMinute: 180
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreBauxite_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 12,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Caterium_Copper_C: {
+			className: "Recipe_Caterium_Copper_C",
+			recipeDisplayName: "Caterium Ore (Copper)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreCopper_C",
+					amountPerMinute: 150
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 8,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Caterium_Quartz_C: {
+			className: "Recipe_Caterium_Quartz_C",
+			recipeDisplayName: "Caterium Ore (Quartz)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_RawQuartz_C",
+					amountPerMinute: 120
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 9,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Coal_Iron_C: {
+			className: "Recipe_Coal_Iron_C",
+			recipeDisplayName: "Coal (Iron)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreIron_C",
+					amountPerMinute: 180
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Coal_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 5,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Coal_Limestone_C: {
+			className: "Recipe_Coal_Limestone_C",
+			recipeDisplayName: "Coal (Limestone)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_Stone_C",
+					amountPerMinute: 360
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Coal_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 4,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Alternate_Coal_2_C: {
+			className: "Recipe_Alternate_Coal_2_C",
+			recipeDisplayName: "Alternate: Biocoal",
+			inputs: [
+				{
+					itemClass: "Desc_GenericBiomass_C",
+					amountPerMinute: 37.5
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Coal_C",
+					amountPerMinute: 45
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/Biomass",
+			priority: 6
+		},
+		Recipe_Alternate_Coal_1_C: {
+			className: "Recipe_Alternate_Coal_1_C",
+			recipeDisplayName: "Alternate: Charcoal",
+			inputs: [
+				{
+					itemClass: "Desc_Wood_C",
+					amountPerMinute: 15
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Coal_C",
+					amountPerMinute: 150
+				}
+			],
+			producedIn: "Build_ConstructorMk1_C",
+			category: "Categories/Biomass",
+			priority: 7
+		},
+		Recipe_Copper_Quartz_C: {
+			className: "Recipe_Copper_Quartz_C",
+			recipeDisplayName: "Copper Ore (Quartz)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_RawQuartz_C",
+					amountPerMinute: 100
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreCopper_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 2,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Copper_Sulfur_C: {
+			className: "Recipe_Copper_Sulfur_C",
+			recipeDisplayName: "Copper Ore (Sulfur)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_Sulfur_C",
+					amountPerMinute: 120
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreCopper_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 1,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Iron_Limestone_C: {
+			className: "Recipe_Iron_Limestone_C",
+			recipeDisplayName: "Iron Ore (Limestone)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_Stone_C",
+					amountPerMinute: 240
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreIron_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 0,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Limestone_Sulfur_C: {
+			className: "Recipe_Limestone_Sulfur_C",
+			recipeDisplayName: "Limestone (Sulfur)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_Sulfur_C",
+					amountPerMinute: 20
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Stone_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 3,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Nitrogen_Bauxite_C: {
+			className: "Recipe_Nitrogen_Bauxite_C",
+			recipeDisplayName: "Nitrogen Gas (Bauxite)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreBauxite_C",
+					amountPerMinute: 100
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_NitrogenGas_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 15,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Nitrogen_Caterium_C: {
+			className: "Recipe_Nitrogen_Caterium_C",
+			recipeDisplayName: "Nitrogen Gas (Caterium)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreGold_C",
+					amountPerMinute: 120
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_NitrogenGas_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 14,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_UnpackageNitrogen_C: {
+			className: "Recipe_UnpackageNitrogen_C",
+			recipeDisplayName: "Unpackage Nitrogen Gas",
+			inputs: [
+				{
+					itemClass: "Desc_PackagedNitrogenGas_C",
+					amountPerMinute: 60
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_NitrogenGas_C",
+					amountPerMinute: 240
+				},
+				{
+					itemClass: "Desc_GasTank_C",
+					amountPerMinute: 60
+				}
+			],
+			producedIn: "Build_Packager_C",
+			category: "Categories/Unpackaging",
+			priority: 10
+		},
+		Recipe_Quartz_Bauxite_C: {
+			className: "Recipe_Quartz_Bauxite_C",
+			recipeDisplayName: "Raw Quartz (Bauxite)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreBauxite_C",
+					amountPerMinute: 100
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_RawQuartz_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 11,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Quartz_Coal_C: {
+			className: "Recipe_Quartz_Coal_C",
+			recipeDisplayName: "Raw Quartz (Coal)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_Coal_C",
+					amountPerMinute: 240
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_RawQuartz_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 10,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Sulfur_Coal_C: {
+			className: "Recipe_Sulfur_Coal_C",
+			recipeDisplayName: "Sulfur (Coal)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_Coal_C",
+					amountPerMinute: 200
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Sulfur_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 7,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Sulfur_Iron_C: {
+			className: "Recipe_Sulfur_Iron_C",
+			recipeDisplayName: "Sulfur (Iron)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreIron_C",
+					amountPerMinute: 300
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_Sulfur_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 6,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
+		Recipe_Uranium_Bauxite_C: {
+			className: "Recipe_Uranium_Bauxite_C",
+			recipeDisplayName: "Uranium Ore (Bauxite)",
+			inputs: [
+				{
+					itemClass: "Desc_SAMIngot_C",
+					amountPerMinute: 10
+				},
+				{
+					itemClass: "Desc_OreBauxite_C",
+					amountPerMinute: 480
+				}
+			],
+			outputs: [
+				{
+					itemClass: "Desc_OreUranium_C",
+					amountPerMinute: 120
+				}
+			],
+			producedIn: "Build_Converter_C",
+			category: "Categories/RawResourceConversion",
+			priority: 16,
+			customPowerConsumption: {
+				max: 400,
+				average: 250
+			}
+		},
 		Recipe_Biomass_AlienProtein_C: {
 			className: "Recipe_Biomass_AlienProtein_C",
 			recipeDisplayName: "Biomass (Alien Protein)",
@@ -5571,52 +6060,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 				}
 			],
 			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/Biomass",
-			priority: 2
-		},
-		Recipe_Fabric_C: {
-			className: "Recipe_Fabric_C",
-			recipeDisplayName: "Fabric",
-			inputs: [
-				{
-					itemClass: "Desc_Mycelia_C",
-					amountPerMinute: 15
-				},
-				{
-					itemClass: "Desc_GenericBiomass_C",
-					amountPerMinute: 75
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Fabric_C",
-					amountPerMinute: 15
-				}
-			],
-			producedIn: "Build_AssemblerMk1_C",
-			category: "Categories/Biomass",
-			priority: 5
-		},
-		Recipe_Alternate_PolyesterFabric_C: {
-			className: "Recipe_Alternate_PolyesterFabric_C",
-			recipeDisplayName: "Alternate: Polyester Fabric",
-			inputs: [
-				{
-					itemClass: "Desc_PolymerResin_C",
-					amountPerMinute: 30
-				},
-				{
-					itemClass: "Desc_Water_C",
-					amountPerMinute: 30
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Fabric_C",
-					amountPerMinute: 30
-				}
-			],
-			producedIn: "Build_OilRefinery_C",
 			category: "Categories/Biomass",
 			priority: 2
 		},
@@ -5828,449 +6271,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			customPowerConsumption: {
 				max: 2000,
 				average: 1000
-			}
-		},
-		Recipe_Bauxite_Caterium_C: {
-			className: "Recipe_Bauxite_Caterium_C",
-			recipeDisplayName: "Bauxite (Caterium)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 150
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 13,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Bauxite_Copper_C: {
-			className: "Recipe_Bauxite_Copper_C",
-			recipeDisplayName: "Bauxite (Copper)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreCopper_C",
-					amountPerMinute: 180
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 12,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Caterium_Copper_C: {
-			className: "Recipe_Caterium_Copper_C",
-			recipeDisplayName: "Caterium Ore (Copper)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreCopper_C",
-					amountPerMinute: 150
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 8,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Caterium_Quartz_C: {
-			className: "Recipe_Caterium_Quartz_C",
-			recipeDisplayName: "Caterium Ore (Quartz)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_RawQuartz_C",
-					amountPerMinute: 120
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreGold_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 9,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Coal_Iron_C: {
-			className: "Recipe_Coal_Iron_C",
-			recipeDisplayName: "Coal (Iron)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreIron_C",
-					amountPerMinute: 180
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 5,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Coal_Limestone_C: {
-			className: "Recipe_Coal_Limestone_C",
-			recipeDisplayName: "Coal (Limestone)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_Stone_C",
-					amountPerMinute: 360
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 4,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Alternate_Coal_2_C: {
-			className: "Recipe_Alternate_Coal_2_C",
-			recipeDisplayName: "Alternate: Biocoal",
-			inputs: [
-				{
-					itemClass: "Desc_GenericBiomass_C",
-					amountPerMinute: 37.5
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 45
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/RawMaterials",
-			priority: 6
-		},
-		Recipe_Alternate_Coal_1_C: {
-			className: "Recipe_Alternate_Coal_1_C",
-			recipeDisplayName: "Alternate: Charcoal",
-			inputs: [
-				{
-					itemClass: "Desc_Wood_C",
-					amountPerMinute: 15
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 150
-				}
-			],
-			producedIn: "Build_ConstructorMk1_C",
-			category: "Categories/RawMaterials",
-			priority: 7
-		},
-		Recipe_Copper_Quartz_C: {
-			className: "Recipe_Copper_Quartz_C",
-			recipeDisplayName: "Copper Ore (Quartz)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_RawQuartz_C",
-					amountPerMinute: 100
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreCopper_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 2,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Copper_Sulfur_C: {
-			className: "Recipe_Copper_Sulfur_C",
-			recipeDisplayName: "Copper Ore (Sulfur)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 120
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreCopper_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 1,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Iron_Limestone_C: {
-			className: "Recipe_Iron_Limestone_C",
-			recipeDisplayName: "Iron Ore (Limestone)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_Stone_C",
-					amountPerMinute: 240
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreIron_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 0,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Limestone_Sulfur_C: {
-			className: "Recipe_Limestone_Sulfur_C",
-			recipeDisplayName: "Limestone (Sulfur)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 20
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Stone_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 3,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Quartz_Bauxite_C: {
-			className: "Recipe_Quartz_Bauxite_C",
-			recipeDisplayName: "Raw Quartz (Bauxite)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 100
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_RawQuartz_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 11,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Quartz_Coal_C: {
-			className: "Recipe_Quartz_Coal_C",
-			recipeDisplayName: "Raw Quartz (Coal)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 240
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_RawQuartz_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 10,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Sulfur_Coal_C: {
-			className: "Recipe_Sulfur_Coal_C",
-			recipeDisplayName: "Sulfur (Coal)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_Coal_C",
-					amountPerMinute: 200
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 7,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Sulfur_Iron_C: {
-			className: "Recipe_Sulfur_Iron_C",
-			recipeDisplayName: "Sulfur (Iron)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreIron_C",
-					amountPerMinute: 300
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_Sulfur_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 6,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
-			}
-		},
-		Recipe_Uranium_Bauxite_C: {
-			className: "Recipe_Uranium_Bauxite_C",
-			recipeDisplayName: "Uranium Ore (Bauxite)",
-			inputs: [
-				{
-					itemClass: "Desc_SAMIngot_C",
-					amountPerMinute: 10
-				},
-				{
-					itemClass: "Desc_OreBauxite_C",
-					amountPerMinute: 480
-				}
-			],
-			outputs: [
-				{
-					itemClass: "Desc_OreUranium_C",
-					amountPerMinute: 120
-				}
-			],
-			producedIn: "Build_Converter_C",
-			category: "Categories/RawMaterials",
-			priority: 16,
-			customPowerConsumption: {
-				max: 400,
-				average: 250
 			}
 		},
 		Recipe_Alternate_AutomatedMiner_C: {
@@ -8234,13 +8234,13 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		Build_MinerMk1_C: {
 			buildingClassName: "Build_MinerMk1_C",
 			baseProductionRate: 60,
+			supportsPurity: true,
 			outputs: [
 				"Desc_Coal_C",
 				"Desc_Stone_C",
 				"Desc_OreIron_C",
 				"Desc_OreBauxite_C",
 				"Desc_OreCopper_C",
-				"Desc_LiquidOil_C",
 				"Desc_OreGold_C",
 				"Desc_RawQuartz_C",
 				"Desc_Sulfur_C",
@@ -8251,13 +8251,13 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		Build_MinerMk2_C: {
 			buildingClassName: "Build_MinerMk2_C",
 			baseProductionRate: 120,
+			supportsPurity: true,
 			outputs: [
 				"Desc_Coal_C",
 				"Desc_Stone_C",
 				"Desc_OreIron_C",
 				"Desc_OreBauxite_C",
 				"Desc_OreCopper_C",
-				"Desc_LiquidOil_C",
 				"Desc_OreGold_C",
 				"Desc_RawQuartz_C",
 				"Desc_Sulfur_C",
@@ -8268,13 +8268,13 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		Build_MinerMk3_C: {
 			buildingClassName: "Build_MinerMk3_C",
 			baseProductionRate: 240,
+			supportsPurity: true,
 			outputs: [
 				"Desc_Coal_C",
 				"Desc_Stone_C",
 				"Desc_OreIron_C",
 				"Desc_OreBauxite_C",
 				"Desc_OreCopper_C",
-				"Desc_LiquidOil_C",
 				"Desc_OreGold_C",
 				"Desc_RawQuartz_C",
 				"Desc_Sulfur_C",
@@ -8285,6 +8285,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		Build_OilPump_C: {
 			buildingClassName: "Build_OilPump_C",
 			baseProductionRate: 120,
+			supportsPurity: true,
 			outputs: [
 				"Desc_LiquidOil_C"
 			]
@@ -8292,6 +8293,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		Build_FrackingExtractor_C: {
 			buildingClassName: "Build_FrackingExtractor_C",
 			baseProductionRate: 60,
+			supportsPurity: true,
 			outputs: [
 				"Desc_LiquidOil_C",
 				"Desc_NitrogenGas_C",
@@ -8301,6 +8303,7 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		Build_WaterPump_C: {
 			buildingClassName: "Build_WaterPump_C",
 			baseProductionRate: 120,
+			supportsPurity: false,
 			outputs: [
 				"Desc_Water_C"
 			]
@@ -8678,12 +8681,13 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		"Categories/Unpackaging": "Unpackaging",
 		"Categories/Fuel": "Fuel",
 		"Categories/IndustrialParts": "Industrial Parts",
+		"Categories/Other": "Other",
 		"Categories/Nuclear": "Nuclear",
 		"Categories/QuantumTechnology": "Quantum Technology",
+		"Categories/RawResourceConversion": "Raw Resource Conversion",
 		"Categories/Biomass": "Biomass",
 		"Categories/AlienRemains": "Alien Remains",
 		"Categories/PowerShards": "Power Shards",
-		"Categories/RawMaterials": "Raw Materials",
 		"Categories/Tools": "Tools",
 		"Categories/Ammunition": "Ammunition",
 		"Categories/Consumables": "Consumables",
@@ -10011,6 +10015,706 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			name: "LiquidWater_Pipe",
 			resolutions: [
 				256,
+				48
+			]
+		},
+		TXUI_MIcon_Aggro: {
+			name: "TXUI_MIcon_Aggro",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Arrow_Down: {
+			name: "TXUI_MIcon_Arrow_Down",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Arrow_DownLeft: {
+			name: "TXUI_MIcon_Arrow_DownLeft",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Arrow_DownRight: {
+			name: "TXUI_MIcon_Arrow_DownRight",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Arrow_Left: {
+			name: "TXUI_MIcon_Arrow_Left",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Arrow_Right: {
+			name: "TXUI_MIcon_Arrow_Right",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Arrow_Up: {
+			name: "TXUI_MIcon_Arrow_Up",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Arrow_UpLeft: {
+			name: "TXUI_MIcon_Arrow_UpLeft",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Arrow_UpRight: {
+			name: "TXUI_MIcon_Arrow_UpRight",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Cogwheel: {
+			name: "TXUI_MIcon_Cogwheel",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Crate: {
+			name: "TXUI_MIcon_Crate",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Drone: {
+			name: "TXUI_MIcon_Drone",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Drop: {
+			name: "TXUI_MIcon_Drop",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Exit: {
+			name: "TXUI_MIcon_Exit",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_ExlamationMark: {
+			name: "TXUI_MIcon_ExlamationMark",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Explorer: {
+			name: "TXUI_MIcon_Explorer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Factory: {
+			name: "TXUI_MIcon_Factory",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_FactoryCart: {
+			name: "TXUI_MIcon_FactoryCart",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Home: {
+			name: "TXUI_MIcon_Home",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Loop: {
+			name: "TXUI_MIcon_Loop",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Next: {
+			name: "TXUI_MIcon_Next",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Pause: {
+			name: "TXUI_MIcon_Pause",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Pioneer: {
+			name: "TXUI_MIcon_Pioneer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Play: {
+			name: "TXUI_MIcon_Play",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Portal: {
+			name: "TXUI_MIcon_Portal",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_PortalSatellite: {
+			name: "TXUI_MIcon_PortalSatellite",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Power: {
+			name: "TXUI_MIcon_Power",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Previous: {
+			name: "TXUI_MIcon_Previous",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_QuestionMark: {
+			name: "TXUI_MIcon_QuestionMark",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Radiation: {
+			name: "TXUI_MIcon_Radiation",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Recycle: {
+			name: "TXUI_MIcon_Recycle",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_ResizeWidth: {
+			name: "TXUI_MIcon_ResizeWidth",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_RoadArrow_Down: {
+			name: "TXUI_MIcon_RoadArrow_Down",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_RoadArrow_TurnAround: {
+			name: "TXUI_MIcon_RoadArrow_TurnAround",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_RoadArrow_TurnLeft: {
+			name: "TXUI_MIcon_RoadArrow_TurnLeft",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_RoadArrow_TurnRight: {
+			name: "TXUI_MIcon_RoadArrow_TurnRight",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_RoadArrow_Up: {
+			name: "TXUI_MIcon_RoadArrow_Up",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_SmallTape: {
+			name: "TXUI_MIcon_SmallTape",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_SortRule_Any: {
+			name: "TXUI_MIcon_SortRule_Any",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_SortRule_AnyUndefined: {
+			name: "TXUI_MIcon_SortRule_AnyUndefined",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_SortRule_Overflow: {
+			name: "TXUI_MIcon_SortRule_Overflow",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Speedometer: {
+			name: "TXUI_MIcon_Speedometer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Stop_X: {
+			name: "TXUI_MIcon_Stop_X",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_ThumbDown: {
+			name: "TXUI_MIcon_ThumbDown",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_ThumbUp: {
+			name: "TXUI_MIcon_ThumbUp",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Tractor: {
+			name: "TXUI_MIcon_Tractor",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Train: {
+			name: "TXUI_MIcon_Train",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Trash: {
+			name: "TXUI_MIcon_Trash",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Truck: {
+			name: "TXUI_MIcon_Truck",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_VolDown: {
+			name: "TXUI_MIcon_VolDown",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_VolUp: {
+			name: "TXUI_MIcon_VolUp",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		TXUI_MIcon_Warning: {
+			name: "TXUI_MIcon_Warning",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		IconDesc_CrossStencil: {
+			name: "IconDesc_CrossStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_ExplorerStencil: {
+			name: "IconDesc_ExplorerStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_FactoryCartStencil: {
+			name: "IconDesc_FactoryCartStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_FactoryStencil: {
+			name: "IconDesc_FactoryStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_LiquidStencil: {
+			name: "IconDesc_LiquidStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_NoFactoryCartStencil: {
+			name: "IconDesc_NoFactoryCartStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_NoParkingStencil: {
+			name: "IconDesc_NoParkingStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_NoPioneerStencil: {
+			name: "IconDesc_NoPioneerStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_NuclearStencil: {
+			name: "IconDesc_NuclearStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_ParkingStencil: {
+			name: "IconDesc_ParkingStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_PatternRemover: {
+			name: "IconDesc_PatternRemover",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_PioneerStencil: {
+			name: "IconDesc_PioneerStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_PowerStencil: {
+			name: "IconDesc_PowerStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_StorageStencil: {
+			name: "IconDesc_StorageStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_TractorStencil: {
+			name: "IconDesc_TractorStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		IconDesc_TruckStencil: {
+			name: "IconDesc_TruckStencil",
+			resolutions: [
+				512,
+				48
+			]
+		},
+		PatternDesc_Icon_Cart: {
+			name: "PatternDesc_Icon_Cart",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Explorer: {
+			name: "PatternDesc_Icon_Explorer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Factory: {
+			name: "PatternDesc_Icon_Factory",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Liquid: {
+			name: "PatternDesc_Icon_Liquid",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Nuclear: {
+			name: "PatternDesc_Icon_Nuclear",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Parking: {
+			name: "PatternDesc_Icon_Parking",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Pioneer: {
+			name: "PatternDesc_Icon_Pioneer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Power: {
+			name: "PatternDesc_Icon_Power",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_StopCross: {
+			name: "PatternDesc_Icon_StopCross",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Storage: {
+			name: "PatternDesc_Icon_Storage",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Tractor: {
+			name: "PatternDesc_Icon_Tractor",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Icon_Truck: {
+			name: "PatternDesc_Icon_Truck",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_NO_Cart: {
+			name: "PatternDesc_NO_Cart",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_NO_Parking: {
+			name: "PatternDesc_NO_Parking",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_NO_Pioneer: {
+			name: "PatternDesc_NO_Pioneer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		PatternDesc_Remover_Icons: {
+			name: "PatternDesc_Remover_Icons",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Cart: {
+			name: "Recipe_Pattern_Icon_Cart",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Explorer: {
+			name: "Recipe_Pattern_Icon_Explorer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Factory: {
+			name: "Recipe_Pattern_Icon_Factory",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Liquid: {
+			name: "Recipe_Pattern_Icon_Liquid",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Nuclear: {
+			name: "Recipe_Pattern_Icon_Nuclear",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Parking: {
+			name: "Recipe_Pattern_Icon_Parking",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Pioneer: {
+			name: "Recipe_Pattern_Icon_Pioneer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Power: {
+			name: "Recipe_Pattern_Icon_Power",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_StopCross: {
+			name: "Recipe_Pattern_Icon_StopCross",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Storage: {
+			name: "Recipe_Pattern_Icon_Storage",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Tractor: {
+			name: "Recipe_Pattern_Icon_Tractor",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Icon_Truck: {
+			name: "Recipe_Pattern_Icon_Truck",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_NO_Cart: {
+			name: "Recipe_Pattern_NO_Cart",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_NO_Parking: {
+			name: "Recipe_Pattern_NO_Parking",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_NO_Pioneer: {
+			name: "Recipe_Pattern_NO_Pioneer",
+			resolutions: [
+				128,
+				48
+			]
+		},
+		Recipe_Pattern_Remover_Icons: {
+			name: "Recipe_Pattern_Remover_Icons",
+			resolutions: [
+				128,
 				48
 			]
 		}

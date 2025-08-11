@@ -50,7 +50,7 @@ async function main() {
 	const extractedFilesPath = args["extracted-files"];
 	const tsSavePath = args["ts-save"];
 	if (!extractedFilesPath) {
-		throw new Error("Please provide the path to the extracted files using --extracted-files=<path>.");
+		throw new Error("Please provide the path to the extracted files FactoryGame\\Content\\ folder using --extracted-files=<path>.");
 	}
 	if (!tsSavePath) {
 		throw new Error("Please provide the path to save the TypeScript file using --ts-save=<path>.");
@@ -86,7 +86,7 @@ async function main() {
 		}
 		const filePath = join(file.parentPath, file.name);
 		const fileContent = readFileSync(filePath, "utf-8");
-		if (!fileContent.includes(`"mCategory": `)) {
+		if (!fileContent.includes(`"mCategory": `) && !fileContent.includes(`"mOverriddenCategory": `)) {
 			continue;
 		}
 		const jsonData = JSON.parse(fileContent);
@@ -96,10 +96,19 @@ async function main() {
 
 		for (const item of jsonData) {
 			const type = item["Type"];
-			if (!item.Properties?.mCategory) {
+			// let objectPath: string | undefined;
+			// if (item.Properties?.mCategory) {
+			// 	objectPath = item.Properties.mCategory.ObjectPath;
+			// } else if (item.Properties?.mOverriddenCategory) {
+			// 	objectPath = item.Properties.mOverriddenCategory.ObjectPath;
+			// }
+			let objectPath = (
+				item.Properties?.mCategory?.ObjectPath ||
+				item.Properties?.mOverriddenCategory?.ObjectPath
+			);
+			if (!objectPath) {
 				continue;
 			}
-			let objectPath = item.Properties.mCategory.ObjectPath;
 			objectPath = objectPath
 				.replace(/^\/Game\//, "")
 				.replace(/\.[\d]$/, ".json");

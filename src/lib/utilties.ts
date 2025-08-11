@@ -1,4 +1,5 @@
 import type { IVector2D } from "./datamodel/GraphView.svelte";
+import type { ConfirmationPromptEvent, EventStream } from "./EventStream.svelte";
 
 export class Debouncer<T extends (...args: any[]) => void> {
 	private timeoutId: NodeJS.Timeout | null = null;
@@ -261,4 +262,27 @@ export function loadFileFromDisk(): Promise<string> {
 		input.click();
 		document.body.removeChild(input);
 	});
+}
+
+export function showConfirmationPrompt(eventStream: EventStream, params: Partial<ConfirmationPromptEvent>): Promise<boolean|null> {
+	return new Promise((resolve) => {
+		const event: ConfirmationPromptEvent = {
+			type: "confirmationPrompt",
+			confirmLabel: "Confirm",
+			cancelLabel: "Cancel",
+			message: "Are you sure?",
+			...params,
+			onAnswer: resolve,
+		};
+		eventStream.emit(event);
+	});
+}
+
+export function openLinkInNewTab(url: string): void {
+	const a = document.createElement("a");
+	a.href = url;
+	a.target = "_blank";
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
 }

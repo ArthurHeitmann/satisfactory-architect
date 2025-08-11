@@ -10,7 +10,7 @@ import { determineStraightEdgeCount, makeStraightEdgePoints } from "./straightEd
 
 export type GraphEdgeType = "item-flow";
 
-export type GraphEdgeDisplayType = "straight" | "curved" | "angled";
+export type GraphEdgeDisplayType = "straight" | "curved" | "angled" | "teleport";
 export interface GraphEdgeProperties {
 	displayType: GraphEdgeDisplayType;
 	straightLineOffsets?: number[];
@@ -229,7 +229,7 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 					x: endPos.x - unitVector.x * (endNodeRadius + edgeArrowLength),
 					y: endPos.y - unitVector.y * (endNodeRadius + edgeArrowLength),
 				};
-			} else if (this.properties.displayType === "curved" || this.properties.displayType === "angled") {
+			} else if (this.properties.displayType === "curved" || this.properties.displayType === "angled" || this.properties.displayType === "teleport") {
 				const { startOffset, endOffset } = this.orientationVectors!;
 				const startNodeRadius = this.startNodeRadius!;
 				const endNodeRadius = this.endNodeRadius!;

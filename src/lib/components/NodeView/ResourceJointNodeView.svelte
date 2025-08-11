@@ -202,6 +202,8 @@
 					class="rate-suggestion"
 					style="--throughput-color: {throughputColor}; transform: translate({suggestionRelOffset}, -100%);"
 					onmousedown={(e) => {
+						if (e.button !== 0)
+							return;
 						e.stopPropagation();
 						setProductionRate(suggestedThroughput);
 					}}

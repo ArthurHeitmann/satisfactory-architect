@@ -10,7 +10,7 @@
     import { userCanChangeOrientationVector } from "../../datamodel/nodeTypeProperties.svelte";
     import UserEvents, { type DragEvent } from "../UserEvents.svelte";
     import type { LayoutOrientation } from "../../datamodel/GraphNode.svelte";
-    import { edgeArrowLength } from "$lib/datamodel/constants";
+    import { edgeArrowLength, gridSize } from "$lib/datamodel/constants";
 
 	interface Props {
 		edge: GraphEdge;
@@ -112,6 +112,40 @@
 				};
 			}
 			return {pathD, midPoint, arrowHeadPlaceholderPos};
+		} else if (edge.properties.displayType === "teleport") {
+			if (!edge.pathPoints || !edge.orientationVectors)
+				return fallback;
+			const startPoint = edge.pathPoints.startPoint;
+			const endPoint = edge.pathPoints.endPointWithoutArrow;
+			const startVec = edge.orientationVectors.startOffset;
+			const endVec = edge.orientationVectors.endOffset;
+			const lineLength = gridSize / 2;
+			const miniRadius = 2.5;
+			const startPointEnd = {
+				x: startPoint.x + startVec.x * (lineLength - miniRadius*1),
+				y: startPoint.y + startVec.y * (lineLength - miniRadius*1),
+			};
+			const endPointCircleStart = {
+				x: endPoint.x + endVec.x * (lineLength - edgeArrowLength + miniRadius * 1),
+				y: endPoint.y + endVec.y * (lineLength - edgeArrowLength + miniRadius * 1),
+			};
+			const endPointStart = {
+				x: endPoint.x + endVec.x * (lineLength - edgeArrowLength - miniRadius * 1),
+				y: endPoint.y + endVec.y * (lineLength - edgeArrowLength - miniRadius * 1),
+			};
+			const relCircle1 = `a ${miniRadius},${miniRadius} 0 1,0 ${startVec.x * miniRadius * 2},${startVec.y * miniRadius * 2} a ${miniRadius},${miniRadius} 0 1,0 ${startVec.x * miniRadius * -2},${startVec.y * miniRadius * -2}`;
+			const relCircle2 = `M ${endPointCircleStart.x} ${endPointCircleStart.y} a ${miniRadius},${miniRadius} 0 1,0 ${endVec.x * miniRadius * -2},${endVec.y * miniRadius * -2} a ${miniRadius},${miniRadius} 0 1,0 ${endVec.x * miniRadius * 2},${endVec.y * miniRadius * 2}`;
+			const pathD =
+				`M ${startPoint.x} ${startPoint.y} L ${startPointEnd.x} ${startPointEnd.y} ${relCircle1}` +
+				`${relCircle2} M ${endPointStart.x} ${endPointStart.y} L ${endPoint.x} ${endPoint.y}`;
+			return {
+				pathD,
+				midPoint: null,
+				arrowHeadPlaceholderPos: {
+					x: (startPointEnd.x + endPointStart.x) / 2,
+					y: (startPointEnd.y + endPointStart.y) / 2,
+				},
+			};
 		} else {
 			assertUnreachable(edge.properties.displayType);
 		}
@@ -191,24 +225,28 @@
 			icon: "branch",
 			onClick: () => edge.properties.isDrainLine = !edge.properties.isDrainLine,
 		});
-		// items.push(<ContextMenuItemButtonRow<GraphEdgeDisplayType>>{
-		// 	onClick: (v) => edge.properties.displayType = v,
-		// 	currentValue: edge.properties.displayType,
-		// 	items: [
-		// 		{
-		// 			icon: "straight-line",
-		// 			value: "straight",
-		// 		},
-		// 		{
-		// 			icon: "curved-line",
-		// 			value: "curved",
-		// 		},
-		// 		{
-		// 			icon: "angled-line",
-		// 			value: "angled",
-		// 		},
-		// 	]
-		// })
+		items.push(<ContextMenuItemButtonRow<GraphEdgeDisplayType>>{
+			onClick: (v) => edge.properties.displayType = v,
+			currentValue: edge.properties.displayType,
+			items: [
+				{
+					icon: "straight-line",
+					value: "straight",
+				},
+				{
+					icon: "curved-line",
+					value: "curved",
+				},
+				{
+					icon: "angled-line",
+					value: "angled",
+				},
+				{
+					icon: "teleport-line",
+					value: "teleport",
+				},
+			]
+		})
 		return items;
 	});
 

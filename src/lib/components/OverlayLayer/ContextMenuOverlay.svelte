@@ -67,7 +67,7 @@
 				{/each}
 			</div>
 		{:else}
-			<button class="context-menu-item" onclick={() => handleItemClick(item)}>
+			<button class="context-menu-item" onclick={() => handleItemClick(item)} disabled={item.disabled}>
 				{#if item.icon}
 					<PresetSvg name={item.icon} size={18} color="currentColor" />
 				{:else if reserveIconSpace}
@@ -116,13 +116,21 @@
 		border-radius: var(--rounded-border-radius);
 		text-align: left;
 		
-		&:hover {
-			background: var(--context-menu-item-hover-color);
+		&:disabled {
+			opacity: 0.5;
+			cursor: default;
 		}
 
-		&:active {
-			background: var(--context-menu-item-active-color);
+		&:not(:disabled) {
+			&:hover {
+				background: var(--context-menu-item-hover-color);
+			}
+	
+			&:active {
+				background: var(--context-menu-item-active-color);
+			}
 		}
+
 
 		.label {
 			flex: 1;

@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { EventStream, type EventBase, type EventType, type ShowContextMenuEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowContextMenuEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
 	import { onDestroy, setContext, type Snippet } from "svelte";
 	import ContextMenuOverlay from "./ContextMenuOverlay.svelte";
 	import RecipeSelectorOverlay from "./RecipeSelectorOverlay.svelte";
     import { fade } from "svelte/transition";
     import type { IVector2D } from "$lib/datamodel/GraphView.svelte";
+    import ConfirmationPrompt from "./ConfirmationPrompt.svelte";
 
 	interface Props {
 		children: Snippet;
@@ -189,6 +190,12 @@
 			{:else if event.type === "showProductionSelector"}
 				<RecipeSelectorOverlay
 					event={event as ShowProductionSelectorEvent}
+					{dismissEventStream}
+					onclose={() => closeEvent(event)}
+				/>
+			{:else if event.type === "confirmationPrompt"}
+				<ConfirmationPrompt
+					event={event as ConfirmationPromptEvent}
 					{dismissEventStream}
 					onclose={() => closeEvent(event)}
 				/>

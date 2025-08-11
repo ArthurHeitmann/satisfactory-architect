@@ -29,6 +29,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	readonly idGen: IdGen;
 	readonly id: Id;
 	name: string;
+	icon: string;
 	readonly view: GraphView;
 	readonly nodes: SvelteMap<Id, GraphNode>;
 	readonly edges: SvelteMap<Id, GraphEdge>;
@@ -41,11 +42,12 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	svgElement: Element | null;
 	asJson: any;
 
-	constructor(appState: AppState, id: Id, name: string, view: GraphView, nodes: GraphNode[], edges: GraphEdge[], toolMode: ToolMode) {
+	constructor(appState: AppState, id: Id, name: string, icon: string, view: GraphView, nodes: GraphNode[], edges: GraphEdge[], toolMode: ToolMode) {
 		this.context = { appState, page: this };
 		this.idGen = appState.idGen;
 		this.id = id;
 		this.name = $state(name);
+		this.icon = $state(icon);
 		this.view = view;
 		this.nodes = new SvelteMap(nodes.map((n) => [n.id, n]));
 		this.edges = new SvelteMap(edges.map((e) => [e.id, e]));
@@ -64,12 +66,12 @@ export class GraphPage implements JsonSerializable<PageContext> {
 
 	static newDefault(appState: AppState, name: string = "New Page"): GraphPage {
 		const view = GraphView.newDefault();
-		return new GraphPage(appState, appState.idGen.nextId(), name, view, [], [], "select-nodes");
+		return new GraphPage(appState, appState.idGen.nextId(), name, "IconDesc_FactoryStencil", view, [], [], "select-nodes");
 	}
 
 	static fromJSON(appState: AppState, json: any): GraphPage {
 		const view = GraphView.fromJSON(json.view);
-		const page = new GraphPage(appState, json.id, json.name, view, [], [], json.toolMode);
+		const page = new GraphPage(appState, json.id, json.name, json.icon, view, [], [], json.toolMode);
 		const nodes = Object.values(json.nodes).map((n: any) => GraphNode.fromJSON(n, page.context));
 		for (const node of nodes) {
 			page.nodes.set(node.id, node);
@@ -86,6 +88,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
 		}
 		this.name = json.name;
+		this.icon = json.icon;
 		applyJsonToMap(json.nodes, this.nodes, GraphNode.fromJSON, this.context);
 		applyJsonToMap(json.edges, this.edges, GraphEdge.fromJSON, this.context);
 		applyJsonToSet(json.selectedNodes, this.selectedNodes);
@@ -98,6 +101,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			type: "graph-page",
 			id: this.id,
 			name: this.name,
+			icon: this.icon,
 			view: untrack(() => this.view.toJSON()),
 			nodes: Object.fromEntries(this.nodes.entries().map(([k, n]) => [k, n.asJson])),
 			edges: Object.fromEntries(this.edges.entries().map(([k, e]) => [k, e.asJson])),
@@ -483,14 +487,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		}
 	}
 
-	insertJson(text: string, pasteSource: PasteSource, centerPoint?: IVector2D) {
-		let data;
-		try {
-			data = JSON.parse(text);
-		} catch {
-			console.log("Not json data");
-			return;
-		}
+	insertJson(data: any, pasteSource: PasteSource, centerPoint?: IVector2D) {
 		if (data.type !== "factory-data" || data.version !== dataModelVersion) {
 			console.log("Unsupported data format or version");
 			return;

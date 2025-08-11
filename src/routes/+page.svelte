@@ -2,6 +2,7 @@
 <script lang="ts">
     import { browser } from "$app/environment";
     import OverlayLayer from "$lib/components/OverlayLayer/OverlayLayer.svelte";
+    import PagesBar from "$lib/components/PagesBar/PagesBar.svelte";
     import PageView from "$lib/components/PageView/PageView.svelte";
 	import { AppState } from "$lib/datamodel/AppState.svelte";
     import { StorageKeys } from "$lib/datamodel/constants";
@@ -96,32 +97,11 @@
 				<PageView page={app.currentPage} />
 			{/key}
 		</div>
-		<div class="bottom-bar">
-			{#each app.pages as page (page.id)}
-				<button
-					class="page-button"
-					onclick={() => app.setCurrentPage(page)}
-					disabled={currentPageId === page.id}
-				>
-					{page.name}
-				</button>
-			{/each}
-			<button
-				class="page-button"
-				onclick={() => app.addPage(GraphPage.newDefault(app, `Page ${app.pages.length + 1}`))}
-			>
-				➕ Add Page
-			</button>
-			<div class="spacer"></div>
-		</div>
+		<PagesBar appState={app} />
 	</div>
 </OverlayLayer>
 
 <style lang="scss">
-	:global(:root) {
-		overscroll-behavior: none;
-	}
-
 	.home {
 		display: flex;
 		flex-direction: column;
@@ -134,39 +114,5 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
-
-	.bottom-bar {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 10px;
-		padding: 10px;
-		border-top: 1px solid var(--background-300);
-	}
-
-	.page-button {
-		padding: 5px 10px;
-		background-color: var(--background-200);
-		border: none;
-		border-radius: 4px;
-
-		&:not(:disabled) {
-			&:hover {
-				background-color: var(--background-300);
-			}
-
-			&:active {
-				background-color: var(--background-400);
-			}
-		}
-
-		&:disabled {
-			background-color: var(--secondary);
-		}
-	}
-
-	.spacer {
-		flex-grow: 1;
 	}
 </style>

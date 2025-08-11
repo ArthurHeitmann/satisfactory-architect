@@ -85,7 +85,7 @@
 				src={imagePreviewSrc}
 				width={size}
 				height={size}
-				loading="lazy"
+				loading={showOriginal ? "lazy" : "eager"}
 			/>
 		{/if}
 		{#if showOriginal}
@@ -106,6 +106,8 @@
 
 		.preview {
 			position: absolute;
+			top: 0;
+			left: 0;
 		}
 	}
 </style>

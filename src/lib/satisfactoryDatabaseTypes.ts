@@ -30,6 +30,7 @@ export interface SFPart {
 export interface SFExtractionBuilding {
 	buildingClassName: string;
 	baseProductionRate: number;
+	supportsPurity: boolean;
 	outputs: string[];
 }
 

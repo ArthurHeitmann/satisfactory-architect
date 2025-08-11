@@ -36,10 +36,12 @@
 				categories[categoryName] = [];
 			}
 			const outputPart = satisfactoryDatabase.parts[recipe.outputs[0].itemClass];
+			const outputPart2 = satisfactoryDatabase.parts[recipe.outputs[1]?.itemClass];
 			categories[categoryName].push({
 				key: recipe.className,
 				label: recipe.recipeDisplayName,
 				icon: {name: outputPart?.icon ?? ""},
+				iconSmall: outputPart2 ? outputPart2.icon : "",
 				inputs: recipe.inputs,
 				outputs: recipe.outputs,
 				buildingClassName: recipe.producedIn,
@@ -55,8 +57,9 @@
 		};
 	})();
 
-	const resourceExtractorsPage: Page = (() => {
+	const {resourceExtractorsPage, compactResourceExtractorsPage} = (() => {
 		const categories: Record<string, RecipeEntry[]> = {};
+		const compactList: RecipeEntry[] = [];
 		for (const productionBuilding of Object.values(satisfactoryDatabase.extractionBuildings)) {
 			const building = satisfactoryDatabase.buildings[productionBuilding.buildingClassName];
 			const buildingIcon = building?.icon;
@@ -75,7 +78,7 @@
 					buildingClassName: productionBuilding.buildingClassName,
 					purityModifier: 1,
 				};
-				categories[categoryName].push({
+				const recipeEntry = {
 					key: `${productionBuilding.buildingClassName} ${output}`,
 					label: partName,
 					icon: {name: buildingIcon ?? ""},
@@ -84,16 +87,30 @@
 					outputs: [{itemClass: output, amountPerMinute: productionBuilding.baseProductionRate}],
 					buildingClassName: productionBuilding.buildingClassName,
 					details: recipe,
-				});
+				};
+				categories[categoryName].push(recipeEntry);
+				const compactRecipeEntry = {
+					...recipeEntry,
+					label: `${partName} (${buildingName})`,
+				};
+				compactList.push(compactRecipeEntry);
 			}
 		}
-		return {
+		const resourceExtractorsPage = {
 			name: "Resource Extractors",
 			categories: Object.entries(categories).map(([name, recipes]) => ({
 				name,
 				recipes: recipes.sort((a, b) => a.label.localeCompare(b.label)),
 			})),
 		};
+		const compactResourceExtractorsPage = {
+			name: "Resource Extractors (Compact)",
+			categories: [{
+				name: "",
+				recipes: compactList.sort((a, b) => a.label.localeCompare(b.label)),
+			}],
+		};
+		return {resourceExtractorsPage, compactResourceExtractorsPage};
 	})();
 
 	const powerRecipesPage: Page = (() => {
@@ -236,7 +253,7 @@
 			factories.push({
 				key: page.id,
 				label: page.name,
-				icon: {name: ""},
+				icon: {name: page.icon},
 				inputs: inputs,
 				outputs: outputs,
 				details: { type: "factory-reference", factoryId: page.id, jointsToExternalNodes: {} },
@@ -306,8 +323,8 @@
 						] : [],
 					},
 					{
-						name: resourceExtractorsPage.name,
-						recipes: filterRecipes(resourceExtractorsPage.categories.map(c => c.recipes).flat())
+						name: compactResourceExtractorsPage.name,
+						recipes: filterRecipes(compactResourceExtractorsPage.categories.map(c => c.recipes).flat())
 					},
 					{
 						name: factoriesPage.name,
