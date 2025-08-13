@@ -116,14 +116,17 @@
 		/>
 	{/if}
 	{#if factoryName}
-		<text
-			x="0"
+		<foreignObject
+			x={-node.size.x / 2 + 12}
 			y={productionNodeIconSize / 2 + 12}
-			text-anchor="middle"
-			style="pointer-events: none; font-size: 11px;"
+			width={node.size.x - 24}
+			height={node.size.y / 2 - productionNodeIconSize / 2 - 12}
+			class="factory-name"
 		>
-			{factoryName}
-		</text>
+			<div>
+				{factoryName}
+			</div>
+		</foreignObject>
 	{/if}
 	{#if globals.debugShowNodeIds}
 		<text
@@ -158,6 +161,17 @@
 			.background {
 				stroke: var(--node-border-selected-color);
 			}
+		}
+	}
+
+	.factory-name {
+		pointer-events: none;
+		overflow: hidden;
+
+		div {
+			text-align: center;
+			font-size: 11px;
+			line-break: anywhere;
 		}
 	}
 </style>

@@ -142,6 +142,8 @@
 	}
 
 	.name {
+		white-space: nowrap;
+
 		&.editing {
 			cursor: text;
 		}
