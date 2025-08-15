@@ -4,7 +4,7 @@
 	import { getContext } from "svelte";
 	import SfIconView from "../SFIconView.svelte";
 	import SvgInput from "../SvgInput.svelte";
-	import { floatToString } from "$lib/utilties";
+	import { floatToString, parseFloatExpr } from "$lib/utilties";
 	import { globals } from "../../datamodel/globals.svelte";
 	import type { GraphNode, GraphNodeProductionProperties } from "../../datamodel/GraphNode.svelte";
 	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
@@ -74,6 +74,13 @@
 	});
 
 	$effect(() => node.reorderRecipeJoints(page));
+
+	function onMultiplierChange(value: string, isEnter: boolean) {
+		const parsedValue = parseFloatExpr(value, !isEnter);
+		if (!isNaN(parsedValue)) {
+			node.properties.multiplier = parsedValue;
+		}
+	}
 </script>
 
 <g
@@ -106,21 +113,17 @@
 			isEditable={!node.properties.autoMultiplier}
 			fontSize={12}
 			value={floatToString(node.properties.multiplier, 3)}
-			onChange={(value) => {
-				const parsedValue = Number(value);
-				if (!isNaN(parsedValue)) {
-					node.properties.multiplier = parsedValue;
-				}
-			}}
+			onChange={(value) => onMultiplierChange(value, false)}
+			onEnter={(value) => onMultiplierChange(value, true)}
 			textAlign="right"
 		/>
 	{/if}
 	{#if factoryName}
 		<foreignObject
 			x={-node.size.x / 2 + 12}
-			y={productionNodeIconSize / 2 + 12}
+			y={productionNodeIconSize / 2}
 			width={node.size.x - 24}
-			height={node.size.y / 2 - productionNodeIconSize / 2 - 12}
+			height={node.size.y / 2 - productionNodeIconSize / 2}
 			class="factory-name"
 		>
 			<div>

@@ -1,7 +1,12 @@
 
 :root {
+	--rounded-border-radius: 4px;
+	--rounded-border-radius-big: 8px;
+	--rounded-border-width: 2px;
+	--font-family: "Funnel Sans", sans-serif;
+	overscroll-behavior: none;
 	font-size: 16px;
-	font-family: 'Lato', sans-serif;
+	font-family: var(--font-family);
 }
 
 /* https://www.realtimecolors.com/?colors=0f0f0f-f0f0f0-ce5f27-efc0a9-df6020&fonts=Inter-Inter */
@@ -49,6 +54,7 @@
 	--recipe-selector-tile-border-color: var(--background-100);
 	--recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px white) drop-shadow(0px 0px 5px white);
 	--recipe-selector-border-color: var(--background-100);
+	--recipe-selector-scrollbar-color: var(--background-200);
 	--context-menu-background-color: var(--background);
 	--context-menu-border-color: var(--background-100);
 	--context-menu-item-color: transparent;
@@ -141,6 +147,7 @@
 	--recipe-selector-tile-border-color: var(--background-300);
 	--recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 4px black);
 	--recipe-selector-border-color: var(--background-200);
+	--recipe-selector-scrollbar-color: var(--background-300);
 	--context-menu-background-color: var(--background-100);
 	--context-menu-border-color: var(--background-200);
 	--context-menu-item-color: transparent;
@@ -187,13 +194,6 @@
 	--grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiMyNDI0MjQiLz4NCjwvc3ZnPg==");
 }
 
-:root {
-	--rounded-border-radius: 4px;
-	--rounded-border-radius-big: 8px;
-	--rounded-border-width: 2px;
-	overscroll-behavior: none;
-}
-
 *, *::before, *::after {
 	box-sizing: border-box;
 	margin: 0;
@@ -209,13 +209,13 @@
 body {
 	background-color: var(--background);
 	color: var(--text);
-	font-family: 'Lato', sans-serif;
+	font-family: var(--font-family);
 	line-height: 1.5;
 	overflow-x: hidden;
 }
 
 text {
-	font-family: 'Lato', sans-serif;
+	font-family: var(--font-family);
 	fill: var(--text);
 }
 

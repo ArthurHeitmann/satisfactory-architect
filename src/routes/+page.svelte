@@ -8,6 +8,7 @@
     import { StorageKeys } from "$lib/datamodel/constants";
     import { darkTheme, globals } from "$lib/datamodel/globals.svelte";
 	import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
+    import { starterSaveJson } from "$lib/datamodel/starterSave";
     import { EventStream } from "$lib/EventStream.svelte";
 	import { loadFormLocalStorage, localStorageState } from "$lib/localStorageState.svelte";
 	import { onMount, setContext } from "svelte";
@@ -31,25 +32,12 @@
 		if (savedJson !== null) {
 			return AppState.fromJSON(savedJson);
 		} else {
-			const app = AppState.newDefault();
 			if (browser) {
-				app.addPage(GraphPage.newDefault(app));
-				app.pages[1].name = `Page ${app.pages.length}`;
-				const page = app.pages[0];
-				page.makeNewNode(
-					{type: "recipe", recipeClassName: "Recipe_ModularFrameHeavy_C"},
-					{x: 300, y: 300},
-				);
-				page.makeNewNode(
-					{type: "recipe", recipeClassName: "Recipe_UnpackageAlumina_C"},
-					{x: 600, y: 500},
-				);
-				page.makeNewNode(
-					{type: "recipe", recipeClassName: "Recipe_PackagedAlumina_C"},
-					{x: 900, y: 300},
-				);
+				const starterSave = JSON.parse(starterSaveJson);
+				return AppState.fromJSON(starterSave);
+			} else {
+				return AppState.newDefault();
 			}
-			return app;
 		}
 	})();
 
@@ -72,7 +60,7 @@
 
 
 	function onBeforeUnload() {
-		const json = app.toJSON();
+		const json = app.toJSON({ forceToJson: true });
 		app.saveToLocalStorage(json);
 	}
 </script>

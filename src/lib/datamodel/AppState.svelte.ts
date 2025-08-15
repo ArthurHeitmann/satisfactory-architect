@@ -86,17 +86,17 @@ export class AppState {
 		}
 	}
 
-	toJSON(filterPageIds?: Id[]): any {
+	toJSON(options: {forceToJson?: boolean, filterPageIds?: Id[]} = {}): any {
 		const state = {
 			version: dataModelVersion,
 			type: "app-state",
 			idGen: this.idGen.toJSON(),
 			currentPageId: this.currentPageId,
-			pages: this.pages.map((p) => p.asJson),
+			pages: this.pages.map((p) => options.forceToJson ? p.toJSON() : p.asJson),
 		};
-		if (filterPageIds) {
-			state.pages = state.pages.filter((p: any) => filterPageIds.includes(p.id));
-			state.currentPageId = filterPageIds[0];
+		if (options.filterPageIds) {
+			state.pages = state.pages.filter((p: any) => options.filterPageIds!.includes(p.id));
+			state.currentPageId = options.filterPageIds[0];
 		}
 		return state;
 	}

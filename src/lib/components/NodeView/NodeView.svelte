@@ -133,6 +133,7 @@
 					onClick: () => {
 						const properties = node.properties as GraphNodeProductionProperties;
 						properties.autoMultiplier = !properties.autoMultiplier;
+						globals.useAutoRateForFactoryInOutput = properties.autoMultiplier;
 					},
 				});
 			}

@@ -53,6 +53,8 @@
 	<foreignObject
 		x={-node.size.x / 2}
 		y={-node.size.y / 2}
+		width={node.size.x}
+		height={node.size.y}
 	>
 		<div class="content-wrapper" bind:this={div}>
 			<div
@@ -98,6 +100,7 @@
 		.content {
 			width: max-content;
 			height: max-content;
+			white-space: pre-line;
 			font-size: 12px;
 		}
 

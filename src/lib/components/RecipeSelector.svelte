@@ -577,6 +577,12 @@
 		flex-direction: column;
 		gap: 10px;
 		margin: 0 10px 0px 10px;
+		scrollbar-width: thin;
+		scrollbar-color: var(--recipe-selector-scrollbar-color) transparent;
+		&::-webkit-scrollbar {
+			width: 8px;
+			background-color: transparent;
+		}
 	}
 
 	.recipe-group {

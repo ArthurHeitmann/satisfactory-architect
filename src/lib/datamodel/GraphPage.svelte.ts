@@ -76,9 +76,9 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		for (const node of nodes) {
 			page.nodes.set(node.id, node);
 		}
-		for (const [edgeId, edgeJson] of Object.entries(json.edges)) {
-			const edge = GraphEdge.fromJSON(edgeJson, page.context);
-			page.edges.set(edgeId, edge);
+		const edges = Object.values(json.edges).map((e: any) => GraphEdge.fromJSON(e, page.context));
+		for (const edge of edges) {
+			page.edges.set(edge.id, edge);
 		}
 		return page;
 	}
@@ -95,7 +95,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		applyJsonToSet(json.selectedEdges, this.selectedEdges);
 	}
 
-	private toJSON(): any {
+	toJSON(): any {
 		return {
 			version: dataModelVersion,
 			type: "graph-page",

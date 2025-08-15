@@ -495,7 +495,7 @@
 		background: var(--edge-color);
 		color: var(--edge-background-color-text);
 		font-size: 9px;
-		font-weight: bold;
+		font-weight: 500;
 		padding: 2px 4px;
 		height: 13px;
 		line-height: 9px;

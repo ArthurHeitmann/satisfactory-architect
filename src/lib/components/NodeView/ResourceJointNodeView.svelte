@@ -6,7 +6,7 @@
 	import { getNodeRadius, isNodeSelectable } from "../../datamodel/nodeTypeProperties.svelte";
 	import { globals } from "../../datamodel/globals.svelte";
 	import SvgInput from "../SvgInput.svelte";
-	import { assertUnreachable, floatToString, getThroughputColor, isThroughputBalanced } from "$lib/utilties";
+	import { assertUnreachable, floatToString, getThroughputColor, isThroughputBalanced, parseFloatExpr } from "$lib/utilties";
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "../../datamodel/GraphNode.svelte";
 	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
     import type { Id } from "../../datamodel/IdGen";
@@ -157,6 +157,14 @@
 			assertUnreachable(node.properties.jointType);
 		}
 	})();
+
+	
+	function onProductionRateChange(value: string, isEnter: boolean) {
+		const parsedValue = parseFloatExpr(value, !isEnter);
+		if (!isNaN(parsedValue)) {
+			setProductionRate!(parsedValue);
+		}
+	}
 </script>
 
 <g
@@ -185,12 +193,8 @@
 			isEditable={isEditable && setProductionRate !== undefined}
 			textAlign={"center"}
 			value={floatToString(productionRate, 4)}
-			onChange={setProductionRate !== undefined ? (value) => {
-				const parsedValue = Number(value);
-				if (!isNaN(parsedValue)) {
-					setProductionRate(parsedValue);
-				}
-			} : undefined}
+			onChange={setProductionRate !== undefined ? (value) => onProductionRateChange(value, false) : undefined}
+			onEnter={setProductionRate !== undefined ? (value) => onProductionRateChange(value, true) : undefined}
 		/>
 	{/if}
 	{#if setProductionRate && suggestedThroughput !== 0}
@@ -267,7 +271,7 @@
 		background: var(--throughput-color);
 		color: var(--edge-background-color-text);
 		font-size: 9px;
-		font-weight: bold;
+		font-weight: 500;
 		padding: 2px 4px;
 		height: 13px;
 		line-height: 9px;

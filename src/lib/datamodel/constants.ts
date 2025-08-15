@@ -1,3 +1,4 @@
+export const latestAppVersion = 1;
 export const dataModelVersion = 1;
 
 export const gridSize = 50;
@@ -21,4 +22,5 @@ export class NodePriorities {
 export class StorageKeys {
 	static readonly darkTheme = "dark-theme";
 	static readonly appState = "app-state";
+	static readonly appVersion = "app-version";
 }

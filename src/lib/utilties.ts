@@ -173,15 +173,33 @@ export function bezierPoint(startP: IVector2D, endP: IVector2D, ctrl1: IVector2D
 	};
 }
 
-export function parseFloatExpr(s: string): number {
-	if (!/^[\d\-+*/().\s]+$/.test(s)) {
-		throw NaN;
+export function parseFloatExpr(s: string, requireEquals: boolean): number {
+	s = s.trim();
+	if (s === "") {
+		return NaN;
 	}
-	const result = Function(`"use strict"; return (${s})`)();
-	if (typeof result !== "number" || isNaN(result) || !isFinite(result)) {
-		throw NaN;
+	if (/^[+\-]?\d+(\.\d+)?$/.test(s)) {
+		return Number(s);
 	}
-	return result;
+	if (requireEquals) {
+		if (!/^[\d\-+*/().\s]+=$/.test(s)) {
+			return NaN;
+		}
+		s = s.replace(/=$/g, "");
+	} else {
+		if (!/^[\d\-+*/().\s]+$/.test(s)) {
+			return NaN;
+		}
+	}
+	try {
+		const result = Function(`"use strict"; return (${s})`)();
+		if (typeof result !== "number" || isNaN(result) || !isFinite(result)) {
+			return NaN;
+		}
+		return result;
+	} catch (e) {
+		return NaN;
+	}
 }
 
 export function isThroughputBalanced(pushed: number, pulled: number): boolean {

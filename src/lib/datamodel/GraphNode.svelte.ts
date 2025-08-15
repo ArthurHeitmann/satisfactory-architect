@@ -8,6 +8,7 @@ import type { Id, IdGen, IdMapper, PasteSource } from "./IdGen";
 import { gridSize, NodePriorities, productionNodeIconSize, productionNodeVerticalPadding, productionNodeHorizontalPadding } from "./constants";
 import { getNodeRadius, getProductionNodeDisplayName } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, applyJsonToSet, type JsonSerializable } from "./StateHistory.svelte";
+import { globals } from "./globals.svelte";
 
 export type GraphNodeType = "production" | "resource-joint" | "splitter" | "merger" | "factory-reference" | "text-note";
 export interface ResourceJointInfo {
@@ -120,6 +121,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		let inputs: SFRecipePart[];
 		let outputs: SFRecipePart[];
 		let multiplier = 1;
+		let useAutoMultiplier = false;
 		const extInputNodeIds: Id[] = [];
 		const extOutputNodeIds: Id[] = [];
 		switch (details.type) {
@@ -145,6 +147,9 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 					outputs = [recipePart];
 				}
 				multiplier = 60;
+				if (globals.useAutoRateForFactoryInOutput) {
+					useAutoMultiplier = true;
+				}
 				break;
 			case "extraction":
 				const part = satisfactoryDatabase.parts[details.partClassName];
@@ -256,7 +261,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			type: "production",
 			details,
 			multiplier,
-			autoMultiplier: false,
+			autoMultiplier: useAutoMultiplier,
 			resourceJoints: resourceJoints,
 		};
 		const parent = new GraphNode(idGen.nextId(), context, position, NodePriorities.RECIPE, edges, null, [], properties, nodeSize);

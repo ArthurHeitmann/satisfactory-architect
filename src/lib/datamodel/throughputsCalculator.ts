@@ -44,7 +44,6 @@ interface LinkedNode {
 }
 
 export function calculateThroughputs(page: GraphPage) {
-	console.time("calculateThroughputs");
 	blockStateChanges();
 	try {
 		for (const edge of page.edges.values()) {
@@ -76,7 +75,6 @@ export function calculateThroughputs(page: GraphPage) {
 		}
 	} finally {
 		unblockStateChanges();
-		console.timeEnd("calculateThroughputs");
 	}
 }
 

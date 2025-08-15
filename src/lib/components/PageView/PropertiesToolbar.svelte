@@ -2,7 +2,7 @@
     import type { GraphNodeProductionProperties, LayoutOrientation, ProductionExtractionDetails } from "$lib/datamodel/GraphNode.svelte";
     import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
     import type { Id } from "$lib/datamodel/IdGen";
-    import { floatToString, formatPower, loadFileFromDisk, openLinkInNewTab, saveFileToDisk, showConfirmationPrompt } from "$lib/utilties";
+    import { floatToString, formatPower, loadFileFromDisk, openLinkInNewTab, parseFloatExpr, saveFileToDisk, showConfirmationPrompt } from "$lib/utilties";
     import { getContext, untrack } from "svelte";
     import PresetSvg from "../icons/PresetSvg.svelte";
     import type { SvgPresetName } from "../icons/svgPresets";
@@ -86,7 +86,10 @@
 		return aggregateValues(
 			Array.from(multiplierValues),
 			v => v.autoMultiplier,
-			(v, value) => v.autoMultiplier = value,
+			(v, value) => {
+				v.autoMultiplier = value;
+				globals.useAutoRateForFactoryInOutput = value;
+			},
 		);
 	});
 	const aggDisplayType = $derived.by(() => {
@@ -309,7 +312,7 @@
 	}
 
 	function saveCurrentPage() {
-		const jsonData = JSON.stringify(appState.toJSON([page.id]));
+		const jsonData = JSON.stringify(appState.toJSON({ filterPageIds: [page.id] }));
 		saveFileToDisk(`${page.name}.json`, jsonData);
 	}
 
@@ -344,6 +347,13 @@
 			return;
 		}
 		appState.insertPagesFromJSON(jsonData);
+	}
+	
+	function onMultiplierChange(value: string, isEnter: boolean) {
+		const parsedValue = parseFloatExpr(value, !isEnter);
+		if (!isNaN(parsedValue)) {
+			setNodesMultiplier(parsedValue);
+		}
 	}
 
 	type DisplayMethod = {text: string} | {icon: SvgPresetName};
@@ -407,15 +417,17 @@
 				class="multiplier-input"
 				value={floatToString(nodesMultiplier, 4)}
 				oninput={e => {
-					const value = Number((e.target as HTMLInputElement).value);
-					if (!isNaN(value) && value !== 0) {
-						setNodesMultiplier(value);
-					}
+					const value = (e.target as HTMLInputElement).value;
+					onMultiplierChange(value, false);
 				}}
 				onkeydown={e => {
 					if (e.key === "Enter") {
 						(e.target as HTMLInputElement).blur();
 					}
+				}}
+				onblur={e => {
+					const value = (e.target as HTMLInputElement).value;
+					onMultiplierChange(value, true);
 				}}
 			/>
 		</div>

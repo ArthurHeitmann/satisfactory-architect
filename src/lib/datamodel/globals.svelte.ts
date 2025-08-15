@@ -1,11 +1,12 @@
 import { localStorageState } from "$lib/localStorageState.svelte";
-import { StorageKeys } from "./constants";
+import { latestAppVersion, StorageKeys } from "./constants";
 
 export const globals = $state({
 	mousePosition: {
 		x: 0,
 		y: 0,
 	},
+	useAutoRateForFactoryInOutput: false,
 	debugShowNodeIds: false,
 	debugShowEdgeIds: false,
 	debugConsoleLog: false,
@@ -23,3 +24,4 @@ export function trackStateChanges(): boolean {
 }
 
 export const darkTheme = localStorageState(StorageKeys.darkTheme, true);
+export const appVersion = localStorageState(StorageKeys.appVersion, latestAppVersion);

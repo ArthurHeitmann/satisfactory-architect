@@ -2,7 +2,7 @@
 	interface Props {
 		value: string;
 		onChange?: (value: string) => void;
-		type?: "text" | "number";
+		onEnter?: (value: string) => void;
 		isEditable?: boolean;
 		width: number;
 		height: number;
@@ -14,7 +14,7 @@
 	let {
 		value,
 		onChange,
-		type = "text",
+		onEnter,
 		isEditable = false,
 		width,
 		height,
@@ -50,11 +50,13 @@
 				}}
 				onkeydown={(e) => {
 					if (e.key === "Enter" || e.key === "Escape") {
+						onEnter?.(value);
 						window.getSelection()?.removeAllRanges();
 						e.preventDefault();
 					}
 				}}
 				onblur={() => {
+					onEnter?.(value);
 					window.getSelection()?.removeAllRanges();
 				}}
 				contenteditable="plaintext-only"
