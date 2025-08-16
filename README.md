@@ -1,5 +1,7 @@
 # Satisfactory Architect
 
+**[satisfactory-architect.com](https://satisfactory-architect.com)**
+
 A tool for planning, managing and visualizing Satisfactory factories.
 
 ![Example factory](./example.jpg)
