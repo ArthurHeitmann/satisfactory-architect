@@ -1,9 +1,7 @@
 <script lang="ts">
-	import type { ContextMenuItem, EventStream, ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
-	import { getContext, onDestroy, onMount } from "svelte";
+	import type { EventStream, ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import { onDestroy, onMount } from "svelte";
 	import RecipeSelector from "../RecipeSelector.svelte";
-	import { roundToNearest } from "$lib/utilties";
-	import { gridSize } from "../../datamodel/constants";
 	import type { NewNodeDetails } from "../../datamodel/GraphNode.svelte";
 
 	interface Props {
@@ -17,8 +15,10 @@
 		event.onCancel?.();
 		onclose();
 	}
-
-	dismissEventStream?.addListener(onDismiss);
+	
+	onMount(() => {
+		dismissEventStream?.addListener(onDismiss);
+	});
 
 	let cssWidth = $state("auto");
 

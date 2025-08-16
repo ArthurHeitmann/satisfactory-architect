@@ -50,9 +50,6 @@ async function main() {
 		process.exit(1);
 	}
 
-	// const jsonPath = process.argv[2];
-	// const extractedFilesPath = process.argv[3];
-	// const imgSavePath = process.argv[4];
 	const args = argsParser(process.argv);
 	const jsonPath = args["json"];
 	const extractedFilesPath = args["extracted-files"];
@@ -62,9 +59,15 @@ async function main() {
 		throw new Error("Please provide the path to the JSON file using --json=<path>.");
 	}
 	if (!tsSavePath) {
-		throw new Error("Please provide the path to save the JSON file using --json-save=<path>.");
+		throw new Error("Please provide the path to save the TypeScript file using --ts-save=<path>.");
 	}
-	
+	if (!extractedFilesPath) {
+		console.warn("No --extracted-files=<path> provided. Image files will not be saved.");
+	}
+	if (!imgSavePath) {
+		console.warn("No --img-save=<path> provided. Image files will not be saved.");
+	}
+
 	let content = readFileSync(jsonPath, "utf-16le");
 	content = content.slice(content.indexOf("["));
 	const jsonData = JSON.parse(content);
@@ -86,10 +89,7 @@ async function main() {
 			}
 			let allProducedIn = parseUeData(classDef["mProducedIn"]) as string[];
 			allProducedIn = allProducedIn.filter((item: string) => !item.includes("BuildGun"));
-			let producedIn =
-				allProducedIn.find((item: string) => item.startsWith("/Game/FactoryGame/Buildable/Factory")) /*??
-				allProducedIn.find((item: string) => item.startsWith("/Game/FactoryGame/Buildable/-Shared/WorkBench")) ??
-				allProducedIn[0]*/;
+			let producedIn = allProducedIn.find((item: string) => item.startsWith("/Game/FactoryGame/Buildable/Factory"));
 			if (!producedIn) {
 				continue;
 			}
@@ -442,7 +442,7 @@ async function main() {
 				resolutions: [resolution, 48],
 			});
 			const destPath = join(imgSavePath, `${iconName}.png`);
-			// copyFileSync(filePath, destPath);
+			copyFileSync(filePath, destPath);
 		}
 		console.log(`Copied ${imgPaths.size} icons to ${imgSavePath}.`);
 	}

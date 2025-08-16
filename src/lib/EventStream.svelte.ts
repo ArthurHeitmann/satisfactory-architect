@@ -36,7 +36,7 @@ export interface ShowContextMenuEvent extends EventBase {
 	onClick?: (item: string) => void;
 	items: ContextMenuItem[];
 }
-export type ContextMenuItemAction  = {value: string} | {onClick: () => void};
+export type ContextMenuItemAction = {value: string} | {onClick: () => void};
 export interface ContextMenuTextItemBase {
 	label: string;
 	hint?: string;

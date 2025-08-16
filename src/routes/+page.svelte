@@ -1,16 +1,15 @@
 
 <script lang="ts">
-    import { browser } from "$app/environment";
-    import OverlayLayer from "$lib/components/OverlayLayer/OverlayLayer.svelte";
-    import PagesBar from "$lib/components/PagesBar/PagesBar.svelte";
-    import PageView from "$lib/components/PageView/PageView.svelte";
+	import { browser } from "$app/environment";
+	import OverlayLayer from "$lib/components/OverlayLayer/OverlayLayer.svelte";
+	import PagesBar from "$lib/components/PagesBar/PagesBar.svelte";
+	import PageView from "$lib/components/PageView/PageView.svelte";
 	import { AppState } from "$lib/datamodel/AppState.svelte";
-    import { StorageKeys } from "$lib/datamodel/constants";
-    import { darkTheme, globals } from "$lib/datamodel/globals.svelte";
-	import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-    import { starterSaveJson } from "$lib/datamodel/starterSave";
-    import { EventStream } from "$lib/EventStream.svelte";
-	import { loadFormLocalStorage, localStorageState } from "$lib/localStorageState.svelte";
+	import { StorageKeys } from "$lib/datamodel/constants";
+	import { darkTheme, globals } from "$lib/datamodel/globals.svelte";
+	import { starterSaveJson } from "$lib/datamodel/starterSave";
+	import { EventStream } from "$lib/EventStream.svelte";
+	import { loadFormLocalStorage } from "$lib/localStorageState.svelte";
 	import { onMount, setContext } from "svelte";
 
 	onMount(() => {
@@ -28,16 +27,19 @@
 	});
 
 	const app = (() => {
-		const savedJson = loadFormLocalStorage(StorageKeys.appState, null);
-		if (savedJson !== null) {
-			return AppState.fromJSON(savedJson);
-		} else {
-			if (browser) {
-				const starterSave = JSON.parse(starterSaveJson);
-				return AppState.fromJSON(starterSave);
-			} else {
-				return AppState.newDefault();
+		try {
+			const savedJson = loadFormLocalStorage(StorageKeys.appState, null);
+			if (savedJson !== null) {
+				return AppState.fromJSON(savedJson);
 			}
+		} catch (e) {
+			console.error("Failed to load app state from local storage:", e);
+		}
+		if (browser) {
+			const starterSave = JSON.parse(starterSaveJson);
+			return AppState.fromJSON(starterSave);
+		} else {
+			return AppState.newDefault();
 		}
 	})();
 
@@ -55,7 +57,6 @@
 		}
 	}
 	
-	const currentPageId = $derived(app.currentPage.id);
 	setContext("app-state", app);
 
 
@@ -70,6 +71,7 @@
 	<meta name="description" content="A tool for planning, managing and visualizing Satisfactory factories." />
 </svelte:head>
 
+<!-- maybe non passive touch handlers + prevent default -->
 <svelte:window
 	onbeforeunload={onBeforeUnload}
 	onmousedown={onMouseEvent}

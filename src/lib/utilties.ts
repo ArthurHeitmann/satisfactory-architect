@@ -113,16 +113,6 @@ export function formatPower(mw: number): string {
 	return `${floatToString(mw, 2)} MW`;
 }
 
-export function angleBetweenPoints(
-	centerPoint: { x: number; y: number },
-	outerPoint: { x: number; y: number }
-): number {
-	const dx = outerPoint.x - centerPoint.x;
-	const dy = outerPoint.y - centerPoint.y;
-	const angle = Math.atan2(dy, dx);
-	return angle < 0 ? angle + 2 * Math.PI : angle;
-}
-
 export function assertUnreachable(x: never): never {
 	throw new Error("Didn't expect to get here");
 }

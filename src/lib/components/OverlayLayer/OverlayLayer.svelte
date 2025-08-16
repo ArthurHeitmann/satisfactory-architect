@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowContextMenuEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
-	import { onDestroy, setContext, type Snippet } from "svelte";
+	import { onDestroy, onMount, setContext, type Snippet } from "svelte";
 	import ContextMenuOverlay from "./ContextMenuOverlay.svelte";
 	import RecipeSelectorOverlay from "./RecipeSelectorOverlay.svelte";
-    import { fade } from "svelte/transition";
-    import type { IVector2D } from "$lib/datamodel/GraphView.svelte";
-    import ConfirmationPrompt from "./ConfirmationPrompt.svelte";
+	import { fade } from "svelte/transition";
+	import type { IVector2D } from "$lib/datamodel/GraphView.svelte";
+	import ConfirmationPrompt from "./ConfirmationPrompt.svelte";
 
 	interface Props {
 		children: Snippet;
@@ -29,7 +29,9 @@
 		activeEvents = [...activeEvents, event];
 	}
 
-	eventStream.addListener(handleEvent);
+	onMount(() => {
+		eventStream.addListener(handleEvent);
+	});
 
 	onDestroy(() => {
 		eventStream.removeListener(handleEvent);
@@ -48,16 +50,28 @@
 	const dismissEventStream = new EventStream();
 
 	class HoveredElement {
-        isVisible: boolean;
+		element: Element;
+		tooltip: string;
+		startPoint: IVector2D;
+		transform: string;
+		startTimeout: any | null;
+		endTimeout: any | null;
+		isVisible: boolean;
 		
 		constructor(
-			public element: Element,
-			public tooltip: string,
-			public startPoint: IVector2D,
-			public transform: string,
-			public startTimeout: any | null = null,
-			public endTimeout: any | null = null
+			element: Element,
+			tooltip: string,
+			startPoint: IVector2D,
+			transform: string,
+			startTimeout: any | null = null,
+			endTimeout: any | null = null
 		) {
+			this.element = element;
+			this.tooltip = tooltip;
+			this.startPoint = startPoint;
+			this.transform = transform;
+			this.startTimeout = startTimeout;
+			this.endTimeout = endTimeout;
 			this.isVisible = $state(false);
 		}
 	}
@@ -70,7 +84,6 @@
 		const allNew = getNewHovered(allHoveredByEvent);
 		const allSame = getSameHovered(allHoveredByEvent);
 		const allDead = getDeadHovered(allHoveredByEvent);
-		// console.log((Date.now() / 1000).toFixed(1), "new", allNew.map(e => e.getAttribute("data-tooltip")), "same", allSame.map(e => `${e.tooltip}, ${e.isVisible}`), "dead", allDead.map(e => e.tooltip));
 
 		for (const newElement of allNew) {
 			const rect = newElement.getBoundingClientRect();
@@ -126,7 +139,6 @@
 	function onElementTooltipStart(element: HoveredElement) {
 		element.startTimeout = null;
 		element.isVisible = true;
-		// console.log((Date.now() / 1000).toFixed(1), "Show", element.tooltip);
 	}
 
 	function onElementTooltipEnd(element: HoveredElement) {

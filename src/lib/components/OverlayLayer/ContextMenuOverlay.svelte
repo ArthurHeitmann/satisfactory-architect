@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { ContextMenuItem, ContextMenuItemAction, EventStream, ShowContextMenuEvent } from "$lib/EventStream.svelte";
-    import PresetSvg from "../icons/PresetSvg.svelte";
+	import type { ContextMenuItemAction, EventStream, ShowContextMenuEvent } from "$lib/EventStream.svelte";
+	import { onMount } from "svelte";
+	import PresetSvg from "../icons/PresetSvg.svelte";
 
 	interface Props {
 		event: ShowContextMenuEvent;
@@ -9,7 +10,9 @@
 	}
 	const { event, dismissEventStream, onclose }: Props = $props();
 
-	dismissEventStream?.addListener(() => onclose());
+	onMount(() => {
+		dismissEventStream?.addListener(() => onclose());
+	});
 
 	function handleItemClick(item: ContextMenuItemAction) {
 		if ("onClick" in item) {

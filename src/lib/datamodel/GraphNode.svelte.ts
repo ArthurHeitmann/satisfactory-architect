@@ -6,7 +6,7 @@ import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import { Vector2D, type IVector2D } from "./GraphView.svelte";
 import type { Id, IdGen, IdMapper, PasteSource } from "./IdGen";
 import { gridSize, NodePriorities, productionNodeIconSize, productionNodeVerticalPadding, productionNodeHorizontalPadding } from "./constants";
-import { getNodeRadius, getProductionNodeDisplayName } from "./nodeTypeProperties.svelte";
+import { getNodeRadius } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, applyJsonToSet, type JsonSerializable } from "./StateHistory.svelte";
 import { globals } from "./globals.svelte";
 
@@ -34,7 +34,7 @@ export interface ProductionFactoryInOutDetails {
 	type: "factory-output" | "factory-input";
 	partClassName: string;
 }
-export interface GraphNodeFactoryReferenceProperties {
+export interface FactoryReferenceDetails {
 	type: "factory-reference";
 	factoryId: Id;
 	jointsToExternalNodes: Record<Id, Id>;
@@ -43,7 +43,7 @@ export type ProductionDetails =
 	ProductionRecipeDetails |
 	ProductionExtractionDetails |
 	ProductionFactoryInOutDetails |
-	GraphNodeFactoryReferenceProperties |
+	FactoryReferenceDetails |
 	PowerProductionDetails;
 export interface GraphNodeProductionProperties {
 	type: "production";

@@ -1,7 +1,7 @@
 import { EventStream } from "$lib/EventStream.svelte";
 import { Debouncer } from "$lib/utilties";
 import type { SvelteMap, SvelteSet } from "svelte/reactivity";
-import { globals, trackStateChanges } from "./globals.svelte";
+import { trackStateChanges } from "./globals.svelte";
 
 export type JsonPrimitive = string | number | boolean;
 export type JsonElement = JsonPrimitive | JsonElement[] | { [key: string]: JsonElement };

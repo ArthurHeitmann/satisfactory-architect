@@ -128,7 +128,6 @@
 			if (distance < dragStartThreshold)
 				return;
 			hasDragStarted = true;
-			console.log(event);
 			onDragStart?.({
 				deltaX: 0,
 				deltaY: 0,

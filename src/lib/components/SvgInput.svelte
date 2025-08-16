@@ -89,14 +89,6 @@
 		height: 100%;
 		color: var(--node-editable-text-color);
 		padding: 0 3px;
-		// box-shadow:
-		// 	0 0 1px rgba(0, 0, 0, 1.0),
-		// 	0 0 2px rgba(0, 0, 0, 1.0),
-		// 	0 0 3px rgba(0, 0, 0, 1.0);
-		// filter:
-		// 	drop-shadow(0 0 1px rgba(0, 0, 0, 1.0))
-		// 	drop-shadow(0 0 2px rgba(0, 0, 0, 0.5))
-		// 	drop-shadow(0 0 3px rgba(0, 0, 0, 0.25));
 		text-shadow: var(--text-shadow);
 	}
 </style>

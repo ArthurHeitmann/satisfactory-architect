@@ -1,14 +1,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
-import { basename, join } from "path";
+import { join } from "path";
 import argsParser from "args-parser";
 
-function parseFullName(fullName: string): string {
-	const name = fullName.split(".").at(-1);
-	if (!name) {
-		throw new Error(`Invalid full name: ${fullName}`);
-	}
-	return name.replace("'", "");
-}
 
 const priorityOverrides = [
 	"Categories/SpaceElevator",
@@ -96,12 +89,6 @@ async function main() {
 
 		for (const item of jsonData) {
 			const type = item["Type"];
-			// let objectPath: string | undefined;
-			// if (item.Properties?.mCategory) {
-			// 	objectPath = item.Properties.mCategory.ObjectPath;
-			// } else if (item.Properties?.mOverriddenCategory) {
-			// 	objectPath = item.Properties.mOverriddenCategory.ObjectPath;
-			// }
 			let objectPath = (
 				item.Properties?.mCategory?.ObjectPath ||
 				item.Properties?.mOverriddenCategory?.ObjectPath

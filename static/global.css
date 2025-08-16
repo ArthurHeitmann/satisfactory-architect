@@ -89,11 +89,11 @@
 	--tooltip-border-color: var(--background-200);
 
 	--popup-block-area-background-color: color-mix(in srgb, var(--background-500) 50%, transparent);
-	--popup-background-color: var(--background-200);
-	--popup-border-color: var(--background-300);
-	--popup-button-background-color: var(--background-300);
-	--popup-button-hover-background-color: var(--background-400);
-	--popup-button-active-background-color: var(--background-500);
+	--popup-background-color: var(--background-100);
+	--popup-border-color: var(--background-500);
+	--popup-button-background-color: var(--background-200);
+	--popup-button-hover-background-color: var(--background-300);
+	--popup-button-active-background-color: var(--background-400);
 	
 	--pages-bar-border-color: var(--background-200);
 	--pages-bar-background-color: var(--background-100);
@@ -178,11 +178,11 @@
 	--tooltip-border-color: var(--background-200);
 	
 	--popup-block-area-background-color: color-mix(in srgb, var(--background) 70%, transparent);
-	--popup-background-color: var(--background-200);
-	--popup-border-color: var(--background-300);
-	--popup-button-background-color: var(--background-300);
-	--popup-button-hover-background-color: var(--background-400);
-	--popup-button-active-background-color: var(--background-500);
+	--popup-background-color: var(--background-100);
+	--popup-border-color: var(--background-200);
+	--popup-button-background-color: var(--background-200);
+	--popup-button-hover-background-color: var(--background-300);
+	--popup-button-active-background-color: var(--background-400);
 
 	--pages-bar-border-color: var(--background-200);
 	--pages-bar-background-color: var(--background-100);

@@ -19,7 +19,6 @@ export interface GraphEdgeProperties {
 	isDrainLine: boolean;
 }
 
-
 export class GraphEdge implements JsonSerializable<PageContext> {
 	readonly context: PageContext;
 	readonly id: Id;

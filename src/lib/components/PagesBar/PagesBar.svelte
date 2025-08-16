@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { browser } from "$app/environment";
-    import type { AppState } from "$lib/datamodel/AppState.svelte";
-    import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-    import PresetSvg from "../icons/PresetSvg.svelte";
-    import PageButton from "./PageButton.svelte";
+	import { browser } from "$app/environment";
+	import type { AppState } from "$lib/datamodel/AppState.svelte";
+	import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
+	import PresetSvg from "../icons/PresetSvg.svelte";
+	import PageButton from "./PageButton.svelte";
 
 	interface Props {
 		appState: AppState;

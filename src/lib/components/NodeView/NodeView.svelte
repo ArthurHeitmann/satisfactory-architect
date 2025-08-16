@@ -1,21 +1,16 @@
 <script lang="ts">
 	import { getContext, onDestroy, onMount } from "svelte";
-	import RecipeNodeView from "./ProductionNodeView.svelte";
 	import UserEvents, { type CursorEvent, type DragEvent } from "../UserEvents.svelte";
 	import { isNodeSelectable, isNodeDraggable, isNodeDeletable, getNodeRadius, isResourceNodeSplittable } from "../../datamodel/nodeTypeProperties.svelte";
 	import ResourceJointNodeView from "./ResourceJointNodeView.svelte";
-	import type { ContextMenuItem, EventStream, ShowContextMenuEvent, ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import type { ContextMenuItem, EventStream } from "$lib/EventStream.svelte";
 	import { assertUnreachable, pluralStr } from "$lib/utilties";
 	import { gridSize } from "../../datamodel/constants";
-	import type { Id } from "../../datamodel/IdGen";
 	import ProductionNodeView from "./ProductionNodeView.svelte";
 	import SplitterMergerNodeView from "./SplitterMergerNodeView.svelte";
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties, GraphNodeSplitterMergerProperties, GraphNodeTextNoteProperties, JointDragType } from "../../datamodel/GraphNode.svelte";
-	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
-	import type { IVector2D } from "../../datamodel/GraphView.svelte";
-    import { fade } from "svelte/transition";
-    import { blockStateChanges, globals, unblockStateChanges } from "../../datamodel/globals.svelte";
-    import TextNoteNodeView from "./TextNoteNodeView.svelte";
+	import { blockStateChanges, globals, unblockStateChanges } from "../../datamodel/globals.svelte";
+	import TextNoteNodeView from "./TextNoteNodeView.svelte";
 
 	interface Props {
 		node: GraphNode;
@@ -43,9 +38,9 @@
 
 	const contextMenuItems = $derived.by(() => {
 		const items: ContextMenuItem[] = [];
+		const selectedCount = page.selectedNodes.size;
 		if (isDeletable) {
-			if (isSelected && (page.selectedNodes.size > 1 || !page.selectedNodes.has(node.id))) {
-				const selectedCount = page.selectedNodes.size;
+			if (isSelected && (selectedCount > 1 || !page.selectedNodes.has(node.id))) {
 				items.push({
 					label: `Delete ${pluralStr("Node", selectedCount)}`,
 					icon: "delete",
@@ -63,13 +58,13 @@
 		}
 		if (isSelected) {
 			items.push({
-				label: `Copy ${page.selectedNodes.size === 1 ? "Node" : pluralStr("Node", page.selectedNodes.size)}`,
+				label: `Copy ${selectedCount === 1 ? "Node" : pluralStr("Node", selectedCount)}`,
 				icon: "copy",
 				hint: "Ctrl+C",
 				onClick: () => page.copyOrCutSelection("copy"),
 			});
 			items.push({
-				label: `Cut ${page.selectedNodes.size === 1 ? "Node" : pluralStr("Node", page.selectedNodes.size)}`,
+				label: `Cut ${selectedCount === 1 ? "Node" : pluralStr("Node", selectedCount)}`,
 				icon: "cut",
 				hint: "Ctrl+X",
 				onClick: () => page.copyOrCutSelection("cut"),
@@ -157,6 +152,7 @@
 	});
 
 	let dragType: "moveSelf" | "moveSelected" | "moveNewResourceJoint" | null = isMovingResourceJoint ? "moveNewResourceJoint" : null;
+	// svelte-ignore state_referenced_locally
 	const connectableNodes = isMovingResourceJoint ? page.getResourceJointAttachableNodes(node as GraphNode<GraphNodeResourceJointProperties>) : [];
 	const indirectlyConnectableNodes = connectableNodes
 		.filter(n => n.parentNode)

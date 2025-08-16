@@ -1,21 +1,20 @@
 <script lang="ts">
-    import { gridSize } from "$lib/datamodel/constants";
-    import { globals } from "$lib/datamodel/globals.svelte";
-    import type { NewNodeDetails } from "$lib/datamodel/GraphNode.svelte";
-    import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-    import type { Id } from "$lib/datamodel/IdGen";
-    import { isNodeSelectable } from "$lib/datamodel/nodeTypeProperties.svelte";
-    import { calculateThroughputs } from "$lib/datamodel/throughputsCalculator";
-    import { EventStream, type ContextMenuItem } from "$lib/EventStream.svelte";
-    import { pluralStr, getClipboardText, assertUnreachable, targetsInput } from "$lib/utilties";
-	import { getContext, setContext } from "svelte";
-    import { fade } from "svelte/transition";
-    import EdgeView from "../EdgeView/EdgeView.svelte";
-    import NodeView from "../NodeView/NodeView.svelte";
-    import OverlayLayer from "../OverlayLayer/OverlayLayer.svelte";
-    import UserEvents, { type CursorEvent } from "../UserEvents.svelte";
-    import Toolbar from "./ToolModeSelector.svelte";
-    import PropertiesToolbar from "./PropertiesToolbar.svelte";
+	import { gridSize } from "$lib/datamodel/constants";
+	import { globals } from "$lib/datamodel/globals.svelte";
+	import type { NewNodeDetails } from "$lib/datamodel/GraphNode.svelte";
+	import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
+	import type { Id } from "$lib/datamodel/IdGen";
+	import { isNodeSelectable } from "$lib/datamodel/nodeTypeProperties.svelte";
+	import { calculateThroughputs } from "$lib/datamodel/throughputsCalculator";
+	import { EventStream, type ContextMenuItem } from "$lib/EventStream.svelte";
+	import { pluralStr, getClipboardText, assertUnreachable, targetsInput } from "$lib/utilties";
+	import { getContext } from "svelte";
+	import { fade } from "svelte/transition";
+	import EdgeView from "../EdgeView/EdgeView.svelte";
+	import NodeView from "../NodeView/NodeView.svelte";
+	import UserEvents, { type CursorEvent } from "../UserEvents.svelte";
+	import Toolbar from "./ToolModeSelector.svelte";
+	import PropertiesToolbar from "./PropertiesToolbar.svelte";
 
 	interface Props {
 		page: GraphPage;
@@ -175,7 +174,7 @@
 			console.log("Clipboard data is not valid JSON", error);
 			return;
 		}
-		page.insertJson(jsonData, "external", cursorPoint);
+		page.insertJson(jsonData, "local", cursorPoint);
 	}
 
 	function addNewProductionNode(productionDetails: NewNodeDetails, event: MouseEvent) {

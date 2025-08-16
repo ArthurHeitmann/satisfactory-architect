@@ -56,16 +56,6 @@ function axisOf(vec: IVector2D, axis: AxisType, primAxis: Axis) {
 	}
 }
 
-function withAxisValue(vec: IVector2D, axis: AxisType, primAxis: Axis, value: number): IVector2D {
-	if (axis === "prim") {
-		return { ...vec, [primAxis]: value };
-	} else if (axis === "sec") {
-		return { ...vec, [invAxis(primAxis)]: value };
-	} else {
-		assertUnreachable(axis);
-	}
-}
-
 export function primSecVec(prim: number, sec: number, primAxis: AxisType) {
 	if (primAxis === "prim") {
 		return { x: prim, y: sec };

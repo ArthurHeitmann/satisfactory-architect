@@ -2,7 +2,7 @@ import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
 import { assertUnreachable } from "$lib/utilties";
 import type { AppState } from "./AppState.svelte";
 import type { GraphEdge } from "./GraphEdge.svelte";
-import type { GraphNodeType, GraphNode, GraphNodeResourceJointProperties, ProductionDetails } from "./GraphNode.svelte";
+import type { GraphNodeType, GraphNode, ProductionDetails } from "./GraphNode.svelte";
 import { resourceJointNodeRadius, splitterMergerNodeRadius } from "./constants";
 
 const draggableTypes: GraphNodeType[] = ["production", "splitter", "merger", "text-note"];
@@ -60,30 +60,4 @@ export function userCanChangeOrientationVector(node: GraphNode, edge: GraphEdge)
 export function getNodeRadius(node: GraphNode): number {
 	const radius = nodeRadius[node.properties.type];
 	return radius ?? 0;
-}
-
-export function getProductionNodeDisplayName(details: ProductionDetails, appState: AppState): string {
-	switch (details.type) {
-		case "recipe":
-			const recipe = satisfactoryDatabase.recipes[details.recipeClassName];
-			return recipe?.recipeDisplayName ?? details.recipeClassName;
-		case "factory-output":
-		case "factory-input":
-			return satisfactoryDatabase.parts[details.partClassName]?.displayName ?? details.partClassName;
-		case "extraction":
-			const part = satisfactoryDatabase.parts[details.partClassName];
-			return part.displayName ?? details.partClassName;
-		case "power-production":
-			const powerBuilding = satisfactoryDatabase.buildings[details.powerBuildingClassName];
-			const fuelRecipe = satisfactoryDatabase.parts[details.fuelClassName];
-			return `${powerBuilding?.displayName ?? details.powerBuildingClassName} (${fuelRecipe?.displayName ?? details.fuelClassName})`;
-		case "factory-reference":
-			const page = appState.pages.find(p => p.id === details.factoryId);
-			if (!page) {
-				return `Factory Reference (${details.factoryId})`;
-			}
-			return page.name;
-		default:
-			assertUnreachable(details);
-	}
 }

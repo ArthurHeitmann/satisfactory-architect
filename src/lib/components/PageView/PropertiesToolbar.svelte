@@ -1,17 +1,16 @@
 <script lang="ts">
-    import type { GraphNodeProductionProperties, LayoutOrientation, ProductionExtractionDetails } from "$lib/datamodel/GraphNode.svelte";
-    import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-    import type { Id } from "$lib/datamodel/IdGen";
-    import { floatToString, formatPower, loadFileFromDisk, openLinkInNewTab, parseFloatExpr, saveFileToDisk, showConfirmationPrompt } from "$lib/utilties";
-    import { getContext, untrack } from "svelte";
-    import PresetSvg from "../icons/PresetSvg.svelte";
-    import type { SvgPresetName } from "../icons/svgPresets";
-    import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
-    import SfIconView from "../SFIconView.svelte";
-    import type { EventStream, ShowContextMenuEvent } from "$lib/EventStream.svelte";
+	import type { GraphNodeProductionProperties, ProductionExtractionDetails } from "$lib/datamodel/GraphNode.svelte";
+	import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
+	import type { Id } from "$lib/datamodel/IdGen";
+	import { floatToString, formatPower, loadFileFromDisk, openLinkInNewTab, parseFloatExpr, saveFileToDisk, showConfirmationPrompt } from "$lib/utilties";
+	import { getContext, untrack } from "svelte";
+	import PresetSvg from "../icons/PresetSvg.svelte";
+	import type { SvgPresetName } from "../icons/svgPresets";
+	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
+	import SfIconView from "../SFIconView.svelte";
+	import type { EventStream } from "$lib/EventStream.svelte";
 	import { darkTheme, globals } from "$lib/datamodel/globals.svelte";
-    import type { SFVariablePowerConsumption } from "$lib/satisfactoryDatabaseTypes";
-    import type { AppState } from "$lib/datamodel/AppState.svelte";
+	import type { AppState } from "$lib/datamodel/AppState.svelte";
 
 	interface Props {
 		page: GraphPage;
@@ -522,7 +521,7 @@
 			width: 60px;
 		}
 
-		:Where(.toggle-button, .click-button) {
+		:where(.toggle-button, .click-button) {
 			display: flex;
 			align-items: center;
 			justify-content: center;

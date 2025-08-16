@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
-	import type { SFPowerFuel, SFRecipe, SFRecipePart } from "$lib/satisfactoryDatabaseTypes";
-	import { getContext } from "svelte";
+	import type { SFPowerFuel, SFRecipe } from "$lib/satisfactoryDatabaseTypes";
 	import SfIconView from "../SFIconView.svelte";
 	import { getNodeRadius, isNodeSelectable } from "../../datamodel/nodeTypeProperties.svelte";
 	import { globals } from "../../datamodel/globals.svelte";
 	import SvgInput from "../SvgInput.svelte";
 	import { assertUnreachable, floatToString, getThroughputColor, isThroughputBalanced, parseFloatExpr } from "$lib/utilties";
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "../../datamodel/GraphNode.svelte";
-	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
-    import type { Id } from "../../datamodel/IdGen";
+	import type { Id } from "../../datamodel/IdGen";
 
 	interface Props {
 		node: GraphNode<GraphNodeResourceJointProperties>;
@@ -201,6 +199,8 @@
 			<foreignObject
 				x={suggestionAbsOffset}
 				y={-outerRadius/2}
+				width="50"
+				height="13"
 			>
 				<div
 					class="rate-suggestion"
@@ -264,9 +264,13 @@
 		}
 	}
 
+	foreignObject {
+		pointer-events: none;
+	}
 
 	.rate-suggestion {
 		cursor: pointer;
+		pointer-events: all;
 		width: max-content;
 		background: var(--throughput-color);
 		color: var(--edge-background-color-text);

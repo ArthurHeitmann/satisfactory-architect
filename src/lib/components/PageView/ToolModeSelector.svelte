@@ -1,9 +1,7 @@
-<script lang="ts" module>
-</script>
 <script lang="ts">
-    import type { ToolMode } from '$lib/datamodel/GraphPage.svelte';
-    import PresetSvg from '../icons/PresetSvg.svelte';
-        import type { SvgPresetName } from '../icons/svgPresets';
+	import type { ToolMode } from '$lib/datamodel/GraphPage.svelte';
+	import PresetSvg from '../icons/PresetSvg.svelte';
+		import type { SvgPresetName } from '../icons/svgPresets';
 
 	interface Props {
 		activeMode: ToolMode;

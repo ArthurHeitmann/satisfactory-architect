@@ -1,13 +1,12 @@
-import { EventStream } from "$lib/EventStream.svelte";
 import { assertUnreachable, copyText, roundToNearest } from "$lib/utilties";
 import { untrack } from "svelte";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
 import { type IdGen, type Id, IdMapper, type PasteSource } from "./IdGen";
-import { dataModelVersion, NodePriorities } from "./constants";
+import { clipboardDataType, dataModelVersion, NodePriorities } from "./constants";
 import { isNodeAttachable } from "./nodeTypeProperties.svelte";
 import { applyJsonToMap, applyJsonToSet, StateHistory, type JsonSerializable } from "./StateHistory.svelte";
 import { GraphEdge, type GraphEdgeProperties } from "./GraphEdge.svelte";
-import { type LayoutOrientation, GraphNode, type GraphNodeResourceJointProperties, type NewNodeDetails, type GraphNodeSplitterMergerProperties, type ProductionDetails, type JointDragType, type GraphNodeTextNoteProperties } from "./GraphNode.svelte";
+import { type LayoutOrientation, GraphNode, type GraphNodeResourceJointProperties, type NewNodeDetails, type ProductionDetails, type JointDragType } from "./GraphNode.svelte";
 import { GraphView, type IVector2D } from "./GraphView.svelte";
 import type { AppState } from "./AppState.svelte";
 
@@ -130,17 +129,15 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		if (!this.nodes.has(nodeId)) {
 			throw new Error(`Node with id ${nodeId} does not exist.`);
 		}
-		const node = this.nodes.get(nodeId);
-		if (node) {
-			for (const childId of node.children) {
-				const childNode = this.nodes.get(childId);
-				if (childNode) {
-					this.removeNode(childId);
-				}
+		const node = this.nodes.get(nodeId)!;
+		for (const childId of node.children) {
+			const childNode = this.nodes.get(childId);
+			if (childNode) {
+				this.removeNode(childId);
 			}
-			for (const edgeId of node.edges) {
-				this.removeEdge(edgeId);
-			}
+		}
+		for (const edgeId of node.edges) {
+			this.removeEdge(edgeId);
 		}
 		this.nodes.delete(nodeId);
 		this.selectedNodes.delete(nodeId);
@@ -476,7 +473,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		const selectedEdges = Array.from(this.edges.values()
 			.filter(e => allNodeIds.has(e.startNodeId) && allNodeIds.has(e.endNodeId)));
 		const json = {
-			type: "factory-data",
+			type: clipboardDataType,
 			version: dataModelVersion,
 			nodes: allNodes.map((n) => n.asJson),
 			edges: selectedEdges.map((e) => e.asJson),
@@ -488,7 +485,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	}
 
 	insertJson(data: any, pasteSource: PasteSource, centerPoint?: IVector2D) {
-		if (data.type !== "factory-data" || data.version !== dataModelVersion) {
+		if (data.type !== clipboardDataType || data.version !== dataModelVersion) {
 			console.log("Unsupported data format or version");
 			return;
 		}

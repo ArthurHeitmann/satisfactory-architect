@@ -1,7 +1,7 @@
 import { writeToLocalStorage } from "$lib/localStorageState.svelte";
 import { Debouncer } from "$lib/utilties";
-import { dataModelVersion, StorageKeys } from "./constants";
-import { globals, trackStateChanges } from "./globals.svelte";
+import { dataModelVersion, saveDataType, StorageKeys } from "./constants";
+import { trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
 import { IdGen, IdMapper, type Id, type PasteSource } from "./IdGen";
 
@@ -54,20 +54,19 @@ export class AppState {
 		if (json.version !== dataModelVersion) {
 			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
 		}
-		if (json.type !== "app-state") {
+		if (json.type !== saveDataType) {
 			throw new Error(`Invalid JSON type: ${json.type}. Expected: app-state`);
 		}
 		this.idGen.replaceFromJson(json.idGen);
 		this.currentPageId = json.currentPageId;
 		this.pages = json.pages.map((p: any) => GraphPage.fromJSON(this, p));
-		console.log("AppState replaced from JSON");
 	}
 
 	insertPagesFromJSON(json: any): void {
 		if (json.version !== dataModelVersion) {
 			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
 		}
-		if (json.type !== "app-state") {
+		if (json.type !== saveDataType) {
 			throw new Error(`Invalid JSON type: ${json.type}. Expected: app-state`);
 		}
 		const idMapper = new IdMapper(this.idGen);
@@ -89,7 +88,7 @@ export class AppState {
 	toJSON(options: {forceToJson?: boolean, filterPageIds?: Id[]} = {}): any {
 		const state = {
 			version: dataModelVersion,
-			type: "app-state",
+			type: saveDataType,
 			idGen: this.idGen.toJSON(),
 			currentPageId: this.currentPageId,
 			pages: this.pages.map((p) => options.forceToJson ? p.toJSON() : p.asJson),

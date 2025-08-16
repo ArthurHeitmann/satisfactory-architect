@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { svgPresets, type SvgPresetName } from "./svgPresets";
+	import { svgPresets, type SvgPresetName } from "./svgPresets";
 
 	interface Props {
 		name: SvgPresetName,

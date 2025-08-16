@@ -199,12 +199,11 @@
 	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
 	import { innerWidth } from "svelte/reactivity/window";
 	import SfIconView from "./SFIconView.svelte";
-	import { getContext, onMount } from "svelte";
-	import type { GraphNode, GraphNodeProductionProperties, NewNodeDetails, PowerProductionDetails } from "../datamodel/GraphNode.svelte";
-    import type { GraphPage } from "../datamodel/GraphPage.svelte";
-    import type { AppState } from "../datamodel/AppState.svelte";
-    import { floatToString } from "$lib/utilties";
-    import PresetSvg from "./icons/PresetSvg.svelte";
+	import { onMount } from "svelte";
+	import type { NewNodeDetails, PowerProductionDetails } from "../datamodel/GraphNode.svelte";
+	import type { GraphPage } from "../datamodel/GraphPage.svelte";
+	import { floatToString } from "$lib/utilties";
+	import PresetSvg from "./icons/PresetSvg.svelte";
 
 	interface Props {
 		page: GraphPage;

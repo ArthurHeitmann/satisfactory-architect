@@ -24,3 +24,6 @@ export class StorageKeys {
 	static readonly appState = "app-state";
 	static readonly appVersion = "app-version";
 }
+
+export const saveDataType = "app-state";
+export const clipboardDataType = "factory-data";

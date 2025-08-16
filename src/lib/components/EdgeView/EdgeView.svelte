@@ -2,15 +2,14 @@
 	import { getContext, onDestroy } from "svelte";
 	import { blockStateChanges, globals, unblockStateChanges } from "../../datamodel/globals.svelte";
 	import type { GraphEdge, GraphEdgeDisplayType } from "../../datamodel/GraphEdge.svelte";
-	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
-    import type { ContextMenuIconButton, ContextMenuItem, ContextMenuItemButtonRow, EventStream } from "$lib/EventStream.svelte";
-    import { assertUnreachable, bezierPoint, floatToString, getThroughputColor, isThroughputBalanced, pluralStr, roundToNearest } from "$lib/utilties";
-    import { updateEdgeOffsets } from "../../datamodel/straightEdgeRouting";
-    import type { IVector2D } from "../../datamodel/GraphView.svelte";
-    import { userCanChangeOrientationVector } from "../../datamodel/nodeTypeProperties.svelte";
-    import UserEvents, { type DragEvent } from "../UserEvents.svelte";
-    import type { LayoutOrientation } from "../../datamodel/GraphNode.svelte";
-    import { edgeArrowLength, gridSize } from "$lib/datamodel/constants";
+	import type { ContextMenuItem, ContextMenuItemButtonRow, EventStream } from "$lib/EventStream.svelte";
+	import { assertUnreachable, bezierPoint, floatToString, getThroughputColor, isThroughputBalanced, pluralStr } from "$lib/utilties";
+	import { updateEdgeOffsets } from "../../datamodel/straightEdgeRouting";
+	import type { IVector2D } from "../../datamodel/GraphView.svelte";
+	import { userCanChangeOrientationVector } from "../../datamodel/nodeTypeProperties.svelte";
+	import UserEvents, { type DragEvent } from "../UserEvents.svelte";
+	import type { LayoutOrientation } from "../../datamodel/GraphNode.svelte";
+	import { edgeArrowLength, gridSize } from "$lib/datamodel/constants";
 
 	interface Props {
 		edge: GraphEdge;
@@ -200,10 +199,6 @@
 
 	const contextMenuItems = $derived.by(() => {
 		const items: ContextMenuItem[] = [];
-		// items.push({
-		// 	label: "Delete Connection",
-		// 	onClick: () => page.removeEdge(edge.id),
-		// });
 		if (isSelected && (page.selectedEdges.size > 1 || !page.selectedEdges.has(edge.id))) {
 			const selectedCount = page.selectedEdges.size;
 			items.push({
@@ -395,6 +390,8 @@
 		<foreignObject
 			x={midPoint.x}
 			y={midPoint.y}
+			width="100"
+			height="13"
 		>
 			<div class="edge-throughput-text">
 				{#if isBalanced}
@@ -489,7 +486,12 @@
 		font-size: 10px;
 	}
 
+	foreignObject {
+		pointer-events: none;
+	}
+
 	.edge-throughput-text {
+		pointer-events: all;
 		width: max-content;
 		transform: translateX(-50%) translateY(-50%);
 		background: var(--edge-color);

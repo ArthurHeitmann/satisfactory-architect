@@ -1,17 +1,8 @@
 <script lang="ts">
-	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
-	import { productionNodeIconSize } from "$lib/datamodel/constants";
-	import { getContext } from "svelte";
-	import SfIconView from "../SFIconView.svelte";
-	import SvgInput from "../SvgInput.svelte";
-	import { assertUnreachable, floatToString } from "$lib/utilties";
 	import { globals } from "../../datamodel/globals.svelte";
-	import { getNodeRadius, isNodeSelectable } from "../../datamodel/nodeTypeProperties.svelte";
-	import type { Id } from "../../datamodel/IdGen";
-	import type { GraphNode, GraphNodeSplitterMergerProperties, GraphNodeTextNoteProperties, LayoutOrientation } from "../../datamodel/GraphNode.svelte";
-	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
-	import type { IVector2D } from "../../datamodel/GraphView.svelte";
-
+	import { isNodeSelectable } from "../../datamodel/nodeTypeProperties.svelte";
+	import type { GraphNode, GraphNodeTextNoteProperties } from "../../datamodel/GraphNode.svelte";
+	
 	interface Props {
 		node: GraphNode<GraphNodeTextNoteProperties>;
 	}

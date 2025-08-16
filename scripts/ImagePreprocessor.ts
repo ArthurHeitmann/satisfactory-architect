@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import argsParser from "args-parser";
 import { satisfactoryDatabase } from "../src/lib/satisfactoryDatabase";
 import { join } from "path";

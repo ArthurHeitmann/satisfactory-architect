@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
 	import { productionNodeIconSize } from "$lib/datamodel/constants";
-	import { getContext } from "svelte";
 	import SfIconView from "../SFIconView.svelte";
 	import SvgInput from "../SvgInput.svelte";
 	import { floatToString, parseFloatExpr } from "$lib/utilties";
 	import { globals } from "../../datamodel/globals.svelte";
 	import type { GraphNode, GraphNodeProductionProperties } from "../../datamodel/GraphNode.svelte";
-	import type { GraphPage } from "../../datamodel/GraphPage.svelte";
 
 	interface Props {
 		node: GraphNode<GraphNodeProductionProperties>;

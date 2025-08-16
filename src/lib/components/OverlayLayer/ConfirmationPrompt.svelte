@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type { ConfirmationPromptEvent, EventStream } from "$lib/EventStream.svelte";
-    import { onDestroy, onMount } from "svelte";
+	import type { ConfirmationPromptEvent, EventStream } from "$lib/EventStream.svelte";
+	import { onDestroy, onMount } from "svelte";
 
 	interface Props {
 		event: ConfirmationPromptEvent;

@@ -110,7 +110,6 @@ function exploreThroughputOf(node: Node, mode: Mode, startingThroughput: number,
 		let drainI = 0;
 		for (let i = 0; i < nextNodes.length; i++) {
 			const nextNode = nextNodes[i];
-			// const ratio = 1 / (nextNodes.length - i);
 			let ratio: number;
 			if (nextNode.edge.properties.isDrainLine) {
 				ratio = 1 / (drainTotal - drainI);
@@ -121,7 +120,6 @@ function exploreThroughputOf(node: Node, mode: Mode, startingThroughput: number,
 			}
 			let nextResult: ExploreResult;
 			if (nextNode.node.initialThroughput > 0 || nextNode.node.consumeAll) {
-				// const rateChange = Math.min(ratio * rate, nextNode.node.initialThroughput - nextNode.node.usedThroughput);
 				let rateChange: number;
 				if (nextNode.node.consumeAll) {
 					rateChange = ratio * rate;

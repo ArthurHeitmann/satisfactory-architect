@@ -1,10 +1,10 @@
 <script lang="ts">
-    import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-    import type { Id } from "$lib/datamodel/IdGen";
-    import type { EventStream } from "$lib/EventStream.svelte";
-    import { getContext } from "svelte";
-    import SfIconView from "../SFIconView.svelte";
-    import { showConfirmationPrompt } from "$lib/utilties";
+	import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
+	import type { Id } from "$lib/datamodel/IdGen";
+	import type { EventStream } from "$lib/EventStream.svelte";
+	import { getContext } from "svelte";
+	import SfIconView from "../SFIconView.svelte";
+	import { showConfirmationPrompt } from "$lib/utilties";
 
 	interface Props {
 		page: GraphPage;
@@ -112,7 +112,15 @@
 >
 	<SfIconView icon={page.icon} size={20} quality="min" />
 	{#if isRenaming}
-		<span class="name editing" onblur={onBlur} onkeydown={onKeyDown} oninput={onInput} contenteditable="plaintext-only" bind:textContent={page.name} bind:this={nameElement}></span>
+		<span
+			class="name editing"
+			onblur={onBlur}
+			onkeydown={onKeyDown}
+			oninput={onInput}
+			contenteditable="plaintext-only"
+			bind:textContent={page.name}
+			bind:this={nameElement}
+		></span>
 	{:else}
 		<span class="name" ondblclick={onDoubleClick}>{page.name}</span>
 	{/if}

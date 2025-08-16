@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { base } from '$app/paths'
-    import { iconPreviews } from '$lib/iconPreviews';
+	import { iconPreviews } from '$lib/iconPreviews';
 	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
-    import { onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	interface Props {
 		icon: string;
@@ -54,7 +54,6 @@
 			showPreview = false;
 		}
 	}
-
 </script>
 
 {#if isInSvg}
