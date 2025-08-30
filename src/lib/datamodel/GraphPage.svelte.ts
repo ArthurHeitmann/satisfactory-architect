@@ -141,6 +141,9 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		}
 		this.nodes.delete(nodeId);
 		this.selectedNodes.delete(nodeId);
+		if (this.selectedNodes.has(nodeId)) {
+			this.selectedNodes.delete(nodeId);
+		}
 	}
 
 	removeSelectedNodes(): void {
@@ -202,6 +205,9 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			endNode.edges.delete(edge.id);
 		}
 		this.edges.delete(edgeId);
+		if (this.selectedEdges.has(edgeId)) {
+			this.selectedEdges.delete(edgeId);
+		}
 	}
 
 	moveSelectedNodes(totalDeltaX: number, totalDeltaY: number): void {

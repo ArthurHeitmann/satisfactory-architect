@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowContextMenuEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowColorPickerEvent, type ShowContextMenuEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
 	import { onDestroy, onMount, setContext, type Snippet } from "svelte";
 	import ContextMenuOverlay from "./ContextMenuOverlay.svelte";
 	import RecipeSelectorOverlay from "./RecipeSelectorOverlay.svelte";
 	import { fade } from "svelte/transition";
 	import type { IVector2D } from "$lib/datamodel/GraphView.svelte";
 	import ConfirmationPrompt from "./ConfirmationPrompt.svelte";
+    import ColorPickerOverlay from "./ColorPickerOverlay.svelte";
 
 	interface Props {
 		children: Snippet;
@@ -38,9 +39,12 @@
 	});
 
 	function onBackgroundClick(event: MouseEvent) {
-		if (event.target === event.currentTarget) {
-			dismissEventStream.emit({type: ""});
+		if (event.target !== event.currentTarget) {
+			return;
 		}
+		dismissEventStream.emit({type: ""});
+		const autoDismissEventTypes: EventType[] = ["showContextMenu", "showColorPicker"];
+		activeEvents = activeEvents.filter(e => !autoDismissEventTypes.includes(e.type));
 	}
 
 	function closeEvent(event: EventBase) {
@@ -196,7 +200,6 @@
 			{#if event.type === "showContextMenu"}
 				<ContextMenuOverlay
 					event={event as ShowContextMenuEvent}
-					{dismissEventStream}
 					onclose={() => closeEvent(event)}
 				/>
 			{:else if event.type === "showProductionSelector"}
@@ -209,6 +212,11 @@
 				<ConfirmationPrompt
 					event={event as ConfirmationPromptEvent}
 					{dismissEventStream}
+					onclose={() => closeEvent(event)}
+				/>
+			{:else if event.type === "showColorPicker"}
+				<ColorPickerOverlay
+					event={event as ShowColorPickerEvent}
 					onclose={() => closeEvent(event)}
 				/>
 			{/if}

@@ -102,6 +102,8 @@
 	--pages-bar-button-selected-background-color: var(--primary);
 	--pages-bar-button-selected-text-color: var(--background);
 
+	--color-button-selected-border-color: var(--text);
+
 	--grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiNkNmQ2ZDYiLz4NCjwvc3ZnPg==");
 }
 :root.dark-theme {
@@ -190,6 +192,8 @@
 	--pages-bar-button-active-background-color: var(--background-300);
 	--pages-bar-button-selected-background-color: var(--primary);
 	--pages-bar-button-selected-text-color: var(--text);
+
+	--color-button-selected-border-color: var(--text);
 
 	--grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiMyNDI0MjQiLz4NCjwvc3ZnPg==");
 }

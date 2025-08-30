@@ -194,7 +194,7 @@
 		}
 		return {canRotateStart, startButtonPosition, canRotateEnd, endButtonPosition};
 	});
-	const isBalanced = $derived(edge.properties.isDrainLine || isThroughputBalanced(edge.pushThroughput, edge.pullThroughput));
+	const isBalanced = $derived(isThroughputBalanced(edge.pushThroughput, edge.pullThroughput));
 	const color = $derived(getThroughputColor(isBalanced, edge.pushThroughput, edge.pullThroughput));
 
 	const contextMenuItems = $derived.by(() => {

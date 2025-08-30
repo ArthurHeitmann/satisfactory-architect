@@ -133,4 +133,8 @@ export function applyJsonToObject(json: Record<string, JsonElement>, obj: Record
 	for (const [key, value] of Object.entries(json)) {
 		obj[key] = value;
 	}
+	const keysToRemove = Object.keys(obj).filter((key) => !(key in json));
+	for (const key of keysToRemove) {
+		delete obj[key];
+	}
 }

@@ -90,6 +90,19 @@
 				globals.useAutoRateForFactoryInOutput = value;
 			},
 		);
+	});;
+	const aggCustomColor = $derived.by(() => {
+		const customColorValues = selectedNodes
+			.values()
+			.map(node => node.properties)
+			.filter(properties => properties.type === "production")
+			.map(properties => properties as GraphNodeProductionProperties);
+
+		return aggregateValues(
+			Array.from(customColorValues),
+			v => v.customColor,
+			(v, value) => v.customColor = value
+		);
 	});
 	const aggDisplayType = $derived.by(() => {
 		return aggregateValues(
@@ -431,6 +444,29 @@
 			/>
 		</div>
 	{/if}
+	{#if aggCustomColor.hasValues}
+		<div class="option-group">
+			<div class="title">Color</div>
+			<button
+				class="click-button color-button"
+				style="--custom-color: {aggCustomColor.value ?? "--node-background-color"};"
+				onclick={(e) => {
+					console.log(aggCustomColor.value);
+					const target = (e.currentTarget as HTMLElement);
+					const rect = target.getBoundingClientRect();
+					eventStream.emit({
+						type: "showColorPicker",
+						x: rect.left,
+						y: rect.bottom + 4,
+						currentColor: () => aggCustomColor.value,
+						onSelect: (color) => aggCustomColor.setValues(color),
+					});
+				}}
+			>
+				<div class="circle"></div>
+			</button>
+		</div>
+	{/if}
 	{@render optionButtons(aggPurityModifier, "", false, [
 		{v: 0.5 as const, display: {text: "Impure"}},
 		{v: 1.0 as const, display: {text: "Normal"}},
@@ -551,6 +587,16 @@
 
 			.button-text {
 				padding: 0 4px;
+			}
+		}
+
+		.color-button {
+			.circle {
+				width: 16px;
+				height: 16px;
+				border-radius: 50%;
+				border: 2px solid var(--color-button-selected-border-color);
+				background: var(--custom-color);
 			}
 		}
 

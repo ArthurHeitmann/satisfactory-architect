@@ -5,14 +5,9 @@
 
 	interface Props {
 		event: ShowContextMenuEvent;
-		dismissEventStream?: EventStream;
 		onclose: () => void;
 	}
-	const { event, dismissEventStream, onclose }: Props = $props();
-
-	onMount(() => {
-		dismissEventStream?.addListener(() => onclose());
-	});
+	const { event, onclose }: Props = $props();
 
 	function handleItemClick(item: ContextMenuItemAction) {
 		if ("onClick" in item) {

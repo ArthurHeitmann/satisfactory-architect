@@ -86,6 +86,7 @@
 	class:selected={isSelected}
 	class:highlight-attachable={highlightAttachable}
 	class:highlight-hovered={highlightHovered}
+	style="--background-color: {node.properties.customColor ?? 'var(--node-background-color)'};"
 >
 	<rect
 		class="background"
@@ -144,7 +145,7 @@
 <style lang="scss">
 	.recipe-node-view {
 		.background {
-			fill: var(--node-background-color);
+			fill: var(--background-color);
 			stroke: var(--node-border-color);
 			stroke-width: var(--rounded-border-width);
 			rx: var(--rounded-border-radius-big);

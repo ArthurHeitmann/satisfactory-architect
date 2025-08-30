@@ -2,7 +2,7 @@ import type { SvgPresetName } from "./components/icons/svgPresets";
 import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
 import type { GraphPage } from "./datamodel/GraphPage.svelte";
 
-export type EventType = "" | "showContextMenu" | "showProductionSelector" | "confirmationPrompt";
+export type EventType = "" | "showContextMenu" | "showProductionSelector" | "confirmationPrompt" | "showColorPicker";
 
 export interface EventBase {
 	type: EventType;
@@ -77,9 +77,16 @@ export interface ConfirmationPromptEvent extends EventBase {
 	onAnswer: (answer: boolean|null) => void;
 }
 
+export interface ShowColorPickerEvent extends EventBase {
+	type: "showColorPicker";
+	onSelect: (color: string|undefined) => void;
+	currentColor: () => string|undefined;
+	x: number;
+	y: number;
+}
 
 export interface EmptyEvent extends EventBase {
 	type: "";
 }
 
-export type AllowedEventTypes = EmptyEvent | ShowContextMenuEvent | ShowProductionSelectorEvent | ConfirmationPromptEvent;
+export type AllowedEventTypes = EmptyEvent | ShowContextMenuEvent | ShowProductionSelectorEvent | ConfirmationPromptEvent | ShowColorPickerEvent;

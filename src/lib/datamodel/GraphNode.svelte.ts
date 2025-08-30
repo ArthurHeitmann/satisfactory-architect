@@ -51,6 +51,7 @@ export interface GraphNodeProductionProperties {
 	multiplier: number;
 	autoMultiplier: boolean;
 	resourceJoints: ResourceJointInfo[];
+	customColor?: string;
 }
 export type LayoutOrientation = "top" | "bottom" | "left" | "right";
 export type JointDragType = "drag-to-connect" | "click-to-connect";
