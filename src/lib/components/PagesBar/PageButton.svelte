@@ -5,6 +5,7 @@
 	import { getContext } from "svelte";
 	import SfIconView from "../SFIconView.svelte";
 	import { showConfirmationPrompt } from "$lib/utilties";
+    import type { AppState } from "$lib/datamodel/AppState.svelte";
 
 	interface Props {
 		page: GraphPage;
@@ -23,6 +24,7 @@
 		...listeners
 	}: Props = $props();
 	const eventStream = getContext("overlay-layer-event-stream") as EventStream;
+	const appState = getContext("app-state") as AppState;
 
 	let isRenaming = $state(false);
 	// svelte-ignore non_reactive_update
@@ -91,6 +93,11 @@
 							onRemove();
 						}
 					}
+				},
+				{
+					label: "Duplicate",
+					icon: "copy",
+					onClick: () => appState.duplicatePage(page.id)
 				},
 				{
 					label: "Rename",

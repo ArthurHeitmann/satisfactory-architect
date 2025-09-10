@@ -324,15 +324,18 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			for (const joint of this.properties.resourceJoints) {
 				joint.id = mapper.mapId(joint.id);
 			}
-			if (pasteSource === "external") {
-				if (this.properties.details.type === "factory-reference") {
+			if (this.properties.details.type === "factory-reference") {
+				if (pasteSource === "external") {
 					this.properties.details.factoryId = mapper.mapId(this.properties.details.factoryId);
-					const newJointsToExternalNodes = Object.fromEntries(
-						Object.entries(this.properties.details.jointsToExternalNodes)
-							.map(([jointId, extNodeId]) => [mapper.mapId(jointId), mapper.mapId(extNodeId)])
-					);
-					this.properties.details.jointsToExternalNodes = newJointsToExternalNodes;
 				}
+				const newJointsToExternalNodes = Object.fromEntries(
+					Object.entries(this.properties.details.jointsToExternalNodes)
+						.map(([jointId, extNodeId]) => [
+							mapper.mapId(jointId),
+							pasteSource === "external" ? mapper.mapId(extNodeId) : extNodeId
+						])
+				);
+				this.properties.details.jointsToExternalNodes = newJointsToExternalNodes;
 			}
 		}
 	}

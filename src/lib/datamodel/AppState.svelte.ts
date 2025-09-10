@@ -1,5 +1,5 @@
 import { writeToLocalStorage } from "$lib/localStorageState.svelte";
-import { Debouncer } from "$lib/utilties";
+import { Debouncer, deepClone } from "$lib/utilties";
 import { dataModelVersion, saveDataType, StorageKeys } from "./constants";
 import { trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
@@ -62,7 +62,7 @@ export class AppState {
 		this.pages = json.pages.map((p: any) => GraphPage.fromJSON(this, p));
 	}
 
-	insertPagesFromJSON(json: any): void {
+	insertPagesFromJSON(json: any, pasteSource: PasteSource, index: number|null = null): GraphPage[] {
 		if (json.version !== dataModelVersion) {
 			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
 		}
@@ -70,7 +70,6 @@ export class AppState {
 			throw new Error(`Invalid JSON type: ${json.type}. Expected: app-state`);
 		}
 		const idMapper = new IdMapper(this.idGen);
-		const pasteSource: PasteSource = "external";
 		const allJsonNodes = json.pages.flatMap((p: any) => Object.values(p.nodes));
 		const allJsonEdges = json.pages.flatMap((p: any) => Object.values(p.edges));
 		for (const item of [...json.pages, ...allJsonNodes, ...allJsonEdges]) {
@@ -80,9 +79,10 @@ export class AppState {
 		}
 		const newPages = (json.pages as any[]).map((p: any) => GraphPage.fromJSON(this, p));
 		for (const page of newPages) {
-			this.addPage(page);
+			this.addPage(page, index);
 			page.afterPaste(idMapper, pasteSource);
 		}
+		return newPages;
 	}
 
 	toJSON(options: {forceToJson?: boolean, filterPageIds?: Id[]} = {}): any {
@@ -100,11 +100,19 @@ export class AppState {
 		return state;
 	}
 
-	addPage(page: GraphPage): void {
+	addPage(page: GraphPage, index: number|null = null): void {
 		if (this.pages.some((p) => p.id === page.id)) {
 			throw new Error(`Page with id ${page.id} already exists.`);
 		}
-		this.pages = [...this.pages, page];
+		if (index !== null) {
+			this.pages = [
+				...this.pages.slice(0, index),
+				page,
+				...this.pages.slice(index),
+			];
+		} else {
+			this.pages = [...this.pages, page];
+		}
 	}
 
 	removePage(pageId: Id): void {
@@ -116,6 +124,26 @@ export class AppState {
 			this.currentPageId = this.pages[0].id;
 		}
 	}
+
+	duplicatePage(pageId: Id): void {
+		const pageIndex = this.pages.findIndex((p) => p.id === pageId);
+		if (pageIndex === -1) {
+			throw new Error(`Page with id ${pageId} does not exist.`);
+		}
+		const json = deepClone(this.toJSON({filterPageIds: [pageId]}));
+		const usedNames = this.pages.map((p) => p.name);
+		const newPage = this.insertPagesFromJSON(json, "local", pageIndex + 1)[0];
+		let newName = newPage.name;
+		if (!/ copy( \d+)?$/.test(newName)) {
+			newName += " copy";
+		}
+		let copyIndex = 1;
+		while (usedNames.includes(newName)) {
+			newName = newName.replace(/ copy( \d+)?$/, ` copy ${copyIndex++}`);
+		}
+		newPage.name = newName;
+	}
+
 
 	setCurrentPage(page: GraphPage): void {
 		if (!this.pages.some((p) => p.id === page.id)) {

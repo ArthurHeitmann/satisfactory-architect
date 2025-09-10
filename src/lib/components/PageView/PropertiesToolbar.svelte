@@ -358,7 +358,7 @@
 			console.error("Failed to parse JSON from file", error);
 			return;
 		}
-		appState.insertPagesFromJSON(jsonData);
+		appState.insertPagesFromJSON(jsonData, "external");
 	}
 	
 	function onMultiplierChange(value: string, isEnter: boolean) {
