@@ -119,9 +119,14 @@ export class AppState {
 		if (this.pages.length === 1) {
 			throw new Error("Cannot remove the last this.");
 		}
+		const pageIndex = this.pages.findIndex((p) => p.id === pageId);
+		if (pageIndex === -1) {
+			throw new Error(`Page with id ${pageId} does not exist.`);
+		}
 		this.pages = this.pages.filter((p) => p.id !== pageId);
 		if (this.currentPageId === pageId && this.pages.length > 0) {
-			this.currentPageId = this.pages[0].id;
+			const newIndex = Math.min(pageIndex, this.pages.length - 1);
+			this.currentPageId = this.pages[newIndex].id;
 		}
 	}
 
