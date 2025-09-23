@@ -149,6 +149,20 @@ export class AppState {
 		newPage.name = newName;
 	}
 
+	swapPages(fromIndex: number, toIndex: number): void {
+		if (fromIndex < 0 || fromIndex >= this.pages.length || toIndex < 0 || toIndex >= this.pages.length) {
+			throw new Error(`Invalid indices: fromIndex=${fromIndex}, toIndex=${toIndex}, pages.length=${this.pages.length}`);
+		}
+		if (fromIndex === toIndex) {
+			return;
+		}
+		
+		const newPages = [...this.pages];
+		const [movedPage] = newPages.splice(fromIndex, 1);
+		newPages.splice(toIndex, 0, movedPage);
+		this.pages = newPages;
+	}
+
 
 	setCurrentPage(page: GraphPage): void {
 		if (!this.pages.some((p) => p.id === page.id)) {

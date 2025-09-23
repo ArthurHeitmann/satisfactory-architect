@@ -13,6 +13,8 @@
 		canBeRemoved: boolean;
 		onSelect: () => void;
 		onRemove: () => void;
+		isDraggedButton?: boolean;
+		absoluteX?: number;
 	}
 
 	const {
@@ -21,6 +23,8 @@
 		canBeRemoved,
 		onSelect,
 		onRemove,
+		isDraggedButton = false,
+		absoluteX = 0,
 		...listeners
 	}: Props = $props();
 	const eventStream = getContext("overlay-layer-event-stream") as EventStream;
@@ -112,6 +116,9 @@
 <button
 	class="page-button"
 	class:selected={page.id === activePageId}
+	class:dragging={isDraggedButton}
+	style:position={isDraggedButton ? "absolute" : "static"}
+	style:left={isDraggedButton ? `${absoluteX}px` : "auto"}
 	onclick={onSelect}
 	oncontextmenu={showContextMenu}
 	bind:this={button}
@@ -153,6 +160,12 @@
 		&.selected {
 			background-color: var(--pages-bar-button-selected-background-color);
 			color: var(--pages-bar-button-selected-text-color);
+		}
+
+		&.dragging {
+			z-index: 10;
+			opacity: 0.8;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		}
 	}
 
