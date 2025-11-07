@@ -24,3 +24,6 @@ vite.config.ts.timestamp-*
 
 static/img/FactoryGame
 game_extracted
+
+.github/copilot-instructions.md
+CLAUDE.md

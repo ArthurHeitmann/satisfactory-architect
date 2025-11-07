@@ -104,6 +104,21 @@
 					onClick: () => appState.duplicatePage(page.id)
 				},
 				{
+					label: "Change Icon",
+					icon: "image-edit",
+					onClick: () => {
+						eventStream.emit({
+							type: "showIconPicker",
+							onSelect: (iconName: string) => {
+								page.icon = iconName;
+							},
+							currentIcon: page.icon,
+							x: Math.max(buttonRect.left, 10),
+							y: buttonRect.top - 10,
+						});
+					}
+				},
+				{
 					label: "Rename",
 					icon: "edit",
 					onClick: onDoubleClick

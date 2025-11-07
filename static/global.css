@@ -55,6 +55,12 @@
 	--recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px white) drop-shadow(0px 0px 5px white);
 	--recipe-selector-border-color: var(--background-100);
 	--recipe-selector-scrollbar-color: var(--background-200);
+	--icon-picker-background-color: var(--background);
+	--icon-picker-border-color: var(--background-100);
+	--icon-picker-button-color: var(--background);
+	--icon-picker-button-hover-color: var(--background-100);
+	--icon-picker-button-active-color: var(--background-200);
+	--icon-picker-button-border-color: var(--background-100);
 	--context-menu-background-color: var(--background);
 	--context-menu-border-color: var(--background-100);
 	--context-menu-item-color: transparent;
@@ -150,6 +156,12 @@
 	--recipe-selector-tile-secondary-img-shadow: drop-shadow(0px 0px 2px black) drop-shadow(0px 0px 4px black);
 	--recipe-selector-border-color: var(--background-200);
 	--recipe-selector-scrollbar-color: var(--background-300);
+	--icon-picker-background-color: var(--background-100);
+	--icon-picker-border-color: var(--background-200);
+	--icon-picker-button-color: var(--background-100);
+	--icon-picker-button-hover-color: var(--background-200);
+	--icon-picker-button-active-color: var(--background-300);
+	--icon-picker-button-border-color: var(--background-300);
 	--context-menu-background-color: var(--background-100);
 	--context-menu-border-color: var(--background-200);
 	--context-menu-item-color: transparent;

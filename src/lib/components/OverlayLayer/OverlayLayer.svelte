@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowColorPickerEvent, type ShowContextMenuEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowColorPickerEvent, type ShowContextMenuEvent, type ShowIconPickerEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
 	import { onDestroy, onMount, setContext, type Snippet } from "svelte";
 	import ContextMenuOverlay from "./ContextMenuOverlay.svelte";
 	import RecipeSelectorOverlay from "./RecipeSelectorOverlay.svelte";
@@ -7,6 +7,7 @@
 	import type { IVector2D } from "$lib/datamodel/GraphView.svelte";
 	import ConfirmationPrompt from "./ConfirmationPrompt.svelte";
     import ColorPickerOverlay from "./ColorPickerOverlay.svelte";
+    import IconPickerOverlay from "./IconPickerOverlay.svelte";
 
 	interface Props {
 		children: Snippet;
@@ -22,7 +23,7 @@
 	let activeEvents: EventBase[] = $state([]);
 
 	function handleEvent(event: EventBase) {
-		const uniqueEventTypes: EventType[] = ["showContextMenu", "showProductionSelector"];
+		const uniqueEventTypes: EventType[] = ["showContextMenu", "showProductionSelector", "showIconPicker"];
 		const isUniqueEvent = uniqueEventTypes.includes(event.type);
 		if (isUniqueEvent) {
 			activeEvents = activeEvents.filter(e => e.type !== event.type);
@@ -43,7 +44,7 @@
 			return;
 		}
 		dismissEventStream.emit({type: ""});
-		const autoDismissEventTypes: EventType[] = ["showContextMenu", "showColorPicker"];
+		const autoDismissEventTypes: EventType[] = ["showContextMenu", "showColorPicker", "showIconPicker"];
 		activeEvents = activeEvents.filter(e => !autoDismissEventTypes.includes(e.type));
 	}
 
@@ -217,6 +218,11 @@
 			{:else if event.type === "showColorPicker"}
 				<ColorPickerOverlay
 					event={event as ShowColorPickerEvent}
+					onclose={() => closeEvent(event)}
+				/>
+			{:else if event.type === "showIconPicker"}
+				<IconPickerOverlay
+					event={event as ShowIconPickerEvent}
 					onclose={() => closeEvent(event)}
 				/>
 			{/if}
