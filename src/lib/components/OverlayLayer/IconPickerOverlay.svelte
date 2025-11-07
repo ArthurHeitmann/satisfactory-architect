@@ -41,6 +41,7 @@
 	const leftPos = Math.max(0, Math.min(event.x, window.innerWidth - popupWidth - rightPadding));
 	const popupStyle = `left: ${leftPos}px; top: ${event.y - popupMaxHeight}px; width: ${popupWidth}px; max-height: ${popupMaxHeight}px;`;
 
+	let searchInputElement: HTMLInputElement;
 	let iconListElement: HTMLDivElement;
 
 	onMount(() => {
@@ -48,6 +49,7 @@
 		if (selectedButton) {
 			selectedButton.scrollIntoView({ behavior: "instant", block: "center" });
 		}
+		searchInputElement?.focus();
 	});
 </script>
 
@@ -58,6 +60,7 @@
 				type="text"
 				placeholder="Search icons..."
 				bind:value={searchQuery}
+				bind:this={searchInputElement}
 			/>
 		</div>
 		<div class="icon-list" bind:this={iconListElement}>
@@ -135,7 +138,6 @@
 		&.selected {
 			background: var(--icon-picker-button-active-color);
 			border-color: var(--primary);
-			box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent);
 		}
 
 		&:active {
