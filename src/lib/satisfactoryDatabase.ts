@@ -10287,28 +10287,28 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 		TXUI_MIcon_SortRule_Any: {
 			name: "TXUI_MIcon_SortRule_Any",
 			resolutions: [
-				128,
+				256,
 				48
 			]
 		},
 		TXUI_MIcon_SortRule_AnyUndefined: {
 			name: "TXUI_MIcon_SortRule_AnyUndefined",
 			resolutions: [
-				128,
+				256,
 				48
 			]
 		},
 		TXUI_MIcon_SortRule_Overflow: {
 			name: "TXUI_MIcon_SortRule_Overflow",
 			resolutions: [
-				128,
+				256,
 				48
 			]
 		},
 		TXUI_MIcon_Speedometer: {
 			name: "TXUI_MIcon_Speedometer",
 			resolutions: [
-				128,
+				64,
 				48
 			]
 		},
@@ -10491,230 +10491,6 @@ export const satisfactoryDatabase: SatisfactoryDatabase = {
 			name: "IconDesc_TruckStencil",
 			resolutions: [
 				512,
-				48
-			]
-		},
-		PatternDesc_Icon_Cart: {
-			name: "PatternDesc_Icon_Cart",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Explorer: {
-			name: "PatternDesc_Icon_Explorer",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Factory: {
-			name: "PatternDesc_Icon_Factory",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Liquid: {
-			name: "PatternDesc_Icon_Liquid",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Nuclear: {
-			name: "PatternDesc_Icon_Nuclear",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Parking: {
-			name: "PatternDesc_Icon_Parking",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Pioneer: {
-			name: "PatternDesc_Icon_Pioneer",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Power: {
-			name: "PatternDesc_Icon_Power",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_StopCross: {
-			name: "PatternDesc_Icon_StopCross",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Storage: {
-			name: "PatternDesc_Icon_Storage",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Tractor: {
-			name: "PatternDesc_Icon_Tractor",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Icon_Truck: {
-			name: "PatternDesc_Icon_Truck",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_NO_Cart: {
-			name: "PatternDesc_NO_Cart",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_NO_Parking: {
-			name: "PatternDesc_NO_Parking",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_NO_Pioneer: {
-			name: "PatternDesc_NO_Pioneer",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		PatternDesc_Remover_Icons: {
-			name: "PatternDesc_Remover_Icons",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Cart: {
-			name: "Recipe_Pattern_Icon_Cart",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Explorer: {
-			name: "Recipe_Pattern_Icon_Explorer",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Factory: {
-			name: "Recipe_Pattern_Icon_Factory",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Liquid: {
-			name: "Recipe_Pattern_Icon_Liquid",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Nuclear: {
-			name: "Recipe_Pattern_Icon_Nuclear",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Parking: {
-			name: "Recipe_Pattern_Icon_Parking",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Pioneer: {
-			name: "Recipe_Pattern_Icon_Pioneer",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Power: {
-			name: "Recipe_Pattern_Icon_Power",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_StopCross: {
-			name: "Recipe_Pattern_Icon_StopCross",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Storage: {
-			name: "Recipe_Pattern_Icon_Storage",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Tractor: {
-			name: "Recipe_Pattern_Icon_Tractor",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Icon_Truck: {
-			name: "Recipe_Pattern_Icon_Truck",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_NO_Cart: {
-			name: "Recipe_Pattern_NO_Cart",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_NO_Parking: {
-			name: "Recipe_Pattern_NO_Parking",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_NO_Pioneer: {
-			name: "Recipe_Pattern_NO_Pioneer",
-			resolutions: [
-				128,
-				48
-			]
-		},
-		Recipe_Pattern_Remover_Icons: {
-			name: "Recipe_Pattern_Remover_Icons",
-			resolutions: [
-				128,
 				48
 			]
 		}

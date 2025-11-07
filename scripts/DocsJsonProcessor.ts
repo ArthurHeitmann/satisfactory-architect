@@ -355,7 +355,7 @@ async function main() {
 	const referencedBuildBuildings = Array.from(referencedBuildings.values()).filter((building) => building.startsWith("Build_"));
 	console.log(`Found ${buildings.size}/${referencedBuildBuildings.length} buildings.`);
 	// update variable power consumptions in recipes
-	const averagePowerFactors = {
+	const averagePowerFactors: Record<string, number> = {
 		"Build_HadronCollider_C": 2/3,
 		"Build_QuantumEncoder_C": 0.5,
 		"Build_Converter_C": 0.625,
@@ -395,7 +395,10 @@ async function main() {
 				continue;
 			}
 			const filePath = join(file.parentPath, file.name);
-			const imgName = basename(filePath).split(".")[0];
+			const [imgName, imgExt] = basename(filePath).split(".");
+			if (!imgExt || imgExt.toLowerCase() !== "png") {
+				continue;
+			}
 			if (!usedIcons.has(imgName)) {
 				const parentFolder = dirname(filePath);
 				const parentParentFolder = dirname(parentFolder);
@@ -403,11 +406,14 @@ async function main() {
 				const parentParentName = basename(parentParentFolder);
 				if (additionalIconFolders.some(([folder, subfolder]) => parentParentName === folder && parentName === subfolder)) {
 					let additionalIconName = imgName;
-					let size = 128;
+					let size: number;
 					if (/_\d{2,3}$/.test(additionalIconName)) {
 						const matches = additionalIconName.match(/(^.*)_(\d{2,3})$/)!;
 						additionalIconName = matches[1];
 						size = Number(matches[2]);
+					} else {
+						const pngSize = getPngSize(filePath);
+						size = Math.max(pngSize.width, pngSize.height);
 					}
 					if (additionalIconName === "TXUI_MIcon_None") {
 						continue;
@@ -523,6 +529,19 @@ async function main() {
 
 	writeFileSync(tsSavePath, outputTs, "utf-8");
 	console.log(`Saved TypeScript data to ${tsSavePath}.`);
+}
+
+function getPngSize(path: string): { width: number, height: number } {
+	const fileBuffer = readFileSync(path);
+	if (fileBuffer.toString("ascii", 12, 16) !== "IHDR") {
+		throw new Error("Not a valid PNG file.");
+	}
+	const width = fileBuffer.readUInt32BE(16);
+	const height = fileBuffer.readUInt32BE(20);
+	if (width == 0 || height == 0 || width > 10000 || height > 10000) {
+		throw new Error("Invalid PNG dimensions.");
+	}
+	return { width, height };
 }
 
 main().catch((error) => {
