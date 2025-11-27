@@ -61,7 +61,7 @@ export interface GraphNodeResourceJointProperties {
 	jointType: "input" | "output";
 	layoutOrientation: LayoutOrientation | undefined;
 	locked: boolean;
-	jointDragType?: JointDragType;
+	jointDragType?: JointDragType;	// TODO syncing (TODO distinguish between users)
 	dragStartNodeId?: Id;
 }
 export interface GraphNodeSplitterMergerProperties {
@@ -94,13 +94,13 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 	constructor(id: Id, context: PageContext, position: IVector2D, priority: number, edges: Id[], parentNode: Id|null, children: Id[], properties: T, size?: IVector2D) {
 		this.id = id;
 		this.context = context;
-		this.position = new Vector2D(position);
+		this.position = new Vector2D(position);	// TODO sync
 		this.dragStartPosition = { x: 0, y: 0 };
 		this.priority = priority;
-		this.edges = new SvelteSet(edges);
-		this.parentNode = parentNode;
-		this.children = new SvelteSet(children);
-		this.properties = $state(properties);
+		this.edges = new SvelteSet(edges);	// TODO sync
+		this.parentNode = parentNode;	// TODO sync
+		this.children = new SvelteSet(children);	// TODO sync
+		this.properties = $state(properties);	// TODO sync
 		if (!size) {
 			const radius = getNodeRadius(this);
 			size = {
@@ -108,7 +108,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 				y: radius,
 			};
 		}
-		this.size = $state(size);
+		this.size = $state(size);	// TODO sync
 		this.asJson = $derived(this.toJSON());
 	}
 
@@ -289,6 +289,8 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		this.parentNode = json.parentNode;
 		applyJsonToSet(json.children, this.children);
 		applyJsonToObject(json.properties, this.properties as Record<string, any>);
+		this.size.x = json.size.x;
+		this.size.y = json.size.y;
 	}
 
 	private toJSON(): any {

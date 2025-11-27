@@ -59,10 +59,10 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 	constructor(context: PageContext, id: Id, type: GraphEdgeType, startNodeId: Id, endNodeId: Id, properties: GraphEdgeProperties) {
 		this.context = context;
 		this.id = id;
-		this.type = $state(type);
-		this._startNodeId = $state(startNodeId);
-		this._endNodeId = $state(endNodeId);
-		this.properties = $state(properties);
+		this.type = $state(type);	// TODO sync
+		this._startNodeId = $state(startNodeId);	// TODO sync
+		this._endNodeId = $state(endNodeId);	// TODO sync
+		this.properties = $state(properties);	// TODO sync
 		this.pushThroughput = $state(0);
 		this.pullThroughput = $state(0);
 		this.asJson = $derived(this.toJSON());

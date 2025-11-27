@@ -14,9 +14,9 @@ export class AppState {
 	readonly asJson: any;
 
 	constructor(idGen: IdGen, currentPageId: Id, pages: GraphPage[]) {
-		this.idGen = idGen;
+		this.idGen = idGen;	// TODO sync
 		this.currentPageId = $state(currentPageId);
-		this.pages = $state.raw(pages);
+		this.pages = $state.raw(pages);	// TODO sync
 		this.currentPage = $derived(this.pages.find((p) => p.id === this.currentPageId)!);
 		
 		this.debouncedSave = new Debouncer(this.saveToLocalStorage.bind(this), 1500);

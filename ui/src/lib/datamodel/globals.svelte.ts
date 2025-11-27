@@ -12,7 +12,7 @@ export const globals = $state({
 	debugConsoleLog: false,
 });
 
-let stateChangeBlockers = 0;
+let stateChangeBlockers = 0;	// TODO sync
 export function blockStateChanges() {
 	stateChangeBlockers++;
 }

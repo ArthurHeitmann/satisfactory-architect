@@ -45,11 +45,11 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		this.context = { appState, page: this };
 		this.idGen = appState.idGen;
 		this.id = id;
-		this.name = $state(name);
-		this.icon = $state(icon);
+		this.name = $state(name);	// TODO sync
+		this.icon = $state(icon);	// TODO sync
 		this.view = view;
-		this.nodes = new SvelteMap(nodes.map((n) => [n.id, n]));
-		this.edges = new SvelteMap(edges.map((e) => [e.id, e]));
+		this.nodes = new SvelteMap(nodes.map((n) => [n.id, n]));	// TODO sync
+		this.edges = new SvelteMap(edges.map((e) => [e.id, e]));	// TODO sync
 		this.toolMode = $state(toolMode);
 		this.selectedNodes = new SvelteSet();
 		this.selectedEdges = new SvelteSet();
