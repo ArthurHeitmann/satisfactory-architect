@@ -144,6 +144,11 @@ export class DatabaseManager implements IDatabaseManager {
 	 */
 	public saveSnapshot(snapshot: RoomSnapshot): void {
 		try {
+			let dataToSave = snapshot.stateData.data;
+			if (!(dataToSave instanceof Uint8Array)) {
+				dataToSave = new Uint8Array(dataToSave);
+			}
+
 			this.db.execute(
 				`
 				INSERT OR REPLACE INTO room_states (room_id, state_data, compression_method, timestamp)
@@ -151,7 +156,7 @@ export class DatabaseManager implements IDatabaseManager {
 			`,
 				[
 					snapshot.roomId,
-					snapshot.stateData.data,
+					dataToSave,
 					snapshot.stateData.method,
 					snapshot.timestamp,
 				],

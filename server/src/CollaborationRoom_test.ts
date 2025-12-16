@@ -164,9 +164,12 @@ function createMockCompression(): ICompressionService {
 			method: "none" as const,
 			data: new TextEncoder().encode(JSON.stringify(obj)),
 		})),
-		decompressJSON: spy((compressed: CompressedData) =>
-			JSON.parse(new TextDecoder().decode(compressed.data))
-		),
+		decompressJSON: spy((compressed: CompressedData) => {
+			const data = compressed.data instanceof Uint8Array
+				? compressed.data
+				: new Uint8Array(compressed.data);
+			return JSON.parse(new TextDecoder().decode(data));
+		}),
 	};
 }
 

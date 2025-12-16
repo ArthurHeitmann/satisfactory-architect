@@ -2,7 +2,7 @@
 	"tasks": {
 		"dev": "deno run --allow-net --allow-env --watch src/main.ts",
 		"start": "deno run -P src/main.ts",
-		"test": "deno test --allow-all src/"
+		"test": "deno test --allow-all"
 	},
 	"imports": {
 		"@mainframe-api/deno-sqlite": "jsr:@mainframe-api/deno-sqlite@^3.9.1",

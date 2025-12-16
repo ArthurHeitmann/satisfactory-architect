@@ -11,7 +11,7 @@ import { AppError } from "./errors/AppError.ts";
  */
 export interface CompressedData {
 	method: CompressionMethod;
-	data: Uint8Array;
+	data: Uint8Array | number[];
 }
 
 // Compression interface for pluggable implementations
@@ -153,9 +153,16 @@ export class CompressionService implements ICompressionService {
 	 */
 	public decompressJSON(compressed: CompressedData): unknown {
 		try {
+			let data: Uint8Array;
+			if (compressed.data instanceof Uint8Array) {
+				data = compressed.data;
+			} else {
+				data = new Uint8Array(compressed.data);
+			}
+
 			// Handle uncompressed data
 			if (compressed.method === "none") {
-				const json = new TextDecoder().decode(compressed.data);
+				const json = new TextDecoder().decode(data);
 				return JSON.parse(json);
 			}
 
@@ -173,7 +180,7 @@ export class CompressionService implements ICompressionService {
 				);
 			}
 
-			const bytes = provider.decompress(compressed.data);
+			const bytes = provider.decompress(data);
 			const json = new TextDecoder().decode(bytes);
 			return JSON.parse(json);
 		} catch (error) {
