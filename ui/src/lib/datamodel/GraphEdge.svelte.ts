@@ -3,6 +3,7 @@ import type { LayoutOrientation, GraphNode } from "./GraphNode.svelte";
 import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import type { IVector2D } from "./GraphView.svelte";
 import type { Id, IdMapper } from "./IdGen";
+import type { GraphEdgeJson } from "../../../../shared/types_serialization.ts";
 import { edgeArrowLength } from "./constants";
 import { canUseInvertedEdgeControlPoint, getNodeRadius } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, type JsonSerializable } from "./StateHistory.svelte";
@@ -291,8 +292,8 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 		});
 	}
 
-	static fromJSON(json: any, context: PageContext): GraphEdge {
-		return new GraphEdge(context, json.id, json.type, json.startNodeId, json.endNodeId, json.properties);
+	static fromJSON(json: GraphEdgeJson, context: PageContext): GraphEdge {
+		return new GraphEdge(context, json.id, json.type as GraphEdgeType, json.startNodeId, json.endNodeId, json.properties as GraphEdgeProperties);
 	}
 
 	applyJson(json: any): void {
@@ -302,7 +303,7 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 		applyJsonToObject(json.properties, this.properties as Record<string, any>);
 	}
 
-	private toJSON(): any {
+	private toJSON(): GraphEdgeJson {
 		return {
 			id: this.id,
 			type: this.type,

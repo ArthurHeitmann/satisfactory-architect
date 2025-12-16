@@ -11,8 +11,8 @@ import type {
 	RoomListItem,
 	UploadStateMessage,
 	WelcomeMessage,
-} from "./types_shared.ts";
-import { ErrorCode } from "./types_shared.ts";
+} from "../../shared/types_shared.ts";
+import { ErrorCode } from "../../shared/types_shared.ts";
 import type { ServerConfig, WebSocketAdapter } from "./types_server.ts";
 import { AppError } from "./errors/AppError.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";

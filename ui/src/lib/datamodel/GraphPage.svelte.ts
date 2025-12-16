@@ -3,6 +3,7 @@ import { untrack } from "svelte";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
 import { type IdGen, type Id, IdMapper, type PasteSource } from "./IdGen";
 import { clipboardDataType, dataModelVersion, NodePriorities } from "./constants";
+import type { GraphPageJson } from "../../../../shared/types_serialization.ts";
 import { isNodeAttachable } from "./nodeTypeProperties.svelte";
 import { applyJsonToMap, applyJsonToSet, StateHistory, type JsonSerializable } from "./StateHistory.svelte";
 import { GraphEdge, type GraphEdgeProperties } from "./GraphEdge.svelte";
@@ -68,14 +69,14 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		return new GraphPage(appState, appState.idGen.nextId(), name, "IconDesc_FactoryStencil", view, [], [], "select-nodes");
 	}
 
-	static fromJSON(appState: AppState, json: any): GraphPage {
+	static fromJSON(appState: AppState, json: GraphPageJson): GraphPage {
 		const view = GraphView.fromJSON(json.view);
-		const page = new GraphPage(appState, json.id, json.name, json.icon, view, [], [], json.toolMode);
-		const nodes = Object.values(json.nodes).map((n: any) => GraphNode.fromJSON(n, page.context));
+		const page = new GraphPage(appState, json.id, json.name, json.icon, view, [], [], json.toolMode as ToolMode);
+		const nodes = Object.values(json.nodes).map((n) => GraphNode.fromJSON(n, page.context));
 		for (const node of nodes) {
 			page.nodes.set(node.id, node);
 		}
-		const edges = Object.values(json.edges).map((e: any) => GraphEdge.fromJSON(e, page.context));
+		const edges = Object.values(json.edges).map((e) => GraphEdge.fromJSON(e, page.context));
 		for (const edge of edges) {
 			page.edges.set(edge.id, edge);
 		}
@@ -88,13 +89,13 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		}
 		this.name = json.name;
 		this.icon = json.icon;
-		applyJsonToMap(json.nodes, this.nodes, GraphNode.fromJSON, this.context);
-		applyJsonToMap(json.edges, this.edges, GraphEdge.fromJSON, this.context);
+		applyJsonToMap(json.nodes as any, this.nodes, GraphNode.fromJSON as any, this.context);
+		applyJsonToMap(json.edges as any, this.edges, GraphEdge.fromJSON as any, this.context);
 		applyJsonToSet(json.selectedNodes, this.selectedNodes);
 		applyJsonToSet(json.selectedEdges, this.selectedEdges);
 	}
 
-	toJSON(): any {
+	toJSON(): GraphPageJson {
 		return {
 			version: dataModelVersion,
 			type: "graph-page",

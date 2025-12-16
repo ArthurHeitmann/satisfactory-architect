@@ -5,6 +5,7 @@ import { SvelteSet } from "svelte/reactivity";
 import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import { Vector2D, type IVector2D } from "./GraphView.svelte";
 import type { Id, IdGen, IdMapper, PasteSource } from "./IdGen";
+import type { GraphNodeJson } from "../../../../shared/types_serialization.ts";
 import { gridSize, NodePriorities, productionNodeIconSize, productionNodeVerticalPadding, productionNodeHorizontalPadding } from "./constants";
 import { getNodeRadius } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, applyJsonToSet, type JsonSerializable } from "./StateHistory.svelte";
@@ -269,7 +270,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		return { parent, children };
 	}
 
-	static fromJSON(json: any, context: PageContext): GraphNode {
+	static fromJSON(json: GraphNodeJson, context: PageContext): GraphNode {
 		return new GraphNode(
 			json.id,
 			context,
@@ -278,7 +279,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			json.edges,
 			json.parentNode,
 			json.children,
-			json.properties,
+			json.properties as GraphNodeProperties,
 			json.size,
 		);
 	}
@@ -293,7 +294,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		this.size.y = json.size.y;
 	}
 
-	private toJSON(): any {
+	private toJSON(): GraphNodeJson {
 		return {
 			id: this.id,
 			position: this.position.toJSON(),

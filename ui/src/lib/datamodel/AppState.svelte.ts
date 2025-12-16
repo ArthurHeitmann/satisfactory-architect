@@ -4,6 +4,7 @@ import { dataModelVersion, saveDataType, StorageKeys } from "./constants";
 import { trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
 import { IdGen, IdMapper, type Id, type PasteSource } from "./IdGen";
+import type { AppStateJson } from "../../../../shared/types_serialization.ts";
 
 export class AppState {
 	readonly idGen: IdGen;
@@ -37,13 +38,13 @@ export class AppState {
 		return state;
 	}
 
-	static fromJSON(json: any): AppState {
+	static fromJSON(json: AppStateJson): AppState {
 		if (json.version !== dataModelVersion) {
 			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
 		}
 		const idGen = IdGen.fromJson(json.idGen);
 		const state = new AppState(idGen, json.currentPageId, []);
-		const pages = json.pages.map((p: any) => GraphPage.fromJSON(state, p));
+		const pages = json.pages.map((p) => GraphPage.fromJSON(state, p));
 		for (const page of pages) {
 			state.addPage(page);
 		}
@@ -85,8 +86,8 @@ export class AppState {
 		return newPages;
 	}
 
-	toJSON(options: {forceToJson?: boolean, filterPageIds?: Id[]} = {}): any {
-		const state = {
+	toJSON(options: {forceToJson?: boolean, filterPageIds?: Id[]} = {}): AppStateJson {
+		const state: AppStateJson = {
 			version: dataModelVersion,
 			type: saveDataType,
 			idGen: this.idGen.toJSON(),
@@ -94,7 +95,7 @@ export class AppState {
 			pages: this.pages.map((p) => options.forceToJson ? p.toJSON() : p.asJson),
 		};
 		if (options.filterPageIds) {
-			state.pages = state.pages.filter((p: any) => options.filterPageIds!.includes(p.id));
+			state.pages = state.pages.filter((p) => options.filterPageIds!.includes(p.id));
 			state.currentPageId = options.filterPageIds[0];
 		}
 		return state;

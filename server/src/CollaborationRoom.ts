@@ -10,8 +10,8 @@ import type {
 	JoinRoomIntent,
 	RoomJoinedMessage,
 	ServerMessage,
-} from "./types_shared.ts";
-import { ErrorCode } from "./types_shared.ts";
+} from "../../shared/types_shared.ts";
+import { ErrorCode } from "../../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";
 import { Scheduler } from "./utils/Scheduler.ts";
@@ -25,7 +25,7 @@ import {
 } from "./CommandBuffer.ts";
 import type { ICompressionService } from "./compression.ts";
 import type { IDatabaseManager, RoomSnapshot } from "./persistence.ts";
-import { AppStateJson } from "./types_serialization.ts";
+import { AppStateJson } from "../../shared/types_serialization.ts";
 
 export interface RoomConfig {
 	maxClients: number; // 10 default

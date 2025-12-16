@@ -2,7 +2,7 @@
  * Shared message types between client and server
  */
 
-import type { CompressedData } from "./compression.ts";
+import type { CompressedData } from "../server/src/compression.ts";
 
 // Server protocol version compatibility
 export interface VersionInfo {

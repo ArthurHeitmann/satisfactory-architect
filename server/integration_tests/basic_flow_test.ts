@@ -4,14 +4,14 @@ import { TestServer, TestClient } from "./test_utils.ts";
 import type {
 	AppStateJson,
 	GraphPageJson,
-} from "../src/types_serialization.ts";
+} from "../../shared/types_serialization.ts";
 import type {
 	PageAddCommand,
 	ObjectAddCommand,
 	RoomJoinedMessage,
 	CommandBatchMessage,
 	WelcomeMessage,
-} from "../src/types_shared.ts";
+} from "../../shared/types_shared.ts";
 import type { CompressedData } from "../src/compression.ts";
 
 Deno.test({

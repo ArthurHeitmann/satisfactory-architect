@@ -1,5 +1,5 @@
 import { AppError } from "./AppError.ts";
-import { ErrorCode, ErrorMessage } from "../types_shared.ts";
+import { ErrorCode, ErrorMessage } from "../../../shared/types_shared.ts";
 
 export class ErrorHandler {
 	public static handle(

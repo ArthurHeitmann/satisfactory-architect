@@ -20,7 +20,7 @@ import type {
 	RoomJoinedMessage,
 	ServerMessage,
 	WelcomeMessage,
-} from "./types_shared.ts";
+} from "../../shared/types_shared.ts";
 
 // ============================================================================
 // Test Helpers & Mocks

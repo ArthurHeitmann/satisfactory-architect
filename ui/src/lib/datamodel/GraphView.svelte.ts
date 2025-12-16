@@ -1,4 +1,7 @@
 import { gridSize } from "./constants";
+import type { IVector2D, GraphViewJson } from "../../../../shared/types_serialization.ts";
+
+export type { IVector2D };
 
 export class GraphView {
 	readonly offset: IVector2D;
@@ -17,11 +20,11 @@ export class GraphView {
 		return new GraphView({ x: 0, y: 0 }, 1, true);
 	}
 
-	static fromJSON(json: any): GraphView {
+	static fromJSON(json: GraphViewJson): GraphView {
 		return new GraphView(json.offset, json.scale, json.enableGridSnap);
 	}
 
-	toJSON(): any {
+	toJSON(): GraphViewJson {
 		return {
 			offset: $state.snapshot(this.offset),
 			scale: this.scale,
@@ -30,12 +33,7 @@ export class GraphView {
 	}
 }
 
-export interface IVector2D {
-	x: number;
-	y: number;
-}
-
-export class Vector2D {
+export class Vector2D implements IVector2D {
 	x: number;
 	y: number;
 

@@ -1,5 +1,6 @@
+import type { Id } from "../../../../shared/types_serialization.ts";
 
-export type Id = string;
+export type { Id };
 
 export class IdGen {
 	private currentId: number;

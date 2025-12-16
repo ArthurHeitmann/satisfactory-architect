@@ -20,9 +20,9 @@ import type {
 	Command,
 	PageAddCommand,
 	ServerMessage,
-} from "./types_shared.ts";
+} from "../../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
-import type { AppStateJson } from "./types_serialization.ts";
+import type { AppStateJson } from "../../shared/types_serialization.ts";
 
 // ============================================================================
 // Test Helpers & Mocks

@@ -4,7 +4,7 @@
 
 import type { RoomInfo } from "./types_server.ts";
 import type { CompressedData } from "./compression.ts";
-import { ErrorCode } from "./types_shared.ts";
+import { ErrorCode } from "../../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
 
 // Database interface for testing

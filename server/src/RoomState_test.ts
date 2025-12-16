@@ -5,7 +5,7 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { RoomState } from "./RoomState.ts";
-import type { AppStateJson } from "./types_serialization.ts";
+import type { AppStateJson } from "../../shared/types_serialization.ts";
 import type {
 	ObjectAddCommand,
 	ObjectDeleteCommand,
@@ -14,7 +14,7 @@ import type {
 	PageDeleteCommand,
 	PageModifyCommand,
 	PageReorderCommand,
-} from "./types_shared.ts";
+} from "../../shared/types_shared.ts";
 
 // ============================================================================
 // Test Helpers

@@ -2,7 +2,7 @@
 import type {
 	ClientMessage,
 	ServerMessage,
-} from "../src/types_shared.ts";
+} from "../../shared/types_shared.ts";
 
 export class TestServer {
 	private process: Deno.ChildProcess | null = null;

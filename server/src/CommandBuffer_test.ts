@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
 import { CommandBuffer } from "./CommandBuffer.ts";
-import type { Command, ObjectAddCommand, ObjectModifyCommand, PageAddCommand } from "./types_shared.ts";
+import type { Command, ObjectAddCommand, ObjectModifyCommand, PageAddCommand } from "../../shared/types_shared.ts";
 
 // Command presets for reuse across tests
 const createObjectAddCommand = (id: string, timestamp: number): ObjectAddCommand => ({

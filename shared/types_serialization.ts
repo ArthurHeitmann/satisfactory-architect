@@ -20,8 +20,9 @@ export interface IVector2D {
  * Graph view serialization (camera/viewport state)
  */
 export interface GraphViewJson {
-	pos: IVector2D;
-	zoom: number;
+	offset: IVector2D;
+	scale: number;
+	enableGridSnap: boolean;
 }
 
 /**

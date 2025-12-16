@@ -3,7 +3,7 @@
  */
 
 import type { CompressionMethod } from "./EnvironmentConfig.ts";
-import { ErrorCode } from "./types_shared.ts";
+import { ErrorCode } from "../../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
 
 /**
