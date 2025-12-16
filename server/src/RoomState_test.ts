@@ -50,7 +50,7 @@ function createTestState(overrides: Partial<AppStateJson> = {}): AppStateJson {
 function baseCommand() {
 	return {
 		commandId: "cmd-1",
-		clientId: "client-1",
+		userId: "u1",
 		timestamp: Date.now(),
 	};
 }
@@ -455,7 +455,7 @@ describe("RoomState", () => {
 			// 1. Add a new page
 			const addPage: PageAddCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-1",
+				userId: "u1",
 				timestamp: Date.now(),
 				type: "page.add",
 				pageId: "page-2",
@@ -477,7 +477,7 @@ describe("RoomState", () => {
 			// 2. Modify the original page
 			const modifyPage: PageModifyCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-1",
+				userId: "u1",
 				timestamp: Date.now(),
 				type: "page.modify",
 				pageId: "page-1",
@@ -487,7 +487,7 @@ describe("RoomState", () => {
 			// 3. Add nodes to page-2
 			const addNode1: ObjectAddCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-1",
+				userId: "u1",
 				timestamp: Date.now(),
 				type: "object.add",
 				pageId: "page-2",
@@ -507,7 +507,7 @@ describe("RoomState", () => {
 
 			const addNode2: ObjectAddCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-2",
+				userId: "u2",
 				timestamp: Date.now(),
 				type: "object.add",
 				pageId: "page-2",
@@ -528,7 +528,7 @@ describe("RoomState", () => {
 			// 4. Add an edge connecting the nodes
 			const addEdge: ObjectAddCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-1",
+				userId: "u1",
 				timestamp: Date.now(),
 				type: "object.add",
 				pageId: "page-2",
@@ -546,7 +546,7 @@ describe("RoomState", () => {
 			// 5. Modify node-1
 			const modifyNode: ObjectModifyCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-2",
+				userId: "u2",
 				timestamp: Date.now(),
 				type: "object.modify",
 				pageId: "page-2",
@@ -566,7 +566,7 @@ describe("RoomState", () => {
 			// 6. Reorder pages
 			const reorderPages: PageReorderCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-1",
+				userId: "u1",
 				timestamp: Date.now(),
 				type: "page.reorder",
 				pageOrder: ["page-2", "page-1"],
@@ -575,7 +575,7 @@ describe("RoomState", () => {
 			// 7. Add a third page that will be deleted
 			const addPageToDelete: PageAddCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-1",
+				userId: "u1",
 				timestamp: Date.now(),
 				type: "page.add",
 				pageId: "page-3",
@@ -597,7 +597,7 @@ describe("RoomState", () => {
 			// 8. Delete the temporary page
 			const deletePage: PageDeleteCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-1",
+				userId: "u1",
 				timestamp: Date.now(),
 				type: "page.delete",
 				pageId: "page-3",
@@ -606,7 +606,7 @@ describe("RoomState", () => {
 			// 9. Delete an object (edge)
 			const deleteEdge: ObjectDeleteCommand = {
 				commandId: nextCommandId(),
-				clientId: "client-2",
+				userId: "u2",
 				timestamp: Date.now(),
 				type: "object.delete",
 				pageId: "page-2",

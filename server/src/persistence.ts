@@ -26,16 +26,29 @@ export interface RoomSnapshot {
 export interface CommandRecord {
 	commandId: string;
 	roomId: string;
-	clientId: string;
+	userId: string; // User ID who sent the command (e.g., "u1", "u2")
 	timestamp: number;
 	commandType: string;
 	payload: Uint8Array; // Compressed JSON
 }
 
 /**
+ * Database manager interface for dependency injection
+ */
+export interface IDatabaseManager {
+	upsertRoom(roomId: string): void;
+	getRoom(roomId: string): RoomInfo | null;
+	listRooms(): RoomInfo[];
+	saveSnapshot(snapshot: RoomSnapshot): void;
+	loadSnapshot(roomId: string): RoomSnapshot | null;
+	cleanup(maxAgeMs: number): void;
+	close(): void;
+}
+
+/**
  * Database manager for collaboration server persistence
  */
-export class DatabaseManager {
+export class DatabaseManager implements IDatabaseManager {
 	constructor(private db: DatabaseAdapter) {
 		this.initializeSchema();
 	}
@@ -205,33 +218,6 @@ export class DatabaseManager {
 	}
 
 	/**
-	 * Save command to audit log (optional feature)
-	 */
-	public saveCommand(record: CommandRecord): void {
-		try {
-			this.db.execute(
-				`
-				INSERT INTO commands (command_id, room_id, client_id, timestamp, command_type, payload)
-				VALUES (?, ?, ?, ?, ?, ?)
-			`,
-				[
-					record.commandId,
-					record.roomId,
-					record.clientId,
-					record.timestamp,
-					record.commandType,
-					record.payload,
-				],
-			);
-		} catch (error) {
-			throw AppError.wrap(error, ErrorCode.INTERNAL_ERROR, {
-				operation: "saveCommand",
-				commandId: record.commandId,
-			}, "Failed to save command to audit log");
-		}
-	}
-
-	/**
 	 * Clean up old data
 	 */
 	public cleanup(maxAgeMs: number): void {
@@ -299,28 +285,12 @@ export class DatabaseManager {
 				) STRICT
 			`);
 
-			// Command history (audit log)
-			this.db.execute(`
-				CREATE TABLE IF NOT EXISTS commands (
-					command_id TEXT PRIMARY KEY,
-					room_id TEXT NOT NULL,
-					client_id TEXT NOT NULL,
-					timestamp INTEGER NOT NULL,
-					command_type TEXT NOT NULL,
-					payload BLOB NOT NULL,
-					FOREIGN KEY (room_id) REFERENCES rooms(room_id)
-				) STRICT
-			`);
-
 			// Indexes for performance
 			this.db.execute(`
 				CREATE INDEX IF NOT EXISTS idx_rooms_updated ON rooms(last_updated)
 			`);
 			this.db.execute(`
 				CREATE INDEX IF NOT EXISTS idx_room_states_room_time ON room_states(room_id, timestamp DESC)
-			`);
-			this.db.execute(`
-				CREATE INDEX IF NOT EXISTS idx_commands_room ON commands(room_id, timestamp)
 			`);
 		} catch (error) {
 			throw AppError.wrap(error, ErrorCode.INTERNAL_ERROR, {

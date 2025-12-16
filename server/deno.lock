@@ -1,8 +1,10 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@mainframe-api/deno-sqlite@^3.9.1": "3.9.1",
     "jsr:@std/assert@1": "1.0.15",
     "jsr:@std/assert@^1.0.15": "1.0.15",
+    "jsr:@std/async@^1.0.15": "1.0.15",
     "jsr:@std/cli@^1.0.24": "1.0.24",
     "jsr:@std/data-structures@^1.0.9": "1.0.9",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
@@ -18,15 +20,21 @@
     "jsr:@std/path@^1.1.2": "1.1.3",
     "jsr:@std/path@^1.1.3": "1.1.3",
     "jsr:@std/streams@^1.0.14": "1.0.14",
-    "jsr:@std/testing@^1.0.16": "1.0.16",
-    "npm:libsql@~0.5.22": "0.5.22"
+    "jsr:@std/testing@1": "1.0.16",
+    "jsr:@std/testing@^1.0.16": "1.0.16"
   },
   "jsr": {
+    "@mainframe-api/deno-sqlite@3.9.1": {
+      "integrity": "17869ee04209cab3c59a4fe68461d535a075f7ab24cd1455e22fb223b2cd2e2e"
+    },
     "@std/assert@1.0.15": {
       "integrity": "d64018e951dbdfab9777335ecdb000c0b4e3df036984083be219ce5941e4703b",
       "dependencies": [
         "jsr:@std/internal"
       ]
+    },
+    "@std/async@1.0.15": {
+      "integrity": "55d1d9d04f99403fe5730ab16bdcc3c47f658a6bf054cafb38a50f046238116e"
     },
     "@std/cli@1.0.24": {
       "integrity": "b655a5beb26aa94f98add6bc8889f5fb9bc3ee2cc3fc954e151201f4c4200a5e"
@@ -85,6 +93,7 @@
       "integrity": "a917ffdeb5924c9be436dc78bc32e511760e14d3a96e49c607fc5ecca86d0092",
       "dependencies": [
         "jsr:@std/assert@^1.0.15",
+        "jsr:@std/async",
         "jsr:@std/data-structures",
         "jsr:@std/fs@^1.0.19",
         "jsr:@std/internal",
@@ -92,85 +101,22 @@
       ]
     }
   },
-  "npm": {
-    "@libsql/darwin-arm64@0.5.22": {
-      "integrity": "sha512-4B8ZlX3nIDPndfct7GNe0nI3Yw6ibocEicWdC4fvQbSs/jdq/RC2oCsoJxJ4NzXkvktX70C1J4FcmmoBy069UA==",
-      "os": ["darwin"],
-      "cpu": ["arm64"]
-    },
-    "@libsql/darwin-x64@0.5.22": {
-      "integrity": "sha512-ny2HYWt6lFSIdNFzUFIJ04uiW6finXfMNJ7wypkAD8Pqdm6nAByO+Fdqu8t7sD0sqJGeUCiOg480icjyQ2/8VA==",
-      "os": ["darwin"],
-      "cpu": ["x64"]
-    },
-    "@libsql/linux-arm-gnueabihf@0.5.22": {
-      "integrity": "sha512-3Uo3SoDPJe/zBnyZKosziRGtszXaEtv57raWrZIahtQDsjxBVjuzYQinCm9LRCJCUT5t2r5Z5nLDPJi2CwZVoA==",
-      "os": ["linux"],
-      "cpu": ["arm"]
-    },
-    "@libsql/linux-arm-musleabihf@0.5.22": {
-      "integrity": "sha512-LCsXh07jvSojTNJptT9CowOzwITznD+YFGGW+1XxUr7fS+7/ydUrpDfsMX7UqTqjm7xG17eq86VkWJgHJfvpNg==",
-      "os": ["linux"],
-      "cpu": ["arm"]
-    },
-    "@libsql/linux-arm64-gnu@0.5.22": {
-      "integrity": "sha512-KSdnOMy88c9mpOFKUEzPskSaF3VLflfSUCBwas/pn1/sV3pEhtMF6H8VUCd2rsedwoukeeCSEONqX7LLnQwRMA==",
-      "os": ["linux"],
-      "cpu": ["arm64"]
-    },
-    "@libsql/linux-arm64-musl@0.5.22": {
-      "integrity": "sha512-mCHSMAsDTLK5YH//lcV3eFEgiR23Ym0U9oEvgZA0667gqRZg/2px+7LshDvErEKv2XZ8ixzw3p1IrBzLQHGSsw==",
-      "os": ["linux"],
-      "cpu": ["arm64"]
-    },
-    "@libsql/linux-x64-gnu@0.5.22": {
-      "integrity": "sha512-kNBHaIkSg78Y4BqAdgjcR2mBilZXs4HYkAmi58J+4GRwDQZh5fIUWbnQvB9f95DkWUIGVeenqLRFY2pcTmlsew==",
-      "os": ["linux"],
-      "cpu": ["x64"]
-    },
-    "@libsql/linux-x64-musl@0.5.22": {
-      "integrity": "sha512-UZ4Xdxm4pu3pQXjvfJiyCzZop/9j/eA2JjmhMaAhe3EVLH2g11Fy4fwyUp9sT1QJYR1kpc2JLuybPM0kuXv/Tg==",
-      "os": ["linux"],
-      "cpu": ["x64"]
-    },
-    "@libsql/win32-x64-msvc@0.5.22": {
-      "integrity": "sha512-Fj0j8RnBpo43tVZUVoNK6BV/9AtDUM5S7DF3LB4qTYg1LMSZqi3yeCneUTLJD6XomQJlZzbI4mst89yspVSAnA==",
-      "os": ["win32"],
-      "cpu": ["x64"]
-    },
-    "@neon-rs/load@0.0.4": {
-      "integrity": "sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw=="
-    },
-    "detect-libc@2.0.2": {
-      "integrity": "sha512-UX6sGumvvqSaXgdKGUsgZWqcUyIXZ/vZTrlRT/iobiKhGL0zL4d3osHj3uqllWJK+i+sixDS/3COVEOFbupFyw=="
-    },
-    "libsql@0.5.22": {
-      "integrity": "sha512-NscWthMQt7fpU8lqd7LXMvT9pi+KhhmTHAJWUB/Lj6MWa0MKFv0F2V4C6WKKpjCVZl0VwcDz4nOI3CyaT1DDiA==",
-      "dependencies": [
-        "@neon-rs/load",
-        "detect-libc"
-      ],
-      "optionalDependencies": [
-        "@libsql/darwin-arm64",
-        "@libsql/darwin-x64",
-        "@libsql/linux-arm-gnueabihf",
-        "@libsql/linux-arm-musleabihf",
-        "@libsql/linux-arm64-gnu",
-        "@libsql/linux-arm64-musl",
-        "@libsql/linux-x64-gnu",
-        "@libsql/linux-x64-musl",
-        "@libsql/win32-x64-msvc"
-      ],
-      "os": ["darwin", "linux", "win32"],
-      "cpu": ["x64", "arm64", "wasm32", "arm"]
-    }
+  "remote": {
+    "https://deno.land/x/sqlite@v3.8/build/sqlite.js": "72f63689fffcb9bb5ae10b1e8f7db09ea845cdf713e0e3a9693d8416a28f92a6",
+    "https://deno.land/x/sqlite@v3.8/mod.ts": "e09fc79d8065fe222578114b109b1fd60077bff1bb75448532077f784f4d6a83",
+    "https://deno.land/x/sqlite@v3.8/src/constants.ts": "90f3be047ec0a89bcb5d6fc30db121685fc82cb00b1c476124ff47a4b0472aa9",
+    "https://deno.land/x/sqlite@v3.8/src/db.ts": "7d3251021756fa80f382c3952217c7446c5c8c1642b63511da0938fe33562663",
+    "https://deno.land/x/sqlite@v3.8/src/error.ts": "f7a15cb00d7c3797da1aefee3cf86d23e0ae92e73f0ba3165496c3816ab9503a",
+    "https://deno.land/x/sqlite@v3.8/src/function.ts": "e4c83b8ec64bf88bafad2407376b0c6a3b54e777593c70336fb40d43a79865f2",
+    "https://deno.land/x/sqlite@v3.8/src/query.ts": "d58abda928f6582d77bad685ecf551b1be8a15e8e38403e293ec38522e030cad",
+    "https://deno.land/x/sqlite@v3.8/src/wasm.ts": "e79d0baa6e42423257fb3c7cc98091c54399254867e0f34a09b5bdef37bd9487"
   },
   "workspace": {
     "dependencies": [
+      "jsr:@mainframe-api/deno-sqlite@^3.9.1",
       "jsr:@std/assert@1",
       "jsr:@std/http@^1.0.22",
-      "jsr:@std/testing@^1.0.16",
-      "npm:libsql@~0.5.22"
+      "jsr:@std/testing@^1.0.16"
     ]
   }
 }

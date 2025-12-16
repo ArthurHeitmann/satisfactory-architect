@@ -10,9 +10,20 @@ export interface CommandBufferConfig {
 }
 
 /**
+ * Command buffer interface for dependency injection
+ */
+export interface ICommandBuffer {
+	addCommands(commands: Command[]): void;
+	flush(): void;
+	getBufferSize(): number;
+	clear(): void;
+	dispose(): void;
+}
+
+/**
  * Buffers commands for efficient batch processing
  */
-export class CommandBuffer {
+export class CommandBuffer implements ICommandBuffer {
 	private buffer: Command[] = [];
 	private flushTimer: number | null = null;
 
@@ -22,25 +33,16 @@ export class CommandBuffer {
 	) {}
 
 	/**
-	 * Add command to buffer
+	 * Add commands to buffer
 	 */
-	public addCommand(command: Command): void {
-		this.buffer.push(command);
+	public addCommands(commands: Command[]): void {
+		this.buffer.push(...commands);
 
 		// Check if we should flush immediately
 		if (this.buffer.length >= this.config.maxBatchSize) {
 			this.flush();
 		} else if (this.flushTimer === null) {
 			this.scheduleFlush();
-		}
-	}
-
-	/**
-	 * Add multiple commands at once
-	 */
-	public addCommands(commands: Command[]): void {
-		for (const command of commands) {
-			this.addCommand(command);
 		}
 	}
 

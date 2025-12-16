@@ -9,7 +9,7 @@ export interface WebSocketAdapter {
 	sendMessage(message: ServerMessage): void;
 	close(): void;
 	readonly readyState: WebSocketReadyState;
-	clientId: string;
+	socketId: string;
 }
 
 export enum WebSocketReadyState {
@@ -28,7 +28,7 @@ export interface RoomInfo {
 }
 
 export interface ClientInfo {
-	clientId: string;
+	userId: string;
 	cursor: CursorPosition;
 	lastHeartbeat: number;
 	serverProtocolVersion: number;

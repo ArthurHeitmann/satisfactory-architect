@@ -37,13 +37,71 @@ export class NoCompressionProvider implements CompressionProvider {
 }
 
 /**
- * JSON compression service
+ * Compression service interface for dependency injection
  */
-export class CompressionService {
+export interface ICompressionService {
+	registerProvider(provider: CompressionProvider): void;
+	setDefaultMethod(method: CompressionMethod): void;
+	getDefaultMethod(): CompressionMethod;
+	getSupportedMethods(): CompressionMethod[];
+	compressJSON(obj: unknown): CompressedData;
+	decompressJSON(compressed: CompressedData): unknown;
+}
+
+/**
+ * JSON compression service with support for multiple compression methods
+ */
+export class CompressionService implements ICompressionService {
+	private providers: Map<CompressionMethod, CompressionProvider>;
+	private defaultMethod: CompressionMethod;
+
 	constructor(
-		private provider: CompressionProvider = new NoCompressionProvider(),
 		private compressionThreshold: number = 500,
-	) {}
+	) {
+		this.providers = new Map();
+		
+		// Always register the "none" provider for backward compatibility
+		const noneProvider = new NoCompressionProvider();
+		this.providers.set("none", noneProvider);
+		this.defaultMethod = "none";
+	}
+
+	/**
+	 * Register a compression provider for a specific method
+	 * Allows adding support for new compression methods without breaking existing data
+	 */
+	public registerProvider(provider: CompressionProvider): void {
+		const method = provider.getMethod();
+		this.providers.set(method, provider);
+	}
+
+	/**
+	 * Set the default compression method to use for new compressions
+	 */
+	public setDefaultMethod(method: CompressionMethod): void {
+		if (!this.providers.has(method)) {
+			throw new AppError(
+				ErrorCode.INTERNAL_ERROR,
+				{ method, availableMethods: Array.from(this.providers.keys()) },
+				`Cannot set default compression method '${method}': provider not registered`,
+			);
+		}
+		this.defaultMethod = method;
+	}
+
+	/**
+	 * Get the current default compression method
+	 */
+	public getDefaultMethod(): CompressionMethod {
+		return this.defaultMethod;
+	}
+
+	/**
+	 * Get list of supported compression methods
+	 */
+	public getSupportedMethods(): CompressionMethod[] {
+		return Array.from(this.providers.keys());
+	}
 
 	/**
 	 * Compress object to JSON bytes with method wrapper
@@ -60,10 +118,20 @@ export class CompressionService {
 			};
 		}
 
+		// Get the provider for the default method
+		const provider = this.providers.get(this.defaultMethod);
+		if (!provider) {
+			throw new AppError(
+				ErrorCode.INTERNAL_ERROR,
+				{ method: this.defaultMethod },
+				`Compression provider not found for method '${this.defaultMethod}'`,
+			);
+		}
+
 		try {
 			return {
-				method: this.provider.getMethod(),
-				data: this.provider.compress(bytes),
+				method: this.defaultMethod,
+				data: provider.compress(bytes),
 			};
 		} catch (error) {
 			// Wrap compression error with context
@@ -72,7 +140,7 @@ export class CompressionService {
 				ErrorCode.INTERNAL_ERROR,
 				{
 					operation: "compressJSON",
-					method: this.provider.getMethod(),
+					method: this.defaultMethod,
 					dataSize: bytes.length,
 				},
 				"Failed to compress JSON data",
@@ -85,27 +153,27 @@ export class CompressionService {
 	 */
 	public decompressJSON(compressed: CompressedData): unknown {
 		try {
-			// Check if method matches provider (warn if mismatch for "none")
+			// Handle uncompressed data
 			if (compressed.method === "none") {
-				// No decompression needed
 				const json = new TextDecoder().decode(compressed.data);
 				return JSON.parse(json);
 			}
 
-			// Verify provider can handle this compression method
-			if (compressed.method !== this.provider.getMethod()) {
+			// Look up the provider for the compression method used
+			const provider = this.providers.get(compressed.method);
+			if (!provider) {
 				throw new AppError(
 					ErrorCode.INTERNAL_ERROR,
 					{
 						operation: "decompressJSON",
-						expectedMethod: this.provider.getMethod(),
-						actualMethod: compressed.method,
+						requiredMethod: compressed.method,
+						availableMethods: Array.from(this.providers.keys()),
 					},
-					`Cannot decompress data: compression method '${compressed.method}' does not match provider '${this.provider.getMethod()}'`,
+					`Cannot decompress data: no provider registered for compression method '${compressed.method}'`,
 				);
 			}
 
-			const bytes = this.provider.decompress(compressed.data);
+			const bytes = provider.decompress(compressed.data);
 			const json = new TextDecoder().decode(bytes);
 			return JSON.parse(json);
 		} catch (error) {

@@ -1,7 +1,7 @@
 import { ErrorCode } from "../types_shared.ts";
 
 export interface ErrorContext {
-	clientId?: string;
+	socketId?: string;
 	roomId?: string;
 	messageType?: string;
 	source?: string;

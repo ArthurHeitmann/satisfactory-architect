@@ -27,14 +27,42 @@ export class CollaborationClient {
 	public lastHeartbeat = Date.now();
 	public localIdCounter = "0"; // String to match UI's IdGen format
 
+	// User ID assigned by room (set when joining a room)
+	private _userId: string | null = null;
+
 	constructor(
-		public readonly clientId: string,
+		public readonly socketId: string, // Server-internal socket identifier
 		public readonly serverProtocolVersion: number,
 		private socket: WebSocketAdapter,
 		private config: ClientConfig,
 		private onDisconnect: (client: CollaborationClient) => void,
 	) {
 		this.startHeartbeatTimeout();
+	}
+
+	/**
+	 * Get the user ID assigned by the room
+	 * @throws Error if user ID has not been assigned yet
+	 */
+	public get userId(): string {
+		if (this._userId === null) {
+			throw new Error("User ID has not been assigned yet");
+		}
+		return this._userId;
+	}
+
+	/**
+	 * Check if this client has been assigned a user ID
+	 */
+	public hasUserId(): boolean {
+		return this._userId !== null;
+	}
+
+	/**
+	 * Assign a user ID to this client (called when joining a room)
+	 */
+	public assignUserId(userId: string): void {
+		this._userId = userId;
 	}
 
 	/**
@@ -60,7 +88,7 @@ export class CollaborationClient {
 	 */
 	public getClientInfo(): ClientInfo {
 		return {
-			clientId: this.clientId,
+			userId: this.userId,
 			cursor: this.cursor,
 			lastHeartbeat: this.lastHeartbeat,
 			serverProtocolVersion: this.serverProtocolVersion,
@@ -83,8 +111,9 @@ export class CollaborationClient {
 		this.missedHeartbeats++;
 
 		if (this.missedHeartbeats >= this.config.maxMissedHeartbeats) {
+			const identifier = this._userId ?? this.socketId;
 			console.log(
-				`Client ${this.clientId} timed out after ${this.missedHeartbeats} missed heartbeats`,
+				`Client ${identifier} timed out after ${this.missedHeartbeats} missed heartbeats`,
 			);
 			this.disconnect();
 		} else {
@@ -98,7 +127,7 @@ export class CollaborationClient {
 	 */
 	private startHeartbeatTimeout(): void {
 		this.heartbeatTimer = Scheduler.safeTimeout(
-			`heartbeat-timeout-${this.clientId}`,
+			`heartbeat-timeout-${this.socketId}`,
 			() => this.onHeartbeatTimeout(),
 			this.config.heartbeatTimeoutMs,
 		);

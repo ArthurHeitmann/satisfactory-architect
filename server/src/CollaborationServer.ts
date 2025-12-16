@@ -25,26 +25,60 @@ import type { DatabaseManager } from "./persistence.ts";
 import { generateSecureId } from "./utils.ts";
 
 /**
+ * Factory functions for creating server dependencies
+ * Used for dependency injection in tests
+ */
+export interface ServerDependencies {
+	createRoom: (
+		roomId: string,
+		config: RoomConfig,
+		compression: CompressionService,
+		database: DatabaseManager,
+	) => CollaborationRoom;
+	createClient: (
+		socketId: string,
+		serverProtocolVersion: number,
+		socket: WebSocketAdapter,
+		config: ClientConfig,
+		onDisconnect: (client: CollaborationClient) => void,
+	) => CollaborationClient;
+	generateRoomId: () => string;
+}
+
+/** Default implementations for server dependencies */
+const defaultDependencies: ServerDependencies = {
+	createRoom: (roomId, config, compression, database) =>
+		new CollaborationRoom(roomId, config, compression, database),
+	createClient: (socketId, serverProtocolVersion, socket, config, onDisconnect) =>
+		new CollaborationClient(socketId, serverProtocolVersion, socket, config, onDisconnect),
+	generateRoomId: () => generateSecureId(16),
+};
+
+/**
  * Core collaboration server - framework independent
  */
 export class CollaborationServer {
 	private rooms = new Map<string, CollaborationRoom>();
-	private clients = new Map<string, CollaborationClient>();
-	private clientIdToRoomId = new Map<string, string>();
-	private clientIdToSocket = new Map<string, WebSocketAdapter>();
+	private clients = new Map<string, CollaborationClient>(); // Keyed by socketId
+	private socketIdToRoomId = new Map<string, string>();
+	private socketIdToSocket = new Map<string, WebSocketAdapter>();
+	private dependencies: ServerDependencies;
 
 	constructor(
 		private config: ServerConfig,
 		private compression: CompressionService,
 		private database: DatabaseManager,
-	) {}
+		dependencies?: Partial<ServerDependencies>,
+	) {
+		this.dependencies = { ...defaultDependencies, ...dependencies };
+	}
 
 	/**
 	 * Handle new WebSocket connection
 	 */
 	public handleConnection(socket: WebSocketAdapter): void {
 		// Store socket mapping
-		this.clientIdToSocket.set(socket.clientId, socket);
+		this.socketIdToSocket.set(socket.socketId, socket);
 
 		// Send welcome message
 		const welcomeMessage: WelcomeMessage = {
@@ -68,19 +102,19 @@ export class CollaborationServer {
 
 			switch (message.type) {
 				case "create_room":
-					this.handleCreateRoom(socket.clientId, message);
+					this.handleCreateRoom(socket.socketId, message);
 					break;
 				case "join_room":
-					this.handleJoinRoom(socket.clientId, message);
+					this.handleJoinRoom(socket.socketId, message);
 					break;
 				case "command_batch":
-					this.handleCommandBatch(socket.clientId, message);
+					this.handleCommandBatch(socket.socketId, message);
 					break;
 				case "heartbeat":
-					this.handleHeartbeat(socket.clientId, message);
+					this.handleHeartbeat(socket.socketId, message);
 					break;
 				case "upload_state":
-					this.handleUploadState(socket.clientId, message);
+					this.handleUploadState(socket.socketId, message);
 					break;
 				default: {
 					const unknownType = (message as { type: string }).type;
@@ -89,7 +123,7 @@ export class CollaborationServer {
 			}
 		} catch (error) {
 			const errorMessage = ErrorHandler.handle(error, {
-				clientId: socket.clientId,
+				socketId: socket.socketId,
 				source: "CollaborationServer.handleMessage",
 			});
 			if (errorMessage) {
@@ -102,8 +136,8 @@ export class CollaborationServer {
 	 * Handle WebSocket disconnection
 	 */
 	public handleDisconnection(socket: WebSocketAdapter): void {
-		this.clientIdToSocket.delete(socket.clientId);
-		this.removeClient(socket.clientId);
+		this.socketIdToSocket.delete(socket.socketId);
+		this.removeClient(socket.socketId);
 	}
 
 	/**
@@ -111,13 +145,6 @@ export class CollaborationServer {
 	 */
 	public getAvailableRooms(): RoomListItem[] {
 		return Array.from(this.rooms.keys()).map((roomId) => ({ roomId }));
-	}
-
-	/**
-	 * Generate cryptographically secure room ID
-	 */
-	public generateRoomId(): string {
-		return generateSecureId(16);
 	}
 
 	/**
@@ -130,15 +157,22 @@ export class CollaborationServer {
 		}
 		this.rooms.clear();
 		this.clients.clear();
-		this.clientIdToRoomId.clear();
-		this.clientIdToSocket.clear();
+		this.socketIdToRoomId.clear();
+		this.socketIdToSocket.clear();
+	}
+
+	/**
+	 * Generate cryptographically secure room ID
+	 */
+	private generateRoomId(): string {
+		return this.dependencies.generateRoomId();
 	}
 
 	/**
 	 * Handle create room request
 	 */
 	private handleCreateRoom(
-		clientId: string,
+		socketId: string,
 		message: CreateRoomMessage,
 	): void {
 		// Check version compatibility
@@ -146,7 +180,7 @@ export class CollaborationServer {
 			throw new AppError(
 				ErrorCode.VERSION_MISMATCH,
 				{
-					clientId,
+					socketId,
 					clientVersion: message.serverProtocolVersion,
 					serverVersion: this.config.serverProtocolVersion,
 				},
@@ -160,14 +194,14 @@ export class CollaborationServer {
 
 		// Create client and add to room
 		const client = this.getOrCreateClient(
-			clientId,
+			socketId,
 			message.serverProtocolVersion,
 		);
 		const joinResponse = room.addClient(client, "upload"); // New room creator uploads initial state
 
 		// Register room and update database
 		this.rooms.set(roomId, room);
-		this.clientIdToRoomId.set(clientId, roomId);
+		this.socketIdToRoomId.set(socketId, roomId);
 		this.database.upsertRoom(roomId);
 
 		client.sendMessage(joinResponse);
@@ -176,13 +210,13 @@ export class CollaborationServer {
 	/**
 	 * Handle join room request
 	 */
-	private handleJoinRoom(clientId: string, message: JoinRoomMessage): void {
+	private handleJoinRoom(socketId: string, message: JoinRoomMessage): void {
 		// Check version compatibility
 		if (!this.isVersionCompatible(message.serverProtocolVersion)) {
 			throw new AppError(
 				ErrorCode.VERSION_MISMATCH,
 				{
-					clientId,
+					socketId,
 					clientVersion: message.serverProtocolVersion,
 					serverVersion: this.config.serverProtocolVersion,
 				},
@@ -195,7 +229,7 @@ export class CollaborationServer {
 		if (!room) {
 			throw new AppError(
 				ErrorCode.ROOM_NOT_FOUND,
-				{ clientId, roomId: message.roomId },
+				{ socketId, roomId: message.roomId },
 				`Room ${message.roomId} not found`,
 				true,
 			);
@@ -203,12 +237,12 @@ export class CollaborationServer {
 
 		// Create client and add to room
 		const client = this.getOrCreateClient(
-			clientId,
+			socketId,
 			message.serverProtocolVersion,
 		);
 		const joinResponse = room.addClient(client, message.intent);
 
-		this.clientIdToRoomId.set(clientId, message.roomId);
+		this.socketIdToRoomId.set(socketId, message.roomId);
 		client.sendMessage(joinResponse);
 	}
 
@@ -216,34 +250,50 @@ export class CollaborationServer {
 	 * Handle command batch
 	 */
 	private handleCommandBatch(
-		clientId: string,
+		socketId: string,
 		message: CommandBatchMessage,
 	): void {
-		const client = this.clients.get(clientId);
+		const client = this.clients.get(socketId);
 		if (!client) {
-			return;
+			throw new AppError(
+				ErrorCode.INTERNAL_ERROR,
+				{ socketId },
+				`Client ${socketId} not found when handling command batch`,
+				true,
+			);
 		}
 
 		// Find client's room
-		const room = this.findClientRoom(clientId);
-		if (room) {
-			room.handleCommandBatch(clientId, message.commands);
+		const room = this.findClientRoom(socketId);
+		if (!room) {
+			throw new AppError(
+				ErrorCode.ROOM_NOT_FOUND,
+				{ socketId },
+				`Client ${socketId} is not in any room`,
+				true,
+			);
 		}
+		room.handleCommandBatch(socketId, message.commands);
 	}
 
 	/**
 	 * Handle heartbeat
 	 */
-	private handleHeartbeat(clientId: string, message: HeartbeatMessage): void {
-		const client = this.clients.get(clientId);
+	private handleHeartbeat(socketId: string, message: HeartbeatMessage): void {
+		const client = this.clients.get(socketId);
 		if (!client) {
-			return;
+			throw new AppError(
+				ErrorCode.INTERNAL_ERROR,
+				{ socketId },
+				`Client ${socketId} not found when handling heartbeat`,
+				true,
+			);
 		}
 
 		client.updateFromHeartbeat(message);
 
 		// Find client's room and handle heartbeat
-		const room = this.findClientRoom(clientId);
+		const room = this.findClientRoom(socketId);
 		if (room) {
 			room.handleHeartbeat(client);
 		}
@@ -253,14 +303,14 @@ export class CollaborationServer {
 	 * Handle state upload
 	 */
 	private handleUploadState(
-		clientId: string,
+		socketId: string,
 		message: UploadStateMessage,
 	): void {
-		const room = this.findClientRoom(clientId);
+		const room = this.findClientRoom(socketId);
 		if (!room) {
 			throw new AppError(
 				ErrorCode.ROOM_NOT_FOUND,
-				{ clientId },
+				{ socketId },
 				undefined,
 				true,
 			);
@@ -269,7 +319,7 @@ export class CollaborationServer {
 		const decompressedState = this.compression.decompressJSON(
 			message.stateData,
 		);
-		room.setRoomState(clientId, decompressedState);
+		room.setRoomState(socketId, decompressedState);
 	}
 
 	/**
@@ -286,7 +336,7 @@ export class CollaborationServer {
 			},
 		};
 
-		return new CollaborationRoom(
+		return this.dependencies.createRoom(
 			roomId,
 			roomConfig,
 			this.compression,
@@ -295,21 +345,21 @@ export class CollaborationServer {
 	}
 
 	/**
-	 * Get or create client
+	 * Get or create client by socket ID
 	 */
 	private getOrCreateClient(
-		clientId: string,
+		socketId: string,
 		serverProtocolVersion: number,
 	): CollaborationClient {
-		let client = this.clients.get(clientId);
+		let client = this.clients.get(socketId);
 		if (!client) {
-			// Get actual WebSocket from clientId mapping
-			const socket = this.clientIdToSocket.get(clientId);
+			// Get actual WebSocket from socketId mapping
+			const socket = this.socketIdToSocket.get(socketId);
 			if (!socket) {
 				throw new AppError(
 					ErrorCode.INTERNAL_ERROR,
-					{ clientId },
-					`No socket found for client ${clientId}`,
+					{ socketId },
+					`No socket found for socketId ${socketId}`,
 				);
 			}
 
@@ -318,15 +368,15 @@ export class CollaborationServer {
 				maxMissedHeartbeats: 3,
 			};
 
-			client = new CollaborationClient(
-				clientId,
+			client = this.dependencies.createClient(
+				socketId,
 				serverProtocolVersion,
 				socket,
 				clientConfig,
-				(client) => this.removeClient(client.clientId),
+				(client) => this.removeClient(client.socketId),
 			);
 
-			this.clients.set(clientId, client);
+			this.clients.set(socketId, client);
 		}
 		return client;
 	}
@@ -334,8 +384,8 @@ export class CollaborationServer {
 	/**
 	 * Find which room a client is in
 	 */
-	private findClientRoom(clientId: string): CollaborationRoom | null {
-		const roomId = this.clientIdToRoomId.get(clientId);
+	private findClientRoom(socketId: string): CollaborationRoom | null {
+		const roomId = this.socketIdToRoomId.get(socketId);
 		if (!roomId) {
 			return null;
 		}
@@ -345,14 +395,14 @@ export class CollaborationServer {
 	/**
 	 * Remove client from server
 	 */
-	private removeClient(clientId: string): void {
-		this.clients.delete(clientId);
+	private removeClient(socketId: string): void {
+		this.clients.delete(socketId);
 
 		// Remove from room
-		const room = this.findClientRoom(clientId);
+		const room = this.findClientRoom(socketId);
 		if (room) {
-			room.removeClient(clientId);
-			this.clientIdToRoomId.delete(clientId);
+			room.removeClient(socketId);
+			this.socketIdToRoomId.delete(socketId);
 
 			// Clean up empty rooms
 			if (room.isEmpty()) {

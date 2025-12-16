@@ -17,7 +17,7 @@ import { generateSecureId } from "./utils.ts";
 class DenoWebSocketAdapter implements WebSocketAdapter {
 	constructor(
 		private ws: WebSocket,
-		public readonly clientId: string = generateSecureId(16),
+		public readonly socketId: string = generateSecureId(16),
 	) {
 	}
 
@@ -32,7 +32,7 @@ class DenoWebSocketAdapter implements WebSocketAdapter {
 		} catch (error) {
 			ErrorHandler.handle(error, {
 				source: "DenoWebSocketAdapter.sendMessage",
-				clientId: this.clientId,
+				socketId: this.socketId,
 			});
 		}
 	}
@@ -63,10 +63,7 @@ function createServer(): CollaborationServer {
 		maxCommandBatchSize: envConfig.maxCommandBatchSize,
 	};
 
-	const compression = new CompressionService(
-		undefined,
-		envConfig.compressionThreshold,
-	);
+	const compression = new CompressionService(envConfig.compressionThreshold);
 	const dbAdapter = new SqliteDatabaseAdapter(envConfig.databasePath);
 	const database = new DatabaseManager(dbAdapter);
 
@@ -103,7 +100,7 @@ function startServer() {
 				} catch (error) {
 					ErrorHandler.handle(error, {
 						source: "WebSocket.onmessage",
-						clientId: adapter.clientId,
+						socketId: adapter.socketId,
 					});
 				}
 			};
@@ -115,7 +112,7 @@ function startServer() {
 				} catch (error) {
 					ErrorHandler.handle(error, {
 						source: "WebSocket.onclose",
-						clientId: adapter.clientId,
+						socketId: adapter.socketId,
 					});
 				}
 			};
@@ -123,7 +120,7 @@ function startServer() {
 			socket.onerror = (error) => {
 				ErrorHandler.handle(error, {
 					source: "WebSocket.onerror",
-					clientId: adapter.clientId,
+					socketId: adapter.socketId,
 				});
 			};
 
@@ -132,7 +129,7 @@ function startServer() {
 
 		// Handle regular HTTP requests
 		return new Response(
-			"Satisfactory Factory Manager Collaboration Server",
+			"Satisfactory Architect Collaboration Server",
 			{
 				status: 200,
 				headers: { "content-type": "text/plain" },

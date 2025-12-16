@@ -18,9 +18,14 @@ import { Scheduler } from "./utils/Scheduler.ts";
 import type { IRoomState } from "./RoomState.ts";
 import { RoomState } from "./RoomState.ts";
 import type { CollaborationClient } from "./CollaborationClient.ts";
-import { CommandBuffer, type CommandBufferConfig } from "./CommandBuffer.ts";
-import type { CompressionService } from "./compression.ts";
-import type { DatabaseManager, RoomSnapshot } from "./persistence.ts";
+import {
+	CommandBuffer,
+	type CommandBufferConfig,
+	type ICommandBuffer,
+} from "./CommandBuffer.ts";
+import type { ICompressionService } from "./compression.ts";
+import type { IDatabaseManager, RoomSnapshot } from "./persistence.ts";
+import { AppStateJson } from "./types_serialization.ts";
 
 export interface RoomConfig {
 	maxClients: number; // 10 default
@@ -30,28 +35,44 @@ export interface RoomConfig {
 }
 
 /**
+ * Factory functions for creating room dependencies
+ * Used for dependency injection in tests
+ */
+export interface RoomDependencies {
+	createRoomState?: (roomId: string) => IRoomState;
+	createCommandBuffer?: (
+		config: CommandBufferConfig,
+		onFlush: (commands: Command[]) => void,
+	) => ICommandBuffer;
+}
+
+/**
  * Manages a collaboration room and its connected clients
  */
 export class CollaborationRoom {
-	private clients = new Map<string, CollaborationClient>();
-	private nextClientNumber = 1;
+	private clients = new Map<string, CollaborationClient>(); // Keyed by socketId
+	private nextUserNumber = 1;
 	private snapshotTimer: number | null = null;
 	private heartbeatTimer: number | null = null;
 	private roomState: IRoomState;
-	private commandBuffer: CommandBuffer;
+	private commandBuffer: ICommandBuffer;
 
 	constructor(
 		public readonly roomId: string,
 		private config: RoomConfig,
-		private compression: CompressionService,
-		private database: DatabaseManager,
-		roomState?: IRoomState,
+		private compression: ICompressionService,
+		private database: IDatabaseManager,
+		dependencies?: RoomDependencies,
 	) {
-		// Create room state manager with default implementation
-		this.roomState = roomState ?? new RoomState(roomId);
+		// Create room state manager with dependency injection support
+		this.roomState = dependencies?.createRoomState?.(roomId) ??
+			new RoomState(roomId);
 
-		// Create command buffer internally
-		this.commandBuffer = new CommandBuffer(
+		// Create command buffer with dependency injection support
+		this.commandBuffer = dependencies?.createCommandBuffer?.(
+			this.config.commandBuffer,
+			(commands) => this.handleCommandFlush(commands),
+		) ?? new CommandBuffer(
 			this.config.commandBuffer,
 			(commands) => this.handleCommandFlush(commands),
 		);
@@ -98,7 +119,10 @@ export class CollaborationRoom {
 			);
 		}
 
-		this.clients.set(client.clientId, client);
+		// Assign user ID and add client to room
+		const userId = this.generateUserId();
+		client.assignUserId(userId);
+		this.clients.set(client.socketId, client);
 
 		let stateData: unknown | undefined;
 
@@ -108,13 +132,13 @@ export class CollaborationRoom {
 		}
 
 		console.log(
-			`Client ${client.clientId} joined room ${this.roomId} with intent '${intent}' (${this.clients.size}/${this.config.maxClients})`,
+			`Client ${userId} joined room ${this.roomId} with intent '${intent}' (${this.clients.size}/${this.config.maxClients})`,
 		);
 
 		return {
 			type: "room_joined",
 			roomId: this.roomId,
-			clientId: client.clientId,
+			userId: userId,
 			stateData,
 		};
 	}
@@ -122,12 +146,13 @@ export class CollaborationRoom {
 	/**
 	 * Remove client from room
 	 */
-	public removeClient(clientId: string): void {
-		const client = this.clients.get(clientId);
+	public removeClient(socketId: string): void {
+		const client = this.clients.get(socketId);
 		if (client) {
-			this.clients.delete(clientId);
+			this.clients.delete(socketId);
+			const identifier = client.hasUserId() ? client.userId : socketId;
 			console.log(
-				`Client ${clientId} left room ${this.roomId} (${this.clients.size}/${this.config.maxClients})`,
+				`Client ${identifier} left room ${this.roomId} (${this.clients.size}/${this.config.maxClients})`,
 			);
 		}
 	}
@@ -135,10 +160,14 @@ export class CollaborationRoom {
 	/**
 	 * Process command batch from client
 	 */
-	public handleCommandBatch(clientId: string, commands: Command[]): void {
+	public handleCommandBatch(socketId: string, commands: Command[]): void {
 		// Validate client is in room
-		if (!this.clients.has(clientId)) {
-			return;
+		if (!this.clients.has(socketId)) {
+			throw new AppError(
+				ErrorCode.INTERNAL_ERROR,
+				{ socketId, roomId: this.roomId },
+				`Client ${socketId} is not a member of room ${this.roomId}`,
+			);
 		}
 
 		// Apply commands to room state (will throw if state not initialized)
@@ -148,7 +177,7 @@ export class CollaborationRoom {
 			ErrorHandler.handle(error, {
 				source: "Room.handleCommandBatch",
 				roomId: this.roomId,
-				clientId,
+				socketId,
 			});
 			// Don't add to buffer if command application failed
 			return;
@@ -169,10 +198,12 @@ export class CollaborationRoom {
 	/**
 	 * Set room state (from upload)
 	 */
-	public setRoomState(clientId: string, stateData: unknown): void {
-		this.roomState.setState(stateData);
+	public setRoomState(socketId: string, stateData: unknown): void {
+		this.roomState.setState(stateData as AppStateJson);
 		this.saveSnapshot();
-		console.log(`Client ${clientId} uploaded state to room ${this.roomId}`);
+		const client = this.clients.get(socketId);
+		const identifier = client?.hasUserId() ? client.userId : socketId;
+		console.log(`Client ${identifier} uploaded state to room ${this.roomId}`);
 	}
 
 	/**
@@ -190,18 +221,18 @@ export class CollaborationRoom {
 	}
 
 	/**
-	 * Get next client ID for new connections
+	 * Generate a new user ID for a client joining the room
 	 */
-	public getNextClientId(): string {
-		return `u${this.nextClientNumber++}`;
+	private generateUserId(): string {
+		return `u${this.nextUserNumber++}`;
 	}
 
 	/**
 	 * Broadcast message to all clients in room
 	 */
-	public broadcast(message: ServerMessage, excludeClientId?: string): void {
-		for (const [clientId, client] of this.clients) {
-			if (clientId !== excludeClientId) {
+	public broadcast(message: ServerMessage, excludeSocketId?: string): void {
+		for (const [socketId, client] of this.clients) {
+			if (socketId !== excludeSocketId) {
 				client.sendMessage(message);
 			}
 		}
@@ -247,7 +278,7 @@ export class CollaborationRoom {
 	private broadcastHeartbeatResponse(): void {
 		const clients: ClientPresence[] = Array.from(this.clients.values()).map(
 			(client) => ({
-				clientId: client.clientId,
+				userId: client.userId,
 				cursor: client.cursor,
 			}),
 		);
@@ -300,7 +331,7 @@ export class CollaborationRoom {
 				const decompressedState = this.compression.decompressJSON(
 					snapshot.stateData,
 				);
-				this.roomState.setState(decompressedState);
+				this.roomState.setState(decompressedState as AppStateJson);
 				console.log(
 					`Loaded snapshot for room ${this.roomId} from ${new Date(
 						snapshot.timestamp,

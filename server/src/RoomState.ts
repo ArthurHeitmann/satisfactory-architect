@@ -31,7 +31,7 @@ export interface IRoomState {
 	setState(data: AppStateJson): void;
 	getState(): AppStateJson;
 	consumeStateChanges(): { data: AppStateJson | null; hasChanged: boolean };
-	updateIdCounter(clientIdCounter: string): void;
+	updateIdCounter(localIdCounter: string): void;
 	getIdCounter(): string;
 	applyCommand(command: Command): void;
 	applyCommands(commands: Command[]): void;
@@ -75,10 +75,16 @@ export class RoomState implements IRoomState {
 	/**
 	 * Update the highest ID counter seen from a client heartbeat
 	 */
-	public updateIdCounter(clientIdCounter: string): void {
-		if (!this.state) return;
+	public updateIdCounter(localIdCounter: string): void {
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "updateIdCounter" },
+				"Room state has not been initialized yet",
+			);
+		}
 
-		this.state.idGen = clientIdCounter;
+		this.state.idGen = localIdCounter;
 		this.hasChanged = true;
 	}
 
@@ -192,13 +198,25 @@ export class RoomState implements IRoomState {
 	}
 
 	private handlePageAdd(command: PageAddCommand): void {
-		if (!this.state) return;
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handlePageAdd" },
+				"Room state has not been initialized yet",
+			);
+		}
 
 		this.state.pages.push(command.data as GraphPageJson);
 	}
 
 	private handlePageDelete(command: PageDeleteCommand): void {
-		if (!this.state) return;
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handlePageDelete" },
+				"Room state has not been initialized yet",
+			);
+		}
 
 		const pageIndex = this.state.pages.findIndex((p) => p.id === command.pageId);
 		if (pageIndex >= 0) {
@@ -207,7 +225,13 @@ export class RoomState implements IRoomState {
 	}
 
 	private handlePageModify(command: PageModifyCommand): void {
-		if (!this.state) return;
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handlePageModify" },
+				"Room state has not been initialized yet",
+			);
+		}
 
 		const page = this.findPage(command.pageId);
 		if (page) {
@@ -216,7 +240,13 @@ export class RoomState implements IRoomState {
 	}
 
 	private handlePageReorder(command: PageReorderCommand): void {
-		if (!this.state) return;
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handlePageReorder" },
+				"Room state has not been initialized yet",
+			);
+		}
 
 		const reorderedPages: GraphPageJson[] = [];
 		for (const pageId of command.pageOrder) {
@@ -237,7 +267,13 @@ export class RoomState implements IRoomState {
 	}
 
 	private handleObjectAdd(command: ObjectAddCommand): void {
-		if (!this.state) return;
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handleObjectAdd" },
+				"Room state has not been initialized yet",
+			);
+		}
 
 		const page = this.findPage(command.pageId);
 		if (!page) {
@@ -256,20 +292,44 @@ export class RoomState implements IRoomState {
 	}
 
 	private handleObjectDelete(command: ObjectDeleteCommand): void {
-		if (!this.state) return;
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handleObjectDelete" },
+				"Room state has not been initialized yet",
+			);
+		}
 
 		const page = this.findPage(command.pageId);
-		if (!page) return;
+		if (!page) {
+			throw new AppError(
+				ErrorCode.INVALID_MESSAGE,
+				{ roomId: this.roomId, pageId: command.pageId },
+				`Page ${command.pageId} not found`,
+			);
+		}
 
 		delete page.nodes[command.objectId];
 		delete page.edges[command.objectId];
 	}
 
 	private handleObjectModify(command: ObjectModifyCommand): void {
-		if (!this.state) return;
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handleObjectModify" },
+				"Room state has not been initialized yet",
+			);
+		}
 
 		const page = this.findPage(command.pageId);
-		if (!page) return;
+		if (!page) {
+			throw new AppError(
+				ErrorCode.INVALID_MESSAGE,
+				{ roomId: this.roomId, pageId: command.pageId },
+				`Page ${command.pageId} not found`,
+			);
+		}
 
 		if (command.objectId in page.nodes) {
 			page.nodes[command.objectId] = command.data as GraphNodeJson;

@@ -2,7 +2,7 @@
  * SQLite database adapter using @db/sqlite (Deno SQLite library)
  */
 
-import { DB } from "https://deno.land/x/sqlite@v3.8/mod.ts";
+import { DB } from "@mainframe-api/deno-sqlite";
 import type { DatabaseAdapter } from "./persistence.ts";
 
 /**

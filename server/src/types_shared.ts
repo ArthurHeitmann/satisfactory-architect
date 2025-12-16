@@ -12,7 +12,7 @@ export interface VersionInfo {
 // Base command fields shared by all commands
 interface CommandBase {
 	commandId: string; // UUID for deduplication
-	clientId: string; // Source client (assigned by server)
+	userId: string; // Source user ID (assigned by room, e.g., "u1", "u2")
 	timestamp: number; // Client timestamp (for ordering)
 }
 
@@ -127,7 +127,7 @@ export interface WelcomeMessage extends VersionInfo {
 export interface RoomJoinedMessage {
 	type: "room_joined";
 	roomId: string;
-	clientId: string;
+	userId: string; // User ID assigned by the room (e.g., "u1", "u2")
 	stateData?: unknown; // Compressed AppState JSON (if download requested)
 }
 
@@ -155,7 +155,7 @@ export interface CursorPosition {
 }
 
 export interface ClientPresence {
-	clientId: string;
+	userId: string; // User ID assigned by the room (e.g., "u1", "u2")
 	cursor: CursorPosition;
 }
 
