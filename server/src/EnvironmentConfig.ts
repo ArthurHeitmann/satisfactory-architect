@@ -2,6 +2,8 @@
  * Environment configuration with defaults
  */
 
+import { CompressionMethod } from "../../shared/types_shared.ts";
+
 export interface EnvironmentConfig {
 	// Server
 	port: number;
@@ -26,8 +28,6 @@ export interface EnvironmentConfig {
 	compressionMethod: CompressionMethod;
 	compressionThreshold: number;
 }
-
-export type CompressionMethod = "none" | "lz4" | "zstd";
 
 /**
  * Load configuration from environment variables with defaults

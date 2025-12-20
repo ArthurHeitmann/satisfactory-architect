@@ -42,6 +42,10 @@
 		}
 	})();
 
+	const commandQueue = app.serverConnection.dispatchCommandQueue;
+	commandQueue.watchPageList(() => Array.from(app.pages.values()));
+	commandQueue.watchPageOrder(() => Array.from(app.pages.values()));
+
 	const eventStream = new EventStream();
 	setContext("overlay-layer-event-stream", eventStream);
 

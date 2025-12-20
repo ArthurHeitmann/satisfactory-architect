@@ -161,18 +161,21 @@ describe("CollaborationClient", () => {
 			const message: HeartbeatMessage = {
 				type: "heartbeat",
 				cursor: { x: 100, y: 200 },
+				currentPageId: "page-1",
 				localIdCounter: "0",
 			};
 
 			client.updateFromHeartbeat(message);
 
 			assertEquals(client.cursor, { x: 100, y: 200 });
+			assertEquals(client.currentPageId, "page-1");
 		});
 
 		it("should update local ID counter", () => {
 			const message: HeartbeatMessage = {
 				type: "heartbeat",
 				cursor: { x: 0, y: 0 },
+				currentPageId: null,
 				localIdCounter: "500",
 			};
 
@@ -185,6 +188,7 @@ describe("CollaborationClient", () => {
 			const message: HeartbeatMessage = {
 				type: "heartbeat",
 				cursor: { x: 0, y: 0 },
+				currentPageId: null,
 				localIdCounter: "0",
 			};
 
@@ -253,6 +257,7 @@ describe("CollaborationClient", () => {
 			const message: HeartbeatMessage = {
 				type: "heartbeat",
 				cursor: { x: 50, y: 75 },
+				currentPageId: "page-2",
 				localIdCounter: "100",
 			};
 
@@ -260,6 +265,7 @@ describe("CollaborationClient", () => {
 			const info = client.getClientInfo();
 
 			assertEquals(info.cursor, { x: 50, y: 75 });
+			assertEquals(info.currentPageId, "page-2");
 		});
 	});
 
@@ -354,6 +360,7 @@ describe("CollaborationClient", () => {
 			const message: HeartbeatMessage = {
 				type: "heartbeat",
 				cursor: { x: 0, y: 0 },
+				currentPageId: null,
 				localIdCounter: "0",
 			};
 			client.updateFromHeartbeat(message);
@@ -416,6 +423,7 @@ describe("CollaborationClient", () => {
 			const message: HeartbeatMessage = {
 				type: "heartbeat",
 				cursor: { x: 0, y: 0 },
+				currentPageId: null,
 				localIdCounter: "0",
 			};
 

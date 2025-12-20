@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-	import type { Id } from "$lib/datamodel/IdGen";
+	import type { Id } from "$lib/datamodel/IdGen.svelte";
 	import type { EventStream } from "$lib/EventStream.svelte";
 	import { getContext } from "svelte";
 	import SfIconView from "../SFIconView.svelte";
@@ -29,6 +29,9 @@
 	}: Props = $props();
 	const eventStream = getContext("overlay-layer-event-stream") as EventStream;
 	const appState = getContext("app-state") as AppState;
+
+	const commandQueue = appState.serverConnection.dispatchCommandQueue;
+	commandQueue.watchPageChange(() => page);
 
 	let isRenaming = $state(false);
 	// svelte-ignore non_reactive_update

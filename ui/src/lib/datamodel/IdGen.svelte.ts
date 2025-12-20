@@ -1,16 +1,24 @@
-import type { Id } from "../../../../shared/types_serialization.ts";
+import type { Id } from "../../../../shared/types_serialization.js";
 
 export type { Id };
 
 export class IdGen {
 	private currentId: number;
+	private prefix: string = "";
 
 	constructor(currentId: number = 0) {
 		this.currentId = currentId;
 	}
 
+	private static parseId(id: Id): number {
+		if (id.includes("-")) {
+			return Number(id.split("-")[1]);
+		}
+		return Number(id);
+	}
+
 	static fromJson(json: any): IdGen {
-		const num = Number(json);
+		const num = IdGen.parseId(json);
 		if (isNaN(num)) {
 			throw new Error("Invalid ID: not a number");
 		}
@@ -18,11 +26,21 @@ export class IdGen {
 	}
 
 	replaceFromJson(json: any): void {
-		const num = Number(json);
+		const num = IdGen.parseId(json);
 		if (isNaN(num)) {
 			throw new Error("Invalid ID: not a number");
 		}
 		this.currentId = num;
+	}
+
+	replaceFromJsonIfHigher(json: any): void {
+		const num = IdGen.parseId(json);
+		if (isNaN(num)) {
+			throw new Error("Invalid ID: not a number");
+		}
+		if (num > this.currentId) {
+			this.currentId = num;
+		}
 	}
 
 	toJSON(): string {
@@ -30,7 +48,20 @@ export class IdGen {
 	}
 
 	nextId(): Id {
-		return `${this.currentId++}`;
+		const id = this.getCurrentId();
+		this.currentId++;
+		return id;
+	}
+
+	getCurrentId(): Id {
+		return `${this.prefix}${this.currentId}`;
+	}
+
+	setPrefix(prefix: string): void {
+		if (!prefix.endsWith("-")) {
+			prefix += "-";
+		}
+		this.prefix = prefix;
 	}
 }
 

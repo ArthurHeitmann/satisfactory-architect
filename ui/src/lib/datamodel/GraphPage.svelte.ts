@@ -1,7 +1,7 @@
 import { assertUnreachable, copyText, roundToNearest } from "$lib/utilties";
 import { untrack } from "svelte";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
-import { type IdGen, type Id, IdMapper, type PasteSource } from "./IdGen";
+import { type IdGen, type Id, IdMapper, type PasteSource } from "./IdGen.svelte";
 import { clipboardDataType, dataModelVersion, NodePriorities } from "./constants";
 import type { GraphPageJson } from "../../../../shared/types_serialization.ts";
 import { isNodeAttachable } from "./nodeTypeProperties.svelte";
@@ -95,6 +95,15 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		applyJsonToSet(json.selectedEdges, this.selectedEdges);
 	}
 
+	applySyncJson(json: any): void {
+		if (json.version !== dataModelVersion) {
+			throw new Error(`Unsupported data model version: ${json.version}. Expected: ${dataModelVersion}`);
+		}
+		this.name = json.name;
+		this.icon = json.icon;
+		this.toolMode = json.toolMode;
+	}
+
 	toJSON(): GraphPageJson {
 		return {
 			version: dataModelVersion,
@@ -108,6 +117,18 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			toolMode: untrack(() => this.toolMode),
 			selectedNodes: Array.from(this.selectedNodes),
 			selectedEdges: Array.from(this.selectedEdges),
+		};
+	}
+
+	toSyncJson(): any {
+		return {
+			version: dataModelVersion,
+			type: "graph-page",
+			id: this.id,
+			name: this.name,
+			icon: this.icon,
+			view: untrack(() => this.view.toJSON()),
+			toolMode: untrack(() => this.toolMode),
 		};
 	}
 

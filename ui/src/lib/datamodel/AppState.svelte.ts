@@ -1,16 +1,18 @@
 import { writeToLocalStorage } from "$lib/localStorageState.svelte";
 import { Debouncer, deepClone } from "$lib/utilties";
 import { dataModelVersion, saveDataType, StorageKeys } from "./constants";
-import { trackStateChanges } from "./globals.svelte";
+import { globals, trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
-import { IdGen, IdMapper, type Id, type PasteSource } from "./IdGen";
+import { IdGen, IdMapper, type Id, type PasteSource } from "./IdGen.svelte";
 import type { AppStateJson } from "../../../../shared/types_serialization.ts";
+import { ServerConnection } from "$lib/sync/ServerConnection.svelte";
 
 export class AppState {
 	readonly idGen: IdGen;
 	private currentPageId: Id;
 	readonly currentPage: GraphPage;
 	pages: GraphPage[];
+	readonly serverConnection: ServerConnection;
 	private debouncedSave: Debouncer<(json: any) => void>;
 	readonly asJson: any;
 
@@ -19,6 +21,12 @@ export class AppState {
 		this.currentPageId = $state(currentPageId);
 		this.pages = $state.raw(pages);	// TODO sync
 		this.currentPage = $derived(this.pages.find((p) => p.id === this.currentPageId)!);
+
+		this.serverConnection = new ServerConnection(
+			this,
+			() => this.currentPageId,
+			(json) => this.replaceFromJSON(json)
+		);
 		
 		this.debouncedSave = new Debouncer(this.saveToLocalStorage.bind(this), 1500);
 		this.asJson = $derived(this.toJSON());

@@ -7,7 +7,7 @@
 	import SvgInput from "../SvgInput.svelte";
 	import { assertUnreachable, floatToString, getThroughputColor, isThroughputBalanced, parseFloatExpr } from "$lib/utilties";
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "../../datamodel/GraphNode.svelte";
-	import type { Id } from "../../datamodel/IdGen";
+	import type { Id } from "../../datamodel/IdGen.svelte";
 
 	interface Props {
 		node: GraphNode<GraphNodeResourceJointProperties>;

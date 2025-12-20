@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { GraphNodeProductionProperties, ProductionExtractionDetails } from "$lib/datamodel/GraphNode.svelte";
 	import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-	import type { Id } from "$lib/datamodel/IdGen";
+	import type { Id } from "$lib/datamodel/IdGen.svelte";
 	import { floatToString, formatPower, loadFileFromDisk, openLinkInNewTab, parseFloatExpr, saveFileToDisk, showConfirmationPrompt } from "$lib/utilties";
 	import { getContext, untrack } from "svelte";
 	import PresetSvg from "../icons/PresetSvg.svelte";
@@ -280,6 +280,11 @@
 					label: "Import File",
 					icon: "import",
 					onClick: importFile,
+				},
+				{
+					label: "Collaboration / Server",
+					icon: "cloud",
+					onClick: () => eventStream.emit({ type: "showConnectionOverlay" }),
 				},
 				{
 					label: $darkTheme ? "Use Light Theme" : "Use Dark Theme",

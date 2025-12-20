@@ -11,16 +11,20 @@ import {
 	type ServerDependencies,
 } from "./CollaborationServer.ts";
 import type { CollaborationRoom } from "./CollaborationRoom.ts";
-import type { CollaborationClient } from "./CollaborationClient.ts";
+import type { ICollaborationClient } from "./CollaborationClient.ts";
 import type { ServerConfig, WebSocketAdapter } from "./types_server.ts";
 import { WebSocketReadyState } from "./types_server.ts";
-import type { CompressionService, CompressedData } from "./compression.ts";
+import type { CompressionService } from "./compression.ts";
 import type { DatabaseManager } from "./persistence.ts";
 import type {
+CompressedData,
 	RoomJoinedMessage,
 	ServerMessage,
+	UploadConfirmationMessage,
 	WelcomeMessage,
 } from "../../shared/types_shared.ts";
+
+import { uint8ArrayToBase64 } from "./utils.ts";
 
 // ============================================================================
 // Test Helpers & Mocks
@@ -55,12 +59,13 @@ function createMockSocket(socketId: string): WebSocketAdapter {
 function createMockClient(
 	socketId: string,
 	serverProtocolVersion = 1,
-): CollaborationClient {
+): ICollaborationClient {
 	let assignedUserId: string | null = null;
 	return {
 		socketId,
 		serverProtocolVersion,
 		cursor: { x: 0, y: 0 },
+		currentPageId: null,
 		lastHeartbeat: Date.now(),
 		localIdCounter: "0",
 		updateFromHeartbeat: spy(),
@@ -74,11 +79,13 @@ function createMockClient(
 		getClientInfo: () => ({
 			userId: assignedUserId ?? socketId,
 			cursor: { x: 0, y: 0 },
+			currentPageId: null,
 			lastHeartbeat: Date.now(),
 			serverProtocolVersion,
 		}),
 		disconnect: spy(),
-	} as unknown as CollaborationClient;
+		dispose: spy(),
+	} as ICollaborationClient;
 }
 
 /** Creates a mock CollaborationRoom */
@@ -147,8 +154,8 @@ describe("CollaborationServer", () => {
 	let mockCompression: CompressionService;
 	let mockDatabase: DatabaseManager;
 	let mockRoom: CollaborationRoom;
-	let mockClient: CollaborationClient;
-	let createdClients: Map<string, CollaborationClient>;
+	let mockClient: ICollaborationClient;
+	let createdClients: Map<string, ICollaborationClient>;
 	let createdRooms: Map<string, CollaborationRoom>;
 	let time: FakeTime;
 
@@ -461,6 +468,7 @@ describe("CollaborationServer", () => {
 			const heartbeatMessage = {
 				type: "heartbeat",
 				cursor: { x: 100, y: 200 },
+				currentPageId: "page-1",
 				localIdCounter: "500",
 			};
 
@@ -478,6 +486,7 @@ describe("CollaborationServer", () => {
 			server.handleMessage(socket, JSON.stringify({
 				type: "heartbeat",
 				cursor: { x: 100, y: 200 },
+				currentPageId: "page-1",
 				localIdCounter: "500",
 			}));
 
@@ -494,6 +503,7 @@ describe("CollaborationServer", () => {
 		server.handleMessage(socket, JSON.stringify({
 			type: "heartbeat",
 			cursor: { x: 0, y: 0 },
+			currentPageId: null,
 			localIdCounter: "0",
 		}));
 
@@ -520,9 +530,10 @@ describe("CollaborationServer", () => {
 		it("should decompress and set room state", () => {
 			const socket = createMockSocket("socket-1");
 			const testState = { test: "state" };
+			const bytes = new TextEncoder().encode(JSON.stringify(testState));
 			const stateData = {
 				method: "none",
-				data: Array.from(new TextEncoder().encode(JSON.stringify(testState))),
+				data: uint8ArrayToBase64(bytes),
 			};
 
 			server.handleMessage(socket, JSON.stringify({
@@ -532,12 +543,15 @@ describe("CollaborationServer", () => {
 
 			assertSpyCalls(mockCompression.decompressJSON as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockCompression.decompressJSON as ReturnType<typeof spy>, 0, {
-				args: [stateData],
+				args: [{method: stateData.method, data: bytes}],
 			});
 			assertSpyCalls(mockRoom.setRoomState as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockRoom.setRoomState as ReturnType<typeof spy>, 0, {
 				args: ["socket-1", testState],
 			});
+			assertSpyCalls(mockClient.sendMessage as ReturnType<typeof spy>, 2);
+			const confirmationMessage = (mockClient.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as UploadConfirmationMessage;
+			assertEquals(confirmationMessage.type, "upload_confirmation");
 		});
 
 		it("should reject upload from client not in room", () => {
@@ -546,7 +560,7 @@ describe("CollaborationServer", () => {
 
 			server.handleMessage(socket, JSON.stringify({
 				type: "upload_state",
-				stateData: { method: "none", data: [] },
+				stateData: { method: "none", data: "" },
 			}));
 
 			// Should send error
@@ -566,6 +580,8 @@ describe("CollaborationServer", () => {
 			}));
 
 			server.handleDisconnection(socket);
+
+			assertSpyCalls(mockClient.dispose as ReturnType<typeof spy>, 1);
 
 			assertSpyCalls(mockRoom.removeClient as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockRoom.removeClient as ReturnType<typeof spy>, 0, {

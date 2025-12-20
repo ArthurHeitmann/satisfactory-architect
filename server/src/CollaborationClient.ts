@@ -16,14 +16,35 @@ export interface ClientConfig {
 }
 
 /**
+ * Interface for collaboration clients to facilitate testing
+ */
+export interface ICollaborationClient {
+	readonly socketId: string;
+	readonly serverProtocolVersion: number;
+	readonly userId: string;
+	cursor: CursorPosition;
+	currentPageId: string | null;
+	lastHeartbeat: number;
+	localIdCounter: string;
+	hasUserId(): boolean;
+	assignUserId(userId: string): void;
+	updateFromHeartbeat(message: HeartbeatMessage): void;
+	sendMessage(message: ServerMessage): void;
+	getClientInfo(): ClientInfo;
+	disconnect(): void;
+	dispose(): void;
+}
+
+/**
  * Represents a connected collaboration client
  */
-export class CollaborationClient {
+export class CollaborationClient implements ICollaborationClient {
 	private heartbeatTimer: number | null = null;
 	private missedHeartbeats = 0;
 
 	// Client state
 	public cursor: CursorPosition = { x: 0, y: 0 };
+	public currentPageId: string | null = null;
 	public lastHeartbeat = Date.now();
 	public localIdCounter = "0"; // String to match UI's IdGen format
 
@@ -70,6 +91,7 @@ export class CollaborationClient {
 	 */
 	public updateFromHeartbeat(message: HeartbeatMessage): void {
 		this.cursor = message.cursor;
+		this.currentPageId = message.currentPageId;
 		this.localIdCounter = message.localIdCounter;
 		this.lastHeartbeat = Date.now();
 		this.missedHeartbeats = 0;
@@ -90,6 +112,7 @@ export class CollaborationClient {
 		return {
 			userId: this.userId,
 			cursor: this.cursor,
+			currentPageId: this.currentPageId,
 			lastHeartbeat: this.lastHeartbeat,
 			serverProtocolVersion: this.serverProtocolVersion,
 		};
@@ -149,5 +172,9 @@ export class CollaborationClient {
 			clearTimeout(this.heartbeatTimer);
 			this.heartbeatTimer = null;
 		}
+	}
+
+	dispose(): void {
+		this.clearHeartbeatTimer();
 	}
 }

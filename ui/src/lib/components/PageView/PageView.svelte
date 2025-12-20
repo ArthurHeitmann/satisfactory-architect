@@ -3,7 +3,7 @@
 	import { globals } from "$lib/datamodel/globals.svelte";
 	import type { NewNodeDetails } from "$lib/datamodel/GraphNode.svelte";
 	import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-	import type { Id } from "$lib/datamodel/IdGen";
+	import type { Id } from "$lib/datamodel/IdGen.svelte";
 	import { isNodeSelectable } from "$lib/datamodel/nodeTypeProperties.svelte";
 	import { calculateThroughputs } from "$lib/datamodel/throughputsCalculator";
 	import { EventStream, type ContextMenuItem } from "$lib/EventStream.svelte";
@@ -20,6 +20,14 @@
 		page: GraphPage;
 	}
 	const { page }: Props = $props();
+
+	const commandQueue = page.context.appState.serverConnection.dispatchCommandQueue;
+	commandQueue.watchNodeList(page.id, () => Array.from(page.nodes.values()));
+	commandQueue.watchEdgeList(page.id, () => Array.from(page.edges.values()));
+
+	const serverConnection = page.context.appState.serverConnection;
+	const isConnected = $derived(serverConnection.state === "InRoom");
+	const clientCount = $derived(serverConnection.otherClients.length);
 
 	const sortedNodes = $derived.by(() => {
 		return Array.from(page.nodes.entries()).sort((a, b) => {
@@ -435,6 +443,16 @@
 		{/snippet}
 	</UserEvents>
 
+	<div class="connection-status">
+		{#if isConnected}
+			<span class="status-dot connected"></span>
+			<span>{clientCount} {clientCount === 1 ? 'client' : 'clients'}</span>
+		{:else}
+			<span class="status-dot disconnected"></span>
+			<span>Disconnected</span>
+		{/if}
+	</div>
+
 	<Toolbar bind:activeMode={page.toolMode} x={40} y={10} />
 </div>
 
@@ -465,5 +483,35 @@
 		stroke: var(--selection-area-border-color);
 		stroke-width: 1;
 		pointer-events: none;
+	}
+
+	.connection-status {
+		position: absolute;
+		bottom: 10px;
+		right: 10px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 12px;
+		background-color: var(--toolbar-background-color);
+		border: 2px solid var(--toolbar-border-color);
+		border-radius: var(--rounded-border-radius);
+		font-size: 14px;
+		user-select: none;
+		pointer-events: none;
+	}
+
+	.status-dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+	}
+
+	.status-dot.connected {
+		background-color: #4caf50;
+	}
+
+	.status-dot.disconnected {
+		background-color: #f44336;
 	}
 </style>

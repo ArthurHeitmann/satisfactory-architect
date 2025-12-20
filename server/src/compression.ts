@@ -2,17 +2,8 @@
  * JSON compression utilities for reducing WebSocket payload sizes
  */
 
-import type { CompressionMethod } from "./EnvironmentConfig.ts";
-import { ErrorCode } from "../../shared/types_shared.ts";
+import { CompressedData, CompressionMethod, ErrorCode } from "../../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
-
-/**
- * Wrapper for compressed data with method indicator
- */
-export interface CompressedData {
-	method: CompressionMethod;
-	data: Uint8Array | number[];
-}
 
 // Compression interface for pluggable implementations
 export interface CompressionProvider {
@@ -197,28 +188,4 @@ export class CompressionService implements ICompressionService {
 			);
 		}
 	}
-
-	/**
-	 * Get compression statistics
-	 */
-	public getCompressionRatio(
-		original: unknown,
-		compressed: CompressedData,
-	): number {
-		const originalBytes = new TextEncoder().encode(
-			JSON.stringify(original),
-		);
-		return compressed.data.length / originalBytes.length;
-	}
 }
-
-// TODO: Implement LZ4CompressionProvider when LZ4 library is available
-// export class LZ4CompressionProvider implements CompressionProvider {
-//     compress(data: Uint8Array): Uint8Array {
-//         return LZ4.compress(data);
-//     }
-//
-//     decompress(compressed: Uint8Array): Uint8Array {
-//         return LZ4.decompress(compressed);
-//     }
-// }

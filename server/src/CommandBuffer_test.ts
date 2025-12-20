@@ -22,6 +22,7 @@ const createObjectModifyCommand = (id: string, timestamp: number, data: Record<s
 	timestamp,
 	type: "object.modify",
 	pageId: "page-1",
+	objectType: "node",
 	objectId: "node-1",
 	data,
 });

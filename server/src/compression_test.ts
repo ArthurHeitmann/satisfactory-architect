@@ -47,7 +47,7 @@ describe("CompressionService", () => {
 			const service = new CompressionService();
 			const obj = {
 				pages: [{ id: "p1", name: "Page 1", nodes: [1, 2, 3] }],
-				settings: { theme: "dark", zoom: 1.5 },
+				settings: { theme: "dark", scale: 1.5 },
 			};
 
 			const compressed = service.compressJSON(obj);

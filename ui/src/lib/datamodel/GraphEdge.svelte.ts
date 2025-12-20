@@ -2,7 +2,7 @@ import { assertUnreachable } from "$lib/utilties";
 import type { LayoutOrientation, GraphNode } from "./GraphNode.svelte";
 import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import type { IVector2D } from "./GraphView.svelte";
-import type { Id, IdMapper } from "./IdGen";
+import type { Id, IdMapper } from "./IdGen.svelte";
 import type { GraphEdgeJson } from "../../../../shared/types_serialization.ts";
 import { edgeArrowLength } from "./constants";
 import { canUseInvertedEdgeControlPoint, getNodeRadius } from "./nodeTypeProperties.svelte";

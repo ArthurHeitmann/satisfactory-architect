@@ -16,6 +16,9 @@
 	}
 	const { edge }: Props = $props();
 	
+	const commandQueue = edge.context.appState.serverConnection.dispatchCommandQueue;
+	commandQueue.watchNodeOrEdgeChange(() => edge);
+	
 	let isRotating = $state(false);
 
 	const eventStream = getContext("event-stream") as EventStream;

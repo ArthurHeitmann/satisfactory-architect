@@ -309,8 +309,17 @@ export class RoomState implements IRoomState {
 			);
 		}
 
-		delete page.nodes[command.objectId];
-		delete page.edges[command.objectId];
+		if (command.objectType === "node") {
+			delete page.nodes[command.objectId];
+		} else if (command.objectType === "edge") {
+			delete page.edges[command.objectId];
+		} else {
+			throw new AppError(
+				ErrorCode.INVALID_MESSAGE,
+				{ roomId: this.roomId, objectType: command.objectType },
+				`Unknown object type: ${command.objectType}`,
+			);
+		}
 	}
 
 	private handleObjectModify(command: ObjectModifyCommand): void {
@@ -331,10 +340,16 @@ export class RoomState implements IRoomState {
 			);
 		}
 
-		if (command.objectId in page.nodes) {
+		if (command.objectType === "node") {
 			page.nodes[command.objectId] = command.data as GraphNodeJson;
-		} else if (command.objectId in page.edges) {
+		} else if (command.objectType === "edge") {
 			page.edges[command.objectId] = command.data as GraphEdgeJson;
+		} else {
+			throw new AppError(
+				ErrorCode.INVALID_MESSAGE,
+				{ roomId: this.roomId, objectType: command.objectType },
+				`Unknown object type: ${command.objectType}`,
+			);
 		}
 	}
 }

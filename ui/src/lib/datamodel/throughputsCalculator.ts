@@ -5,7 +5,7 @@ import { blockStateChanges, globals, unblockStateChanges } from "./globals.svelt
 import type { GraphEdge } from "./GraphEdge.svelte";
 import type { GraphNode, GraphNodeResourceJointProperties } from "./GraphNode.svelte";
 import type { GraphPage } from "./GraphPage.svelte";
-import type { Id } from "./IdGen";
+import type { Id } from "./IdGen.svelte";
 
 type Mode = "push" | "pull";
 

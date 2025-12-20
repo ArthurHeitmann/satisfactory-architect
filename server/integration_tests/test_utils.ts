@@ -60,11 +60,18 @@ export class TestServer {
 			}
 		}
 		reader.releaseLock();
+
+		// this.process.stdout.pipeTo(Deno.stdout.writable);
+		// this.process.stderr.pipeTo(Deno.stderr.writable);
 	}
 
 	async stop() {
 		if (this.process) {
-			this.process.kill();
+			try {
+				this.process.kill();
+			} catch {
+				// Ignore errors
+			}
 			await this.process.status;
 			this.process = null;
 		}
@@ -106,10 +113,12 @@ export class TestClient {
 	}
 
 	private handleMessage(msg: ServerMessage) {
+		// console.log("Received", msg);
 		this.messageQueue.push(msg);
 	}
 
 	send(msg: ClientMessage) {
+		// console.log("Sending", msg);
 		if (this.ws && this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify(msg));
 		} else {
@@ -151,6 +160,7 @@ export class TestClient {
 			this.send({
 				type: "heartbeat",
 				cursor: { x: 0, y: 0 },
+				currentPageId: null,
 				localIdCounter: "0",
 			});
 		}, intervalMs);

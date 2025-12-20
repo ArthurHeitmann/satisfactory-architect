@@ -2,7 +2,19 @@
  * Shared message types between client and server
  */
 
-import type { CompressedData } from "../server/src/compression.ts";
+
+export type CompressionMethod = "none" | "lz4" | "zstd";
+
+export interface CompressedData {
+	method: CompressionMethod;
+	data: Uint8Array;
+}
+
+export interface CompressedDataJson {
+	method: CompressionMethod;
+	data: string; // Base64 encoded data
+}
+
 
 // Server protocol version compatibility
 export interface VersionInfo {
@@ -39,11 +51,13 @@ export interface PageReorderCommand extends CommandBase {
 	pageOrder: string[]; // New order of page IDs
 }
 
+export type ObjectType = "node" | "edge";
+
 // Object commands (nodes and edges)
 export interface ObjectAddCommand extends CommandBase {
 	type: "object.add";
 	pageId: string;
-	objectType: "node" | "edge";
+	objectType: ObjectType;
 	objectId: string;
 	data: unknown; // Full node/edge JSON
 }
@@ -51,12 +65,14 @@ export interface ObjectAddCommand extends CommandBase {
 export interface ObjectDeleteCommand extends CommandBase {
 	type: "object.delete";
 	pageId: string;
+	objectType: ObjectType;
 	objectId: string;
 }
 
 export interface ObjectModifyCommand extends CommandBase {
 	type: "object.modify";
 	pageId: string;
+	objectType: ObjectType;
 	objectId: string;
 	data: unknown; // Full node/edge JSON replacement
 }
@@ -91,7 +107,7 @@ export type JoinRoomIntent = "download" | "upload";
 export interface JoinRoomMessage extends VersionInfo {
 	type: "join_room";
 	roomId: string;
-	intent: JoinRoomIntent; // "download" = get existing state, "upload" = provide state
+	intent: JoinRoomIntent;
 }
 
 export interface CommandBatchMessage {
@@ -102,21 +118,22 @@ export interface CommandBatchMessage {
 export interface HeartbeatMessage {
 	type: "heartbeat";
 	cursor: CursorPosition;
+	currentPageId: string | null;
 	localIdCounter: string; // String to match UI's IdGen.toJSON() format
 }
 
 export interface UploadStateMessage {
 	type: "upload_state";
-	stateData: CompressedData; // Compressed AppState
+	stateData: CompressedDataJson; // Compressed AppState
 }
 
 // Server → Client messages
 export type ServerMessage =
 	| WelcomeMessage
 	| RoomJoinedMessage
+	| UploadConfirmationMessage
 	| CommandBatchMessage
 	| HeartbeatResponseMessage
-	| StateSnapshotMessage
 	| ErrorMessage;
 
 export interface WelcomeMessage extends VersionInfo {
@@ -128,18 +145,17 @@ export interface RoomJoinedMessage {
 	type: "room_joined";
 	roomId: string;
 	userId: string; // User ID assigned by the room (e.g., "u1", "u2")
-	stateData?: unknown; // Compressed AppState JSON (if download requested)
+	stateData?: CompressedDataJson; // Compressed AppState JSON (if download requested)
+}
+
+export interface UploadConfirmationMessage {
+	type: "upload_confirmation";
 }
 
 export interface HeartbeatResponseMessage {
 	type: "heartbeat_response";
 	clients: ClientPresence[];
 	highestIdCounter: string; // String to match UI's IdGen.toJSON() format
-}
-
-export interface StateSnapshotMessage {
-	type: "state_snapshot";
-	stateData: unknown; // Compressed AppState JSON
 }
 
 export interface ErrorMessage {
@@ -157,6 +173,7 @@ export interface CursorPosition {
 export interface ClientPresence {
 	userId: string; // User ID assigned by the room (e.g., "u1", "u2")
 	cursor: CursorPosition;
+	currentPageId: string | null;
 }
 
 export interface RoomListItem {

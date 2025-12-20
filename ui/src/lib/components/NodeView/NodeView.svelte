@@ -17,6 +17,9 @@
 	}
 	const { node }: Props = $props();
 
+	const commandQueue = node.context.appState.serverConnection.dispatchCommandQueue;
+	commandQueue.watchNodeOrEdgeChange(() => node);
+
 	const eventStream = getContext("event-stream") as EventStream;
 	const page = $derived(node.context.page);
 	

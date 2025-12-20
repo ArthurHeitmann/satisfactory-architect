@@ -34,7 +34,7 @@ function createTestState(overrides: Partial<AppStateJson> = {}): AppStateJson {
 				id: "page-1",
 				name: "Test Page",
 				icon: "",
-				view: { pos: { x: 0, y: 0 }, zoom: 1 },
+				view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
 				nodes: {},
 				edges: {},
 				toolMode: "select",
@@ -188,7 +188,7 @@ describe("RoomState", () => {
 					id: "page-2",
 					name: "New Page",
 					icon: "factory.png",
-					view: { pos: { x: 100, y: 200 }, zoom: 1.5 },
+					view: { offset: { x: 100, y: 200 }, scale: 1.5, enableGridSnap: true },
 					nodes: {},
 					edges: {},
 					toolMode: "pan",
@@ -205,7 +205,7 @@ describe("RoomState", () => {
 			assertEquals(newPage.id, "page-2");
 			assertEquals(newPage.name, "New Page");
 			assertEquals(newPage.icon, "factory.png");
-			assertEquals(newPage.view, { pos: { x: 100, y: 200 }, zoom: 1.5 });
+			assertEquals(newPage.view, { offset: { x: 100, y: 200 }, scale: 1.5, enableGridSnap: true });
 			assertEquals(newPage.toolMode, "pan");
 			assertEquals(newPage.selectedNodes, ["n1", "n2"]);
 			assertEquals(newPage.selectedEdges, ["e1"]);
@@ -249,7 +249,7 @@ describe("RoomState", () => {
 				id: "page-2",
 				name: "Page 2",
 				icon: "",
-				view: { pos: { x: 0, y: 0 }, zoom: 1 },
+				view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
 				nodes: {},
 				edges: {},
 				toolMode: "select",
@@ -363,6 +363,7 @@ describe("RoomState", () => {
 				...baseCommand(),
 				type: "object.delete",
 				pageId: "page-1",
+				objectType: "node",
 				objectId: "node-1",
 			};
 
@@ -392,6 +393,7 @@ describe("RoomState", () => {
 				...baseCommand(),
 				type: "object.modify",
 				pageId: "page-1",
+				objectType: "node",
 				objectId: "node-1",
 				data: { id: "node-1", position: { x: 500, y: 600 } },
 			};
@@ -465,7 +467,7 @@ describe("RoomState", () => {
 					id: "page-2",
 					name: "Production Line",
 					icon: "production.png",
-					view: { pos: { x: 0, y: 0 }, zoom: 1 },
+					view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
 					nodes: {},
 					edges: {},
 					toolMode: "select",
@@ -550,6 +552,7 @@ describe("RoomState", () => {
 				timestamp: Date.now(),
 				type: "object.modify",
 				pageId: "page-2",
+				objectType: "node",
 				objectId: "node-1",
 				data: {
 					id: "node-1",
@@ -585,7 +588,7 @@ describe("RoomState", () => {
 					id: "page-3",
 					name: "Temporary Page",
 					icon: "",
-					view: { pos: { x: 0, y: 0 }, zoom: 1 },
+					view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
 					nodes: {},
 					edges: {},
 					toolMode: "select",
@@ -610,6 +613,7 @@ describe("RoomState", () => {
 				timestamp: Date.now(),
 				type: "object.delete",
 				pageId: "page-2",
+				objectType: "edge",
 				objectId: "edge-1",
 			};
 

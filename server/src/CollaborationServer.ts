@@ -9,6 +9,7 @@ import type {
 	HeartbeatMessage,
 	JoinRoomMessage,
 	RoomListItem,
+	UploadConfirmationMessage,
 	UploadStateMessage,
 	WelcomeMessage,
 } from "../../shared/types_shared.ts";
@@ -16,13 +17,13 @@ import { ErrorCode } from "../../shared/types_shared.ts";
 import type { ServerConfig, WebSocketAdapter } from "./types_server.ts";
 import { AppError } from "./errors/AppError.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";
-import type { ClientConfig } from "./CollaborationClient.ts";
+import type { ClientConfig, ICollaborationClient } from "./CollaborationClient.ts";
 import { CollaborationClient } from "./CollaborationClient.ts";
 import type { RoomConfig } from "./CollaborationRoom.ts";
 import { CollaborationRoom } from "./CollaborationRoom.ts";
 import type { CompressionService } from "./compression.ts";
 import type { DatabaseManager } from "./persistence.ts";
-import { generateSecureId } from "./utils.ts";
+import { base64ToUint8Array, generateSecureId } from "./utils.ts";
 
 /**
  * Factory functions for creating server dependencies
@@ -40,8 +41,8 @@ export interface ServerDependencies {
 		serverProtocolVersion: number,
 		socket: WebSocketAdapter,
 		config: ClientConfig,
-		onDisconnect: (client: CollaborationClient) => void,
-	) => CollaborationClient;
+		onDisconnect: (client: ICollaborationClient) => void,
+	) => ICollaborationClient;
 	generateRoomId: () => string;
 }
 
@@ -59,7 +60,7 @@ const defaultDependencies: ServerDependencies = {
  */
 export class CollaborationServer {
 	private rooms = new Map<string, CollaborationRoom>();
-	private clients = new Map<string, CollaborationClient>(); // Keyed by socketId
+	private clients = new Map<string, ICollaborationClient>(); // Keyed by socketId
 	private socketIdToRoomId = new Map<string, string>();
 	private socketIdToSocket = new Map<string, WebSocketAdapter>();
 	private dependencies: ServerDependencies;
@@ -316,10 +317,18 @@ export class CollaborationServer {
 			);
 		}
 
-		const decompressedState = this.compression.decompressJSON(
-			message.stateData,
-		);
+		const decompressedState = this.compression.decompressJSON({
+			method: message.stateData.method,
+			data: base64ToUint8Array(message.stateData.data),
+		});
 		room.setRoomState(socketId, decompressedState);
+		const client = this.clients.get(socketId);
+		if (client) {
+			const confirmationMessage: UploadConfirmationMessage = {
+				type: "upload_confirmation",
+			};
+			client.sendMessage(confirmationMessage);
+		}
 	}
 
 	/**
@@ -350,7 +359,7 @@ export class CollaborationServer {
 	private getOrCreateClient(
 		socketId: string,
 		serverProtocolVersion: number,
-	): CollaborationClient {
+	): ICollaborationClient {
 		let client = this.clients.get(socketId);
 		if (!client) {
 			// Get actual WebSocket from socketId mapping
@@ -396,6 +405,10 @@ export class CollaborationServer {
 	 * Remove client from server
 	 */
 	private removeClient(socketId: string): void {
+		const client = this.clients.get(socketId);
+		if (client) {
+			client.dispose();
+		}
 		this.clients.delete(socketId);
 
 		// Remove from room

@@ -4,7 +4,7 @@ import { assertUnreachable, floorToNearest, roundToNearest, ceilToNearest } from
 import { SvelteSet } from "svelte/reactivity";
 import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import { Vector2D, type IVector2D } from "./GraphView.svelte";
-import type { Id, IdGen, IdMapper, PasteSource } from "./IdGen";
+import type { Id, IdGen, IdMapper, PasteSource } from "./IdGen.svelte";
 import type { GraphNodeJson } from "../../../../shared/types_serialization.ts";
 import { gridSize, NodePriorities, productionNodeIconSize, productionNodeVerticalPadding, productionNodeHorizontalPadding } from "./constants";
 import { getNodeRadius } from "./nodeTypeProperties.svelte";

@@ -6,6 +6,7 @@ import type {
 	ClientPresence,
 	Command,
 	CommandBatchMessage,
+	CompressedDataJson,
 	HeartbeatResponseMessage,
 	JoinRoomIntent,
 	RoomJoinedMessage,
@@ -15,9 +16,10 @@ import { ErrorCode } from "../../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";
 import { Scheduler } from "./utils/Scheduler.ts";
+import { uint8ArrayToBase64 } from "./utils.ts";
 import type { IRoomState } from "./RoomState.ts";
 import { RoomState } from "./RoomState.ts";
-import type { CollaborationClient } from "./CollaborationClient.ts";
+import type { ICollaborationClient } from "./CollaborationClient.ts";
 import {
 	CommandBuffer,
 	type CommandBufferConfig,
@@ -50,7 +52,7 @@ export interface RoomDependencies {
  * Manages a collaboration room and its connected clients
  */
 export class CollaborationRoom {
-	private clients = new Map<string, CollaborationClient>(); // Keyed by socketId
+	private clients = new Map<string, ICollaborationClient>(); // Keyed by socketId
 	private nextUserNumber = 1;
 	private snapshotTimer: number | null = null;
 	private heartbeatTimer: number | null = null;
@@ -85,7 +87,7 @@ export class CollaborationRoom {
 	 * Add client to room
 	 */
 	public addClient(
-		client: CollaborationClient,
+		client: ICollaborationClient,
 		intent: JoinRoomIntent,
 	): RoomJoinedMessage {
 		if (this.clients.size >= this.config.maxClients) {
@@ -124,11 +126,16 @@ export class CollaborationRoom {
 		client.assignUserId(userId);
 		this.clients.set(client.socketId, client);
 
-		let stateData: unknown | undefined;
+		let stateData: CompressedDataJson | undefined;
 
 		if (intent === "download") {
 			// Client wants to download existing room state
-			stateData = this.roomState.getState();
+			const rawState = this.roomState.getState();
+			const compressed = this.compression.compressJSON(rawState);
+			stateData = {
+				method: compressed.method,
+				data: uint8ArrayToBase64(compressed.data),
+			};
 		}
 
 		console.log(
@@ -190,7 +197,7 @@ export class CollaborationRoom {
 	/**
 	 * Handle heartbeat from client
 	 */
-	public handleHeartbeat(client: CollaborationClient): void {
+	public handleHeartbeat(client: ICollaborationClient): void {
 		// Forward ID counter to room state for tracking
 		this.roomState.updateIdCounter(client.localIdCounter);
 	}
@@ -280,6 +287,7 @@ export class CollaborationRoom {
 			(client) => ({
 				userId: client.userId,
 				cursor: client.cursor,
+				currentPageId: client.currentPageId,
 			}),
 		);
 

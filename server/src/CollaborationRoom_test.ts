@@ -2,7 +2,7 @@
  * CollaborationRoom unit tests - testing all public interfaces
  */
 
-import { assertEquals, assertThrows } from "@std/assert";
+import { assertEquals, assertExists, assertThrows } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
 import { FakeTime } from "@std/testing/time";
@@ -13,11 +13,12 @@ import {
 } from "./CollaborationRoom.ts";
 import type { IRoomState } from "./RoomState.ts";
 import type { ICommandBuffer } from "./CommandBuffer.ts";
-import type { ICompressionService, CompressedData } from "./compression.ts";
+import type { ICompressionService } from "./compression.ts";
 import type { IDatabaseManager, RoomSnapshot } from "./persistence.ts";
-import type { CollaborationClient } from "./CollaborationClient.ts";
+import type { ICollaborationClient } from "./CollaborationClient.ts";
 import type {
 	Command,
+	CompressedData,
 	PageAddCommand,
 	ServerMessage,
 } from "../../shared/types_shared.ts";
@@ -56,7 +57,7 @@ function createTestState(overrides: Partial<AppStateJson> = {}): AppStateJson {
 				id: "page-1",
 				name: "Test Page",
 				icon: "",
-				view: { pos: { x: 0, y: 0 }, zoom: 1 },
+				view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
 				nodes: {},
 				edges: {},
 				toolMode: "select",
@@ -80,13 +81,14 @@ function baseCommand(userId = "u1") {
 /** Creates a mock CollaborationClient */
 function createMockClient(
 	socketId: string,
-	overrides: Partial<CollaborationClient> = {},
-): CollaborationClient {
+	overrides: Partial<ICollaborationClient> = {},
+): ICollaborationClient {
 	let assignedUserId: string | null = null;
 	return {
 		socketId,
 		serverProtocolVersion: 1,
 		cursor: { x: 0, y: 0 },
+		currentPageId: null,
 		lastHeartbeat: Date.now(),
 		localIdCounter: "0",
 		updateFromHeartbeat: spy(),
@@ -97,15 +99,19 @@ function createMockClient(
 		},
 		hasUserId: () => assignedUserId !== null,
 		assignUserId: (userId: string) => { assignedUserId = userId; },
-		getClientInfo: () => ({
-			userId: assignedUserId ?? socketId,
-			cursor: { x: 0, y: 0 },
-			lastHeartbeat: Date.now(),
-			serverProtocolVersion: 1,
-		}),
+		getClientInfo: function() {
+			return {
+				userId: assignedUserId ?? socketId,
+				cursor: this.cursor,
+				currentPageId: this.currentPageId,
+				lastHeartbeat: this.lastHeartbeat,
+				serverProtocolVersion: 1,
+			};
+		},
 		disconnect: spy(),
+		dispose: spy(),
 		...overrides,
-	} as unknown as CollaborationClient;
+	} as ICollaborationClient;
 }
 
 /** Creates a mock RoomState */
@@ -271,7 +277,9 @@ describe("CollaborationRoom", () => {
 				assertEquals(result.type, "room_joined");
 				assertEquals(result.roomId, "test-room");
 				assertEquals(result.userId, "u1");
-				assertEquals(result.stateData !== undefined, true);
+				assertExists(result.stateData);
+				assertEquals(result.stateData.method, "none");
+				assertEquals(typeof result.stateData.data, "string");
 				assertEquals(room.getClientCount(), 1);
 			});
 

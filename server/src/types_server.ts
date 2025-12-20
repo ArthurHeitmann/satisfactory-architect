@@ -30,6 +30,7 @@ export interface RoomInfo {
 export interface ClientInfo {
 	userId: string;
 	cursor: CursorPosition;
+	currentPageId: string | null;
 	lastHeartbeat: number;
 	serverProtocolVersion: number;
 }

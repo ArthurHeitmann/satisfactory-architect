@@ -45,9 +45,14 @@ export type SvgPresetName =
 	"dark-theme"|
 	"edit"|
 	"github"|
-	"image-edit"
+	"image-edit"|
+	"cloud"
 	;
 export const svgPresets: Record<SvgPresetName, SvgPreset> = {
+	"cloud": {
+		viewBox: "0 0 24 24",
+		innerHtml: `<path d="M17.5 19c3.037 0 5.5-2.463 5.5-5.5c0-3.037-2.463-5.5-5.5-5.5c-.07 0-.139.002-.208.005C16.334 4.103 13.684 2 10.5 2C6.91 2 4 4.91 4 8.5c0 .07.002.139.005.208C1.78 9.334 0 11.684 0 14.5C0 18.09 2.91 21 6.5 21h11z" fill="currentColor"/>`
+	},
 	"splitter": {
 		viewBox: "0 0 100 100",
 		innerHtml: `<path

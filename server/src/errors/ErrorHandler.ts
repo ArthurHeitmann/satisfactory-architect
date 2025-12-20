@@ -44,27 +44,41 @@ export class ErrorHandler {
 			context: error.context,
 			stack: error.stack,
 			// Recursively serialize the cause chain
-			cause: this.serializeCause(error.cause),
+			cause: this.serializeCause(error.cause, 0),
 		};
 
-		console.error(JSON.stringify(logPayload));
+		const errorMessage = 
+			`[${logPayload.timestamp}] [${logPayload.level}] ` +
+			`Error Code: ${logPayload.code} - ${logPayload.message}\n` +
+			`Context: ${JSON.stringify(logPayload.context)}\n` +
+			`Stack Trace: ${logPayload.stack}\n` +
+			`Cause: ${logPayload.cause}`;
+		console.error(errorMessage);
 	}
 
 	/**
 	 * Helper to ensure Error objects (which are not JSON-friendly by default)
-	 * are properly serialized in logs.
+	 * are properly serialized in logs with increasing indentation.
 	 */
-	private static serializeCause(cause: unknown): unknown {
-		if (cause instanceof Error) {
-			return {
-				name: cause.name,
-				message: cause.message,
-				stack: cause.stack,
-				cause: cause.cause
-					? this.serializeCause(cause.cause)
-					: undefined,
-			};
+	private static serializeCause(cause: unknown, depth: number = 0): string {
+		if (!cause) {
+			return "none";
 		}
-		return cause;
+
+		const indent = "  ".repeat(depth);
+		const nextIndent = "  ".repeat(depth + 1);
+
+		if (cause instanceof Error) {
+			let result = `\n${indent}${cause.name}: ${cause.message}`;
+			if (cause.stack) {
+				result += `\n${nextIndent}Stack: ${cause.stack.split("\n").join(`\n${nextIndent}`)}`;
+			}
+			if (cause.cause) {
+				result += `\n${nextIndent}Caused by:${this.serializeCause(cause.cause, depth + 1)}`;
+			}
+			return result;
+		}
+
+		return `\n${indent}${JSON.stringify(cause)}`;
 	}
 }

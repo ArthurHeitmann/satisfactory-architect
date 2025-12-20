@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowColorPickerEvent, type ShowContextMenuEvent, type ShowIconPickerEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowColorPickerEvent, type ShowConnectionOverlayEvent, type ShowContextMenuEvent, type ShowIconPickerEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
 	import { onDestroy, onMount, setContext, type Snippet } from "svelte";
 	import ContextMenuOverlay from "./ContextMenuOverlay.svelte";
 	import RecipeSelectorOverlay from "./RecipeSelectorOverlay.svelte";
@@ -8,6 +8,7 @@
 	import ConfirmationPrompt from "./ConfirmationPrompt.svelte";
     import ColorPickerOverlay from "./ColorPickerOverlay.svelte";
     import IconPickerOverlay from "./IconPickerOverlay.svelte";
+	import ConnectionOverlay from "./ConnectionOverlay.svelte";
 
 	interface Props {
 		children: Snippet;
@@ -223,6 +224,12 @@
 			{:else if event.type === "showIconPicker"}
 				<IconPickerOverlay
 					event={event as ShowIconPickerEvent}
+					onclose={() => closeEvent(event)}
+				/>
+			{:else if event.type === "showConnectionOverlay"}
+				<ConnectionOverlay
+					event={event as ShowConnectionOverlayEvent}
+					{dismissEventStream}
 					onclose={() => closeEvent(event)}
 				/>
 			{/if}

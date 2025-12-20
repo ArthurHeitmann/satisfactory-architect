@@ -11,8 +11,10 @@ import type {
 	RoomJoinedMessage,
 	CommandBatchMessage,
 	WelcomeMessage,
+	CompressedDataJson,
 } from "../../shared/types_shared.ts";
-import type { CompressedData } from "../src/compression.ts";
+
+import { base64ToUint8Array, uint8ArrayToBase64 } from "../src/utils.ts";
 
 Deno.test({
 	name: "Basic Collaboration Flow",
@@ -61,10 +63,10 @@ Deno.test({
 				pages: [],
 			};
 			const stateJson = JSON.stringify(initialState);
-			const stateBytes = new TextEncoder().encode(stateJson);
-			const compressedState: CompressedData = {
+			const initialBytes = new TextEncoder().encode(stateJson);
+			const compressedState: CompressedDataJson = {
 				method: "none",
-				data: Array.from(stateBytes),
+				data: uint8ArrayToBase64(initialBytes),
 			};
 
 			console.log("Client 1 uploading state...");
@@ -72,6 +74,8 @@ Deno.test({
 				type: "upload_state",
 				stateData: compressedState,
 			});
+
+			await client1.waitForMessageType("upload_confirmation");
 
 			// --- Client 2: Join & Download State ---
 			console.log("Connecting Client 2...");
@@ -96,9 +100,11 @@ Deno.test({
 			// Verify downloaded state
 			assertExists(joined2.stateData, "Client 2 should receive state data");
 			
-			// The server currently sends uncompressed state in room_joined (based on implementation)
-			// even though types might suggest otherwise or be ambiguous.
-			const receivedState = joined2.stateData as AppStateJson;
+			const compressed = joined2.stateData as CompressedDataJson;
+			assertEquals(compressed.method, "none");
+			const receivedBytes = base64ToUint8Array(compressed.data);
+			const receivedState = JSON.parse(new TextDecoder().decode(receivedBytes)) as AppStateJson;
+			
 			assertEquals(receivedState.type, "app-state");
 			// Client 1 sends heartbeat with "0", which overwrites the uploaded "100"
 			// This confirms heartbeat processing works, even if overwriting seems odd (should probably be max)
@@ -121,7 +127,7 @@ Deno.test({
 					id: "page2",
 					name: "New Page",
 					icon: "icon",
-					view: { pos: { x: 0, y: 0 }, zoom: 1 },
+					view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
 					nodes: {},
 					edges: {},
 					toolMode: "select",
@@ -198,7 +204,10 @@ Deno.test({
 			
 			// Verify state has the new page
 			// The server should have applied `page.add` to the state.
-			const state3 = joined3.stateData as AppStateJson;
+			assertExists(joined3.stateData);
+			const compressed3 = joined3.stateData as CompressedDataJson;
+			const bytes3 = base64ToUint8Array(compressed3.data);
+			const state3 = JSON.parse(new TextDecoder().decode(bytes3)) as AppStateJson;
 			
 			if (state3 && state3.pages) {
 				console.log("Client 3 downloaded state pages:", state3.pages.length);

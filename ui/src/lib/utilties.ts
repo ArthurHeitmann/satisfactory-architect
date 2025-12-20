@@ -298,3 +298,16 @@ export function openLinkInNewTab(url: string): void {
 export function deepClone<T>(obj: T): T {
 	return JSON.parse(JSON.stringify(obj));
 }
+
+type Primitive = string | number | boolean | null | undefined;
+export function arraysEqual<T extends Primitive>(a: T[], b: T[]): boolean {
+	if (a.length !== b.length) {
+		return false;
+	}
+	for (let i = 0; i < a.length; i++) {
+		if (a[i] !== b[i]) {
+			return false;
+		}
+	}
+	return true;
+}
