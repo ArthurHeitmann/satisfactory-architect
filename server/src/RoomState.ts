@@ -11,6 +11,8 @@ import type {
 	PageDeleteCommand,
 	PageModifyCommand,
 	PageReorderCommand,
+	StateVarUpdateCommand,
+	ViewUpdateCommand,
 } from "../../shared/types_shared.ts";
 import { ErrorCode } from "../../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
@@ -158,6 +160,12 @@ export class RoomState implements IRoomState {
 				break;
 			case "object.modify":
 				this.handleObjectModify(command);
+				break;
+			case "statevar.update":
+				this.handleStateVarUpdate(command);
+				break;
+			case "view.update":
+				this.handleViewUpdate(command);
 				break;
 			default:
 				throw new AppError(
@@ -351,5 +359,51 @@ export class RoomState implements IRoomState {
 				`Unknown object type: ${command.objectType}`,
 			);
 		}
+	}
+
+	private handleStateVarUpdate(command: StateVarUpdateCommand): void {
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handleStateVarUpdate" },
+				"Room state has not been initialized yet",
+			);
+		}
+
+		switch (command.name) {
+			case "currentPageId":
+				this.state.currentPageId = command.value as string;
+				break;
+			case "name":
+				this.state.name = command.value as string | undefined;
+				break;
+			default:
+				throw new AppError(
+					ErrorCode.INVALID_MESSAGE,
+					{ roomId: this.roomId, stateVarName: command.name },
+					`Unknown state variable: ${command.name}`,
+				);
+		}
+	}
+
+	private handleViewUpdate(command: ViewUpdateCommand): void {
+		if (!this.state) {
+			throw new AppError(
+				ErrorCode.STATE_NOT_INITIALIZED,
+				{ roomId: this.roomId, operation: "handleViewUpdate" },
+				"Room state has not been initialized yet",
+			);
+		}
+
+		const page = this.findPage(command.pageId);
+		if (!page) {
+			throw new AppError(
+				ErrorCode.INVALID_MESSAGE,
+				{ roomId: this.roomId, pageId: command.pageId },
+				`Page ${command.pageId} not found`,
+			);
+		}
+
+		page.view = command.data as typeof page.view;
 	}
 }

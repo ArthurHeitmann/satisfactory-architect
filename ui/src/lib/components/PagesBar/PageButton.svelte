@@ -4,7 +4,7 @@
 	import type { EventStream } from "$lib/EventStream.svelte";
 	import { getContext } from "svelte";
 	import SfIconView from "../SFIconView.svelte";
-	import { showConfirmationPrompt } from "$lib/utilties";
+	import { getColorFromSeed, showConfirmationPrompt } from "$lib/utilties";
     import type { AppState } from "$lib/datamodel/AppState.svelte";
 
 	interface Props {
@@ -32,6 +32,17 @@
 
 	const commandQueue = appState.serverConnection.dispatchCommandQueue;
 	commandQueue.watchPageChange(() => page);
+	commandQueue.watchPageView(() => page);
+
+	const serverConnection = appState.serverConnection;
+	const MAX_INDICATORS = 5;
+
+	// Get other users (excluding self) that are on this page, limited to MAX_INDICATORS
+	const usersOnPage = $derived(
+		serverConnection.otherClients
+			.filter(client => client.currentPageId === page.id && client.userId !== serverConnection.ownUserId)
+			.slice(0, MAX_INDICATORS)
+	);
 
 	let isRenaming = $state(false);
 	// svelte-ignore non_reactive_update
@@ -135,13 +146,24 @@
 	class="page-button"
 	class:selected={page.id === activePageId}
 	class:dragging={isDraggedButton}
-	style:position={isDraggedButton ? "absolute" : "static"}
+	style:position={isDraggedButton ? "absolute" : "relative"}
 	style:left={isDraggedButton ? `${absoluteX}px` : "auto"}
 	onclick={onSelect}
 	oncontextmenu={showContextMenu}
 	bind:this={button}
 	{...listeners}
 >
+	{#if usersOnPage.length > 0}
+		<div class="user-indicators">
+			{#each usersOnPage as user, index}
+				<div
+					class="user-dot"
+					style:background-color={getColorFromSeed(user.userId)}
+					style:right="{index * 13}px"
+				></div>
+			{/each}
+		</div>
+	{/if}
 	<SfIconView icon={page.icon} size={20} quality="min" />
 	{#if isRenaming}
 		<span
@@ -185,6 +207,23 @@
 			opacity: 0.8;
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		}
+	}
+
+	.user-indicators {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+		height: 0;
+		pointer-events: none;
+	}
+
+	.user-dot {
+		position: absolute;
+		top: 0;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		filter: drop-shadow(0 0 2px var(--background));
 	}
 
 	.name {

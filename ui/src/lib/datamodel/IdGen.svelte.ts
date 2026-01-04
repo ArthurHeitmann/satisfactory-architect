@@ -63,6 +63,10 @@ export class IdGen {
 		}
 		this.prefix = prefix;
 	}
+
+	removePrefix(): void {
+		this.prefix = "";
+	}
 }
 
 export class IdMapper {

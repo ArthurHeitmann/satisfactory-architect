@@ -4,7 +4,7 @@ import { GraphNode } from "$lib/datamodel/GraphNode.svelte";
 import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
 import { assertUnreachable } from "$lib/utilties";
 import type { GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../../../../shared/types_serialization";
-import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, PageReorderCommand } from "../../../../shared/types_shared";
+import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, PageReorderCommand, StateVarUpdateCommand } from "../../../../shared/types_shared";
 
 export class CommandProcessor {
 	constructor(
@@ -39,6 +39,13 @@ export class CommandProcessor {
 					break;
 				case "object.modify":
 					this.handleObjectModifyCommand(command);
+					break;
+				case "statevar.update":
+					this.handleStateVarUpdateCommand(command);
+					break;
+				case "view.update":
+					// View updates are intentionally NOT applied to other clients
+					// They are only stored on the server for persistence
 					break;
 				default:
 					assertUnreachable(command);
@@ -155,6 +162,19 @@ export class CommandProcessor {
 			} else {
 				console.warn(`Cannot modify edge ${command.objectId}: not found on page ${page.id}`);
 			}
+		}
+	}
+
+	private handleStateVarUpdateCommand(command: StateVarUpdateCommand): void {
+		switch (command.name) {
+			case "currentPageId":
+				// do nothing
+				break;
+			case "name":
+				this.appState.name = command.value as string | undefined;
+				break;
+			default:
+				console.warn(`Unknown state variable name: ${command.name}`);
 		}
 	}
 	

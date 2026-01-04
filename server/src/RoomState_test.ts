@@ -5,54 +5,153 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { RoomState } from "./RoomState.ts";
-import type { AppStateJson } from "../../shared/types_serialization.ts";
-import type {
-	ObjectAddCommand,
-	ObjectDeleteCommand,
-	ObjectModifyCommand,
-	PageAddCommand,
-	PageDeleteCommand,
-	PageModifyCommand,
-	PageReorderCommand,
-} from "../../shared/types_shared.ts";
+import type { AppStateJson, GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../../shared/types_serialization.ts";
+import type { Command } from "../../shared/types_shared.ts";
 
 // ============================================================================
 // Test Helpers
 // ============================================================================
+
+/** Auto-incrementing command ID generator */
+let cmdCounter = 0;
+function nextCommandId() {
+	return `cmd-${++cmdCounter}`;
+}
+
+/** Base command fields for test commands */
+function cmd() {
+	return { commandId: nextCommandId(), userId: "u1", timestamp: Date.now() };
+}
+
+/** Creates a page with defaults */
+function createPage(id: string, overrides: Partial<GraphPageJson> = {}): GraphPageJson {
+	return {
+		version: 1,
+		type: "graph-page",
+		id,
+		name: overrides.name ?? "Test Page",
+		icon: overrides.icon ?? "",
+		view: overrides.view ?? { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
+		nodes: overrides.nodes ?? {},
+		edges: overrides.edges ?? {},
+		toolMode: overrides.toolMode ?? "select",
+		selectedNodes: overrides.selectedNodes ?? [],
+		selectedEdges: overrides.selectedEdges ?? [],
+	};
+}
+
+/** Creates a node with defaults */
+function createNode(id: string, overrides: Partial<GraphNodeJson> = {}): GraphNodeJson {
+	return {
+		id,
+		position: overrides.position ?? { x: 0, y: 0 },
+		priority: overrides.priority ?? 1,
+		edges: overrides.edges ?? [],
+		parentNode: overrides.parentNode ?? null,
+		children: overrides.children ?? [],
+		properties: overrides.properties ?? {},
+		size: overrides.size ?? { x: 100, y: 80 },
+	};
+}
+
+/** Creates an edge with defaults */
+function createEdge(id: string, overrides: Partial<GraphEdgeJson> = {}): GraphEdgeJson {
+	return {
+		id,
+		type: overrides.type ?? "conveyor",
+		startNodeId: overrides.startNodeId ?? "node-1",
+		endNodeId: overrides.endNodeId ?? "node-2",
+		properties: overrides.properties ?? {},
+	};
+}
 
 /** Creates a minimal valid app state for testing */
 function createTestState(overrides: Partial<AppStateJson> = {}): AppStateJson {
 	return {
 		version: 1,
 		type: "app-state",
-		idGen: "100",
-		currentPageId: "page-1",
-		pages: [
-			{
-				version: 1,
-				type: "graph-page",
-				id: "page-1",
-				name: "Test Page",
-				icon: "",
-				view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
-				nodes: {},
-				edges: {},
-				toolMode: "select",
-				selectedNodes: [],
-				selectedEdges: [],
-			},
-		],
-		...overrides,
+		idGen: overrides.idGen ?? "100",
+		name: overrides.name,
+		currentPageId: overrides.currentPageId ?? "page-1",
+		pages: overrides.pages ?? [createPage("page-1")],
 	};
 }
 
-/** Base command fields for test commands */
-function baseCommand() {
-	return {
-		commandId: "cmd-1",
-		userId: "u1",
-		timestamp: Date.now(),
-	};
+// Command builders - reduce boilerplate for creating commands
+const commands = {
+	pageAdd: (pageId: string, data: Partial<GraphPageJson> = {}) => ({
+		...cmd(),
+		type: "page.add" as const,
+		pageId,
+		data: { name: data.name ?? "New Page", ...data },
+	}),
+
+	pageDelete: (pageId: string) => ({
+		...cmd(),
+		type: "page.delete" as const,
+		pageId,
+	}),
+
+	pageModify: (pageId: string, data: Partial<GraphPageJson>) => ({
+		...cmd(),
+		type: "page.modify" as const,
+		pageId,
+		data,
+	}),
+
+	pageReorder: (pageOrder: string[]) => ({
+		...cmd(),
+		type: "page.reorder" as const,
+		pageOrder,
+	}),
+
+	objectAdd: (pageId: string, objectType: "node" | "edge", objectId: string, data: unknown) => ({
+		...cmd(),
+		type: "object.add" as const,
+		pageId,
+		objectType,
+		objectId,
+		data,
+	}),
+
+	objectDelete: (pageId: string, objectType: "node" | "edge", objectId: string) => ({
+		...cmd(),
+		type: "object.delete" as const,
+		pageId,
+		objectType,
+		objectId,
+	}),
+
+	objectModify: (pageId: string, objectType: "node" | "edge", objectId: string, data: unknown) => ({
+		...cmd(),
+		type: "object.modify" as const,
+		pageId,
+		objectType,
+		objectId,
+		data,
+	}),
+
+	statevarUpdate: <T extends "currentPageId" | "name">(name: T, value: unknown) => ({
+		...cmd(),
+		type: "statevar.update" as const,
+		name,
+		value,
+	}),
+
+	viewUpdate: (pageId: string, data: unknown) => ({
+		...cmd(),
+		type: "view.update" as const,
+		pageId,
+		data,
+	}),
+};
+
+/** Helper to apply command and verify hasChanged flag is set */
+function applyAndExpectChanged(state: RoomState, command: Command) {
+	state.consumeStateChanges(); // Reset flag
+	state.applyCommands([command]);
+	const result = state.consumeStateChanges();
+	assertEquals(result.hasChanged, true);
 }
 
 // ============================================================================
@@ -140,15 +239,8 @@ describe("RoomState", () => {
 
 	describe("applyCommands", () => {
 		it("throws when not initialized", () => {
-			const command: PageAddCommand = {
-				...baseCommand(),
-				type: "page.add",
-				pageId: "new-page",
-				data: { name: "New Page" },
-			};
-
 			assertThrows(
-				() => state.applyCommands([command]),
+				() => state.applyCommands([commands.pageAdd("new-page")]),
 				Error,
 				"Cannot apply commands: room state has not been initialized",
 			);
@@ -156,19 +248,7 @@ describe("RoomState", () => {
 
 		it("sets hasChanged flag", () => {
 			state.setState(createTestState());
-			state.consumeStateChanges(); // Reset flag
-
-			const command: PageModifyCommand = {
-				...baseCommand(),
-				type: "page.modify",
-				pageId: "page-1",
-				data: { name: "Changed" },
-			};
-
-			state.applyCommands([command]);
-			const result = state.consumeStateChanges();
-
-			assertEquals(result.hasChanged, true);
+			applyAndExpectChanged(state, commands.pageModify("page-1", { name: "Changed" }));
 		});
 	});
 
@@ -178,26 +258,16 @@ describe("RoomState", () => {
 		});
 
 		it("page.add creates a new page with all data", () => {
-			const command: PageAddCommand = {
-				...baseCommand(),
-				type: "page.add",
-				pageId: "page-2",
-				data: {
-					version: 1,
-					type: "graph-page",
-					id: "page-2",
-					name: "New Page",
-					icon: "factory.png",
-					view: { offset: { x: 100, y: 200 }, scale: 1.5, enableGridSnap: true },
-					nodes: {},
-					edges: {},
-					toolMode: "pan",
-					selectedNodes: ["n1", "n2"],
-					selectedEdges: ["e1"],
-				},
-			};
+			const pageData = createPage("page-2", {
+				name: "New Page",
+				icon: "factory.png",
+				view: { offset: { x: 100, y: 200 }, scale: 1.5, enableGridSnap: true },
+				toolMode: "pan",
+				selectedNodes: ["n1", "n2"],
+				selectedEdges: ["e1"],
+			});
 
-			state.applyCommands([command]);
+			state.applyCommands([commands.pageAdd("page-2", pageData)]);
 
 			const result = state.getState();
 			assertEquals(result.pages.length, 2);
@@ -209,32 +279,17 @@ describe("RoomState", () => {
 			assertEquals(newPage.toolMode, "pan");
 			assertEquals(newPage.selectedNodes, ["n1", "n2"]);
 			assertEquals(newPage.selectedEdges, ["e1"]);
-			assertEquals(newPage.nodes, {});
-			assertEquals(newPage.edges, {});
 		});
 
 		it("page.delete removes a page", () => {
-			const command: PageDeleteCommand = {
-				...baseCommand(),
-				type: "page.delete",
-				pageId: "page-1",
-			};
-
-			state.applyCommands([command]);
+			state.applyCommands([commands.pageDelete("page-1")]);
 
 			const result = state.getState();
 			assertEquals(result.pages.length, 0);
 		});
 
 		it("page.modify updates page properties", () => {
-			const command: PageModifyCommand = {
-				...baseCommand(),
-				type: "page.modify",
-				pageId: "page-1",
-				data: { name: "Updated Name", toolMode: "pan" },
-			};
-
-			state.applyCommands([command]);
+			state.applyCommands([commands.pageModify("page-1", { name: "Updated Name", toolMode: "pan" })]);
 
 			const result = state.getState();
 			assertEquals(result.pages[0].name, "Updated Name");
@@ -242,29 +297,9 @@ describe("RoomState", () => {
 		});
 
 		it("page.reorder changes page order", () => {
-			const testData = createTestState();
-			testData.pages.push({
-				version: 1,
-				type: "graph-page",
-				id: "page-2",
-				name: "Page 2",
-				icon: "",
-				view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
-				nodes: {},
-				edges: {},
-				toolMode: "select",
-				selectedNodes: [],
-				selectedEdges: [],
-			});
-			state.setState(testData);
+			state.setState(createTestState({ pages: [createPage("page-1"), createPage("page-2")] }));
 
-			const command: PageReorderCommand = {
-				...baseCommand(),
-				type: "page.reorder",
-				pageOrder: ["page-2", "page-1"],
-			};
-
-			state.applyCommands([command]);
+			state.applyCommands([commands.pageReorder(["page-2", "page-1"])]);
 
 			const result = state.getState();
 			assertEquals(result.pages[0].id, "page-2");
@@ -277,165 +312,145 @@ describe("RoomState", () => {
 			state.setState(createTestState());
 		});
 
-		it("object.add adds a node with all data", () => {
-			const nodeData = {
-				id: "node-1",
-				position: { x: 100, y: 200 },
-				priority: 5,
-				edges: ["edge-1", "edge-2"],
-				parentNode: "parent-1",
-				children: ["child-1"],
-				properties: { recipeId: "Recipe_IronIngot_C", overclock: 1.5 },
-				size: { x: 200, y: 150 },
-			};
+		// Parameterized add tests for nodes and edges
+		const addCases = [
+			{
+				name: "node",
+				data: createNode("node-1", {
+					position: { x: 100, y: 200 },
+					priority: 5,
+					edges: ["edge-1", "edge-2"],
+					parentNode: "parent-1",
+					children: ["child-1"],
+					properties: { recipeId: "Recipe_IronIngot_C", overclock: 1.5 },
+					size: { x: 200, y: 150 },
+				}),
+				getStored: (result: AppStateJson) => result.pages[0].nodes["node-1"],
+			},
+			{
+				name: "edge",
+				data: createEdge("edge-1", {
+					type: "conveyor",
+					startNodeId: "node-1",
+					endNodeId: "node-2",
+					properties: { portFrom: "output-0", portTo: "input-0", waypoints: [{ x: 150, y: 175 }] },
+				}),
+				getStored: (result: AppStateJson) => result.pages[0].edges["edge-1"],
+			},
+		] as const;
 
-			const command: ObjectAddCommand = {
-				...baseCommand(),
-				type: "object.add",
-				pageId: "page-1",
-				objectType: "node",
-				objectId: "node-1",
-				data: nodeData,
-			};
+		for (const { name, data, getStored } of addCases) {
+			it(`object.add adds a ${name} with all data`, () => {
+				state.applyCommands([commands.objectAdd("page-1", name, data.id, data)]);
 
-			state.applyCommands([command]);
-
-			const result = state.getState();
-			assertEquals("node-1" in result.pages[0].nodes, true);
-			const storedNode = result.pages[0].nodes["node-1"];
-			assertEquals(storedNode.id, "node-1");
-			assertEquals(storedNode.position, { x: 100, y: 200 });
-			assertEquals(storedNode.priority, 5);
-			assertEquals(storedNode.edges, ["edge-1", "edge-2"]);
-			assertEquals(storedNode.parentNode, "parent-1");
-			assertEquals(storedNode.children, ["child-1"]);
-			assertEquals(storedNode.properties, { recipeId: "Recipe_IronIngot_C", overclock: 1.5 });
-			assertEquals(storedNode.size, { x: 200, y: 150 });
-		});
-
-		it("object.add adds an edge with all data", () => {
-			const edgeData = {
-				id: "edge-1",
-				type: "conveyor",
-				startNodeId: "node-1",
-				endNodeId: "node-2",
-				properties: { portFrom: "output-0", portTo: "input-0", waypoints: [{ x: 150, y: 175 }] },
-			};
-
-			const command: ObjectAddCommand = {
-				...baseCommand(),
-				type: "object.add",
-				pageId: "page-1",
-				objectType: "edge",
-				objectId: "edge-1",
-				data: edgeData,
-			};
-
-			state.applyCommands([command]);
-
-			const result = state.getState();
-			assertEquals("edge-1" in result.pages[0].edges, true);
-			const storedEdge = result.pages[0].edges["edge-1"];
-			assertEquals(storedEdge.id, "edge-1");
-			assertEquals(storedEdge.type, "conveyor");
-			assertEquals(storedEdge.startNodeId, "node-1");
-			assertEquals(storedEdge.endNodeId, "node-2");
-			assertEquals(storedEdge.properties, { portFrom: "output-0", portTo: "input-0", waypoints: [{ x: 150, y: 175 }] });
-		});
+				const stored = getStored(state.getState());
+				assertEquals(stored, data);
+			});
+		}
 
 		it("object.delete removes a node from a page", () => {
-			const testData = createTestState();
-			testData.pages[0].nodes = {
-				"node-1": {
-					id: "node-1",
-					position: { x: 0, y: 0 },
-					priority: 1,
-					edges: [],
-					parentNode: null,
-					children: [],
-					properties: {},
-					size: { x: 100, y: 80 },
-				},
-			};
-			state.setState(testData);
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": createNode("node-1") } })],
+			}));
 
-			const command: ObjectDeleteCommand = {
-				...baseCommand(),
-				type: "object.delete",
-				pageId: "page-1",
-				objectType: "node",
-				objectId: "node-1",
-			};
+			state.applyCommands([commands.objectDelete("page-1", "node", "node-1")]);
 
-			state.applyCommands([command]);
-
-			const result = state.getState();
-			assertEquals("node-1" in result.pages[0].nodes, false);
+			assertEquals("node-1" in state.getState().pages[0].nodes, false);
 		});
 
 		it("object.modify updates a node", () => {
-			const testData = createTestState();
-			testData.pages[0].nodes = {
-				"node-1": {
-					id: "node-1",
-					position: { x: 0, y: 0 },
-					priority: 1,
-					edges: [],
-					parentNode: null,
-					children: [],
-					properties: {},
-					size: { x: 100, y: 80 },
-				},
-			};
-			state.setState(testData);
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": createNode("node-1") } })],
+			}));
 
-			const command: ObjectModifyCommand = {
-				...baseCommand(),
-				type: "object.modify",
-				pageId: "page-1",
-				objectType: "node",
-				objectId: "node-1",
-				data: { id: "node-1", position: { x: 500, y: 600 } },
-			};
+			state.applyCommands([commands.objectModify("page-1", "node", "node-1", { id: "node-1", position: { x: 500, y: 600 } })]);
 
-			state.applyCommands([command]);
+			const node = state.getState().pages[0].nodes["node-1"];
+			assertEquals(node.position, { x: 500, y: 600 });
+		});
+	});
 
-			const result = state.getState();
-			const node = result.pages[0].nodes["node-1"];
-			assertEquals(node.position.x, 500);
-			assertEquals(node.position.y, 600);
+	describe("statevar and view commands", () => {
+		beforeEach(() => {
+			state.setState(createTestState());
+		});
+
+		// Parameterized tests for commands that require initialized state
+		const uninitializedErrorCases = [
+			{ name: "statevar.update", cmd: () => commands.statevarUpdate("currentPageId", "page-2") },
+			{ name: "view.update", cmd: () => commands.viewUpdate("page-1", {}) },
+		];
+
+		for (const { name, cmd } of uninitializedErrorCases) {
+			it(`${name} throws for state not initialized`, () => {
+				const uninitializedState = new RoomState("room-2");
+				assertThrows(
+					() => uninitializedState.applyCommand(cmd()),
+					Error,
+					"Room state has not been initialized yet",
+				);
+			});
+		}
+
+		// Parameterized tests for hasChanged flag
+		const hasChangedCases = [
+			{ name: "statevar.update", cmd: () => commands.statevarUpdate("currentPageId", "page-new") },
+			{ name: "view.update", cmd: () => commands.viewUpdate("page-1", { offset: { x: 50, y: 50 }, scale: 1.5, enableGridSnap: true }) },
+		];
+
+		for (const { name, cmd } of hasChangedCases) {
+			it(`${name} sets hasChanged flag`, () => {
+				applyAndExpectChanged(state, cmd());
+			});
+		}
+
+		// Specific behavior tests
+		it("statevar.update updates currentPageId", () => {
+			state.setState(createTestState({ pages: [createPage("page-1"), createPage("page-2")] }));
+			state.applyCommands([commands.statevarUpdate("currentPageId", "page-2")]);
+
+			assertEquals(state.getState().currentPageId, "page-2");
+		});
+
+		it("statevar.update updates name", () => {
+			state.applyCommands([commands.statevarUpdate("name", "My Project")]);
+
+			assertEquals(state.getState().name, "My Project");
+		});
+
+		it("statevar.update can clear name with undefined", () => {
+			state.setState(createTestState({ name: "Existing Name" }));
+			state.applyCommands([commands.statevarUpdate("name", undefined)]);
+
+			assertEquals(state.getState().name, undefined);
+		});
+
+		it("view.update updates page view", () => {
+			const newView = { offset: { x: 200, y: 300 }, scale: 2.0, enableGridSnap: false };
+			state.applyCommands([commands.viewUpdate("page-1", newView)]);
+
+			assertEquals(state.getState().pages[0].view, newView);
+		});
+
+		it("view.update throws for non-existent page", () => {
+			assertThrows(
+				() => state.applyCommands([commands.viewUpdate("non-existent-page", {})]),
+				Error,
+				"Page non-existent-page not found",
+			);
 		});
 	});
 
 	describe("serialization", () => {
 		it("preserves state structure", () => {
-			const testData = createTestState({
+			state.setState(createTestState({
 				idGen: "42",
-				currentPageId: "page-1",
-			});
-			testData.pages[0].nodes = {
-				"n1": {
-					id: "n1",
-					position: { x: 0, y: 0 },
-					priority: 1,
-					edges: [],
-					parentNode: null,
-					children: [],
-					properties: { type: "recipe" },
-					size: { x: 100, y: 80 },
-				},
-			};
-			testData.pages[0].edges = {
-				"e1": {
-					id: "e1",
-					type: "conveyor",
-					startNodeId: "n1",
-					endNodeId: "n2",
-					properties: {},
-				},
-			};
+				pages: [createPage("page-1", {
+					nodes: { "n1": createNode("n1", { properties: { type: "recipe" } }) },
+					edges: { "e1": createEdge("e1", { startNodeId: "n1", endNodeId: "n2" }) },
+				})],
+			}));
 
-			state.setState(testData);
 			const result = state.getState();
 
 			assertEquals(result.idGen, "42");
@@ -448,187 +463,28 @@ describe("RoomState", () => {
 	describe("complex workflow", () => {
 		it("applies all command types in sequence", () => {
 			state.setState(createTestState());
-			let cmdCounter = 0;
 
-			function nextCommandId() {
-				return `cmd-${++cmdCounter}`;
-			}
-
-			// 1. Add a new page
-			const addPage: PageAddCommand = {
-				commandId: nextCommandId(),
-				userId: "u1",
-				timestamp: Date.now(),
-				type: "page.add",
-				pageId: "page-2",
-				data: {
-					version: 1,
-					type: "graph-page",
-					id: "page-2",
-					name: "Production Line",
-					icon: "production.png",
-					view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
-					nodes: {},
-					edges: {},
-					toolMode: "select",
-					selectedNodes: [],
-					selectedEdges: [],
-				},
-			};
-
-			// 2. Modify the original page
-			const modifyPage: PageModifyCommand = {
-				commandId: nextCommandId(),
-				userId: "u1",
-				timestamp: Date.now(),
-				type: "page.modify",
-				pageId: "page-1",
-				data: { name: "Iron Production", toolMode: "connect" },
-			};
-
-			// 3. Add nodes to page-2
-			const addNode1: ObjectAddCommand = {
-				commandId: nextCommandId(),
-				userId: "u1",
-				timestamp: Date.now(),
-				type: "object.add",
-				pageId: "page-2",
-				objectType: "node",
-				objectId: "node-1",
-				data: {
-					id: "node-1",
-					position: { x: 0, y: 0 },
-					priority: 1,
-					edges: [],
-					parentNode: null,
-					children: [],
-					properties: { recipeId: "Recipe_IronOre_C" },
-					size: { x: 100, y: 80 },
-				},
-			};
-
-			const addNode2: ObjectAddCommand = {
-				commandId: nextCommandId(),
-				userId: "u2",
-				timestamp: Date.now(),
-				type: "object.add",
-				pageId: "page-2",
-				objectType: "node",
-				objectId: "node-2",
-				data: {
-					id: "node-2",
-					position: { x: 300, y: 0 },
-					priority: 2,
-					edges: [],
-					parentNode: null,
-					children: [],
-					properties: { recipeId: "Recipe_IronIngot_C" },
-					size: { x: 100, y: 80 },
-				},
-			};
-
-			// 4. Add an edge connecting the nodes
-			const addEdge: ObjectAddCommand = {
-				commandId: nextCommandId(),
-				userId: "u1",
-				timestamp: Date.now(),
-				type: "object.add",
-				pageId: "page-2",
-				objectType: "edge",
-				objectId: "edge-1",
-				data: {
-					id: "edge-1",
-					type: "conveyor",
-					startNodeId: "node-1",
-					endNodeId: "node-2",
-					properties: { portFrom: "out-0", portTo: "in-0" },
-				},
-			};
-
-			// 5. Modify node-1
-			const modifyNode: ObjectModifyCommand = {
-				commandId: nextCommandId(),
-				userId: "u2",
-				timestamp: Date.now(),
-				type: "object.modify",
-				pageId: "page-2",
-				objectType: "node",
-				objectId: "node-1",
-				data: {
-					id: "node-1",
-					position: { x: 50, y: 50 },
-					priority: 1,
-					edges: [],
-					parentNode: null,
-					children: [],
-					properties: { recipeId: "Recipe_IronOre_C", overclock: 2.0 },
-					size: { x: 100, y: 80 },
-				},
-			};
-
-			// 6. Reorder pages
-			const reorderPages: PageReorderCommand = {
-				commandId: nextCommandId(),
-				userId: "u1",
-				timestamp: Date.now(),
-				type: "page.reorder",
-				pageOrder: ["page-2", "page-1"],
-			};
-
-			// 7. Add a third page that will be deleted
-			const addPageToDelete: PageAddCommand = {
-				commandId: nextCommandId(),
-				userId: "u1",
-				timestamp: Date.now(),
-				type: "page.add",
-				pageId: "page-3",
-				data: {
-					version: 1,
-					type: "graph-page",
-					id: "page-3",
-					name: "Temporary Page",
-					icon: "",
-					view: { offset: { x: 0, y: 0 }, scale: 1, enableGridSnap: true },
-					nodes: {},
-					edges: {},
-					toolMode: "select",
-					selectedNodes: [],
-					selectedEdges: [],
-				},
-			};
-
-			// 8. Delete the temporary page
-			const deletePage: PageDeleteCommand = {
-				commandId: nextCommandId(),
-				userId: "u1",
-				timestamp: Date.now(),
-				type: "page.delete",
-				pageId: "page-3",
-			};
-
-			// 9. Delete an object (edge)
-			const deleteEdge: ObjectDeleteCommand = {
-				commandId: nextCommandId(),
-				userId: "u2",
-				timestamp: Date.now(),
-				type: "object.delete",
-				pageId: "page-2",
-				objectType: "edge",
-				objectId: "edge-1",
-			};
-
-			// Apply all commands
+			// Apply a sequence of commands covering all command types
 			state.applyCommands([
-				addPage,
-				modifyPage,
-				addNode1,
-				addNode2,
-				addEdge,
-				modifyNode,
-				reorderPages,
-				addPageToDelete,
-				deletePage,
-				deleteEdge,
+				// 1. Add a new page
+				commands.pageAdd("page-2", createPage("page-2", { name: "Production Line", icon: "production.png" })),
+				// 2. Modify the original page
+				commands.pageModify("page-1", { name: "Iron Production", toolMode: "connect" }),
+				// 3. Add nodes to page-2
+				commands.objectAdd("page-2", "node", "node-1", createNode("node-1", { properties: { recipeId: "Recipe_IronOre_C" } })),
+				commands.objectAdd("page-2", "node", "node-2", createNode("node-2", { position: { x: 300, y: 0 }, priority: 2, properties: { recipeId: "Recipe_IronIngot_C" } })),
+				// 4. Add an edge connecting the nodes
+				commands.objectAdd("page-2", "edge", "edge-1", createEdge("edge-1", { properties: { portFrom: "out-0", portTo: "in-0" } })),
+				// 5. Modify node-1
+				commands.objectModify("page-2", "node", "node-1", createNode("node-1", { position: { x: 50, y: 50 }, properties: { recipeId: "Recipe_IronOre_C", overclock: 2.0 } })),
+				// 6. Reorder pages
+				commands.pageReorder(["page-2", "page-1"]),
+				// 7. Add a third page that will be deleted
+				commands.pageAdd("page-3", createPage("page-3", { name: "Temporary Page" })),
+				// 8. Delete the temporary page
+				commands.pageDelete("page-3"),
+				// 9. Delete the edge
+				commands.objectDelete("page-2", "edge", "edge-1"),
 			]);
 
 			// Verify final state

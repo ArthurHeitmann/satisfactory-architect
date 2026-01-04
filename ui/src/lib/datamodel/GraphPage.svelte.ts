@@ -338,6 +338,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		jointDragType: JointDragType,
 		resourceClassName: string,
 		layoutOrientation?: LayoutOrientation,
+		ownerUserId?: string | null,
 	): GraphNode<GraphNodeResourceJointProperties> {
 		const newNode = new GraphNode<GraphNodeResourceJointProperties>(
 			this.idGen.nextId(),
@@ -355,6 +356,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 				locked: false,
 				jointDragType: jointDragType,
 				dragStartNodeId: node.id,
+				dragOwnerUserId: ownerUserId,
 			}
 		);
 		this.addNodes(newNode);

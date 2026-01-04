@@ -7,6 +7,7 @@
 	overscroll-behavior: none;
 	font-size: 16px;
 	font-family: var(--font-family);
+	touch-action: none;
 }
 
 /* https://www.realtimecolors.com/?colors=0f0f0f-f0f0f0-ce5f27-efc0a9-df6020&fonts=Inter-Inter */
@@ -108,6 +109,12 @@
 	--pages-bar-button-selected-background-color: var(--primary);
 	--pages-bar-button-selected-text-color: var(--background);
 
+	--connection-status-color: #00cc08;
+	--danger-color: #dc3545;
+	--danger-hover-color: #c82333;
+	--success-color: #28a745;
+	--warning-color: #ffc107;
+
 	--color-button-selected-border-color: var(--text);
 
 	--grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiNkNmQ2ZDYiLz4NCjwvc3ZnPg==");
@@ -204,6 +211,12 @@
 	--pages-bar-button-active-background-color: var(--background-300);
 	--pages-bar-button-selected-background-color: var(--primary);
 	--pages-bar-button-selected-text-color: var(--text);
+
+	--connection-status-color: #66bb6a;
+	--danger-color: #dc3545;
+	--danger-hover-color: #c82333;
+	--success-color: #66bb6a;
+	--warning-color: #ffc107;
 
 	--color-button-selected-border-color: var(--text);
 

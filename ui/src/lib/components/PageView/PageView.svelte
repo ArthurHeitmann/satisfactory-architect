@@ -15,6 +15,8 @@
 	import UserEvents, { type CursorEvent } from "../UserEvents.svelte";
 	import Toolbar from "./ToolModeSelector.svelte";
 	import PropertiesToolbar from "./PropertiesToolbar.svelte";
+	import CursorOverlay from "./CursorOverlay.svelte";
+	import ConnectionStatus from "./ConnectionStatus.svelte";
 
 	interface Props {
 		page: GraphPage;
@@ -26,8 +28,6 @@
 	commandQueue.watchEdgeList(page.id, () => Array.from(page.edges.values()));
 
 	const serverConnection = page.context.appState.serverConnection;
-	const isConnected = $derived(serverConnection.state === "InRoom");
-	const clientCount = $derived(serverConnection.otherClients.length);
 
 	const sortedNodes = $derived.by(() => {
 		return Array.from(page.nodes.entries()).sort((a, b) => {
@@ -275,6 +275,17 @@
 	$effect(() => {
 		calculateThroughputs(page);
 	});
+
+	$effect(() => {
+		page.svgElement = svg;
+	});
+
+	$effect(() => {
+		const mousePos = globals.mousePosition;
+		if (svg) {
+			globals.pageMousePosition = page.screenToPageCoords(mousePos);
+		}
+	});
 </script>
 
 <svelte:window
@@ -379,7 +390,6 @@
 					`--square-size: ${page.view.scale * gridSize}px;`
 				}
 				bind:this={svg}
-				bind:this={page.svgElement}
 				{...listeners}
 			>
 				<defs>
@@ -438,20 +448,14 @@
 							transition:fade={{ duration: 100 }}
 						/>
 					{/if}
+
+					<CursorOverlay {page} {serverConnection} />
 				</g>
 			</svg>
 		{/snippet}
 	</UserEvents>
 
-	<div class="connection-status">
-		{#if isConnected}
-			<span class="status-dot connected"></span>
-			<span>{clientCount} {clientCount === 1 ? 'client' : 'clients'}</span>
-		{:else}
-			<span class="status-dot disconnected"></span>
-			<span>Disconnected</span>
-		{/if}
-	</div>
+	<ConnectionStatus {serverConnection} />
 
 	<Toolbar bind:activeMode={page.toolMode} x={40} y={10} />
 </div>
@@ -483,35 +487,5 @@
 		stroke: var(--selection-area-border-color);
 		stroke-width: 1;
 		pointer-events: none;
-	}
-
-	.connection-status {
-		position: absolute;
-		bottom: 10px;
-		right: 10px;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 8px 12px;
-		background-color: var(--toolbar-background-color);
-		border: 2px solid var(--toolbar-border-color);
-		border-radius: var(--rounded-border-radius);
-		font-size: 14px;
-		user-select: none;
-		pointer-events: none;
-	}
-
-	.status-dot {
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-	}
-
-	.status-dot.connected {
-		background-color: #4caf50;
-	}
-
-	.status-dot.disconnected {
-		background-color: #f44336;
 	}
 </style>

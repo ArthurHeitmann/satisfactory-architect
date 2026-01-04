@@ -12,9 +12,12 @@ export class AppState {
 	private currentPageId: Id;
 	readonly currentPage: GraphPage;
 	pages: GraphPage[];
+	/** Project name, synced with server via ServerConnection.name setter */
+	name: string | undefined = $state(undefined);
 	readonly serverConnection: ServerConnection;
 	private debouncedSave: Debouncer<(json: any) => void>;
 	readonly asJson: any;
+	private _onUnexpectedDisconnect: ((error: string | null) => void) | null = null;
 
 	constructor(idGen: IdGen, currentPageId: Id, pages: GraphPage[]) {
 		this.idGen = idGen;	// TODO sync
@@ -25,7 +28,8 @@ export class AppState {
 		this.serverConnection = new ServerConnection(
 			this,
 			() => this.currentPageId,
-			(json) => this.replaceFromJSON(json)
+			(json) => this.replaceFromJSON(json),
+			(error) => this._onUnexpectedDisconnect?.(error),
 		);
 		
 		this.debouncedSave = new Debouncer(this.saveToLocalStorage.bind(this), 1500);
@@ -52,6 +56,7 @@ export class AppState {
 		}
 		const idGen = IdGen.fromJson(json.idGen);
 		const state = new AppState(idGen, json.currentPageId, []);
+		state.name = json.name;
 		const pages = json.pages.map((p) => GraphPage.fromJSON(state, p));
 		for (const page of pages) {
 			state.addPage(page);
@@ -67,6 +72,7 @@ export class AppState {
 			throw new Error(`Invalid JSON type: ${json.type}. Expected: app-state`);
 		}
 		this.idGen.replaceFromJson(json.idGen);
+		this.name = json.name;
 		this.currentPageId = json.currentPageId;
 		this.pages = json.pages.map((p: any) => GraphPage.fromJSON(this, p));
 	}
@@ -99,6 +105,7 @@ export class AppState {
 			version: dataModelVersion,
 			type: saveDataType,
 			idGen: this.idGen.toJSON(),
+			name: this.name,
 			currentPageId: this.currentPageId,
 			pages: this.pages.map((p) => options.forceToJson ? p.toJSON() : p.asJson),
 		};
@@ -184,5 +191,9 @@ export class AppState {
 		if (trackStateChanges()) {
 			writeToLocalStorage(StorageKeys.appState, json)
 		}
+	}
+
+	setOnUnexpectedDisconnect(callback: (error: string | null) => void): void {
+		this._onUnexpectedDisconnect = callback;
 	}
 }

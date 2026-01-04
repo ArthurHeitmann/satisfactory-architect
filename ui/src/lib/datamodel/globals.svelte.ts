@@ -6,6 +6,10 @@ export const globals = $state({
 		x: 0,
 		y: 0,
 	},
+	pageMousePosition: {
+		x: 0,
+		y: 0,
+	} as { x: number; y: number } | null,
 	useAutoRateForFactoryInOutput: false,
 	debugShowNodeIds: false,
 	debugShowEdgeIds: false,

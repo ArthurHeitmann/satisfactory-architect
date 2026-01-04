@@ -605,9 +605,6 @@
 			}
 		}
 
-		.power-value {
-		}
-
 		.used-building {
 			display: flex;
 			align-items: center;
@@ -615,9 +612,6 @@
 
 			& + .used-building {
 				margin-left: 4px;
-			}
-
-			.building-count {
 			}
 		}
 	}

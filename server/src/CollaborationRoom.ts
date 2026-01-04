@@ -33,6 +33,7 @@ export interface RoomConfig {
 	maxClients: number; // 10 default
 	snapshotIntervalMs: number; // 30000ms default
 	heartbeatIntervalMs: number; // 1000ms default
+	heartbeatFastDelayMs: number; // 50ms default - delay before broadcasting after receiving a heartbeat
 	commandBuffer: CommandBufferConfig;
 }
 
@@ -56,6 +57,7 @@ export class CollaborationRoom {
 	private nextUserNumber = 1;
 	private snapshotTimer: number | null = null;
 	private heartbeatTimer: number | null = null;
+	private nextHeartbeatTime: number = 0;
 	private roomState: IRoomState;
 	private commandBuffer: ICommandBuffer;
 
@@ -80,7 +82,7 @@ export class CollaborationRoom {
 		);
 
 		this.startSnapshotTimer();
-		this.startHeartbeatTimer();
+		this.scheduleHeartbeat(this.config.heartbeatIntervalMs);
 	}
 
 	/**
@@ -104,7 +106,7 @@ export class CollaborationRoom {
 		}
 
 		// Check if download is requested but state is not initialized
-		if (intent === "download" && !this.roomState.canGetState()) {
+		if (intent === "download" && !this.canDownload()) {
 			throw new AppError(
 				ErrorCode.STATE_NOT_INITIALIZED,
 				{ roomId: this.roomId, intent },
@@ -112,7 +114,7 @@ export class CollaborationRoom {
 				true,
 			);
 		}
-		if (intent === "upload" && !this.roomState.canSetState()) {
+		if (intent === "upload" && !this.canUpload()) {
 			throw new AppError(
 				ErrorCode.UPLOAD_NOT_AUTHORIZED,
 				{ roomId: this.roomId, intent },
@@ -200,6 +202,9 @@ export class CollaborationRoom {
 	public handleHeartbeat(client: ICollaborationClient): void {
 		// Forward ID counter to room state for tracking
 		this.roomState.updateIdCounter(client.localIdCounter);
+		
+		// Schedule a fast heartbeat if it would be sooner than the next scheduled one
+		this.scheduleHeartbeatIfSooner(this.config.heartbeatFastDelayMs);
 	}
 
 	/**
@@ -218,6 +223,35 @@ export class CollaborationRoom {
 	 */
 	public getClientCount(): number {
 		return this.clients.size;
+	}
+
+	/**
+	 * Get allowed join intents for this room
+	 */
+	public getAllowedIntents(): JoinRoomIntent[] {
+		const intents: JoinRoomIntent[] = [];
+		if (this.canDownload()) {
+			intents.push("download");
+		}
+		if (this.canUpload()) {
+			intents.push("upload");
+		}
+		return intents;
+	}
+
+	/**
+	 * Check if download is allowed
+	 */
+	private canDownload(): boolean {
+		return this.roomState.canGetState();
+	}
+
+	/**
+	 * Check if upload is allowed
+	 */
+	private canUpload(): boolean {
+		// Upload is allowed if state is not initialized OR no clients are connected
+		return !this.roomState.isStateInitialized() || this.clients.size === 0;
 	}
 
 	/**
@@ -275,8 +309,8 @@ export class CollaborationRoom {
 
 		this.broadcast(message);
 
-		// Save commands to audit log (optional)
-		// this.saveCommandsToAuditLog(commands);
+		// Broadcast heartbeat immediately after commands and reschedule for full interval
+		this.broadcastHeartbeatAndReschedule();
 	}
 
 	/**
@@ -379,14 +413,38 @@ export class CollaborationRoom {
 	}
 
 	/**
-	 * Start periodic heartbeat broadcast timer
+	 * Schedule a heartbeat broadcast only if it would be sooner than the current schedule.
+	 * This is used for fast heartbeats triggered by client activity.
 	 */
-	private startHeartbeatTimer(): void {
-		this.heartbeatTimer = Scheduler.safeInterval(
+	private scheduleHeartbeatIfSooner(delayMs: number): void {
+		const targetTime = Date.now() + delayMs;
+		if (this.heartbeatTimer !== null && targetTime >= this.nextHeartbeatTime) {
+			return; // Already scheduled for sooner or same time
+		}
+		this.scheduleHeartbeat(delayMs);
+	}
+
+	/**
+	 * Schedule a heartbeat broadcast after the specified delay.
+	 * Clears any existing scheduled heartbeat.
+	 */
+	private scheduleHeartbeat(delayMs: number): void {
+		this.clearHeartbeatTimer();
+		this.nextHeartbeatTime = Date.now() + delayMs;
+		this.heartbeatTimer = Scheduler.safeTimeout(
 			`heartbeat-${this.roomId}`,
-			() => this.broadcastHeartbeatResponse(),
-			this.config.heartbeatIntervalMs,
+			() => this.broadcastHeartbeatAndReschedule(),
+			delayMs,
 		);
+	}
+
+	/**
+	 * Broadcast heartbeat response and schedule the next one for the full interval.
+	 */
+	private broadcastHeartbeatAndReschedule(): void {
+		this.clearHeartbeatTimer();
+		this.broadcastHeartbeatResponse();
+		this.scheduleHeartbeat(this.config.heartbeatIntervalMs);
 	}
 
 	/**
@@ -394,8 +452,9 @@ export class CollaborationRoom {
 	 */
 	private clearHeartbeatTimer(): void {
 		if (this.heartbeatTimer !== null) {
-			clearInterval(this.heartbeatTimer);
+			clearTimeout(this.heartbeatTimer);
 			this.heartbeatTimer = null;
+			this.nextHeartbeatTime = 0;
 		}
 	}
 }

@@ -5,7 +5,7 @@ import type { Id, IdGen } from "$lib/datamodel/IdGen.svelte.js";
 import { watchState } from "$lib/utilities.svelte";
 import { assertUnreachable, Throttler } from "$lib/utilties";
 import { tick } from "svelte";
-import type { ClientMessage, RoomListItem, ServerMessage, WelcomeMessage, UploadConfirmationMessage, RoomJoinedMessage, CommandBatchMessage, HeartbeatResponseMessage, ErrorMessage, CompressedDataJson, CursorPosition, ClientPresence, Command } from "../../../../shared/types_shared.js";
+import { type ClientMessage, type RoomListItem, type ServerMessage, type WelcomeMessage, type UploadConfirmationMessage, type RoomJoinedMessage, type CommandBatchMessage, type HeartbeatResponseMessage, type ErrorMessage, type CompressedDataJson, type CursorPosition, type ClientPresence, type Command, ErrorCode } from "../../../../shared/types_shared.js";
 import { CommandProcessor } from "./CommandProcessor";
 import { DispatchCommandQueue } from "./DispatchCommandQueue";
 import { StateMachine } from "./StateMachine.svelte.js";
@@ -28,7 +28,7 @@ export class ServerConnection {
 			[ServerConnectionState.Disconnected]: [ServerConnectionState.Connecting],
 			[ServerConnectionState.Connecting]: [ServerConnectionState.Connected, ServerConnectionState.Disconnected],
 			[ServerConnectionState.Connected]: [ServerConnectionState.JoiningRoom, ServerConnectionState.Disconnected],
-			[ServerConnectionState.JoiningRoom]: [ServerConnectionState.InRoom, ServerConnectionState.UploadingState, ServerConnectionState.Disconnected],
+			[ServerConnectionState.JoiningRoom]: [ServerConnectionState.InRoom, ServerConnectionState.UploadingState, ServerConnectionState.Connected, ServerConnectionState.Disconnected],
 			[ServerConnectionState.UploadingState]: [ServerConnectionState.InRoom, ServerConnectionState.Disconnected],
 			[ServerConnectionState.InRoom]: [ServerConnectionState.Disconnected],
 		},
@@ -40,6 +40,8 @@ export class ServerConnection {
 	get availableRooms() { return this._availableRooms; }
 	private _roomId: string | null = $state(null);
 	get roomId() { return this._roomId; }
+	private _lastRoomId: string | null = null;
+	get lastRoomId() { return this._lastRoomId; }
 	private _ownUserId: string | null = null;
 	get ownUserId() { return this._ownUserId; }
 	private ws: WebSocket | null = null;
@@ -47,11 +49,14 @@ export class ServerConnection {
 	private uploadStateData: unknown | null = null;
 	private _lastError: string | null = $state(null);
 	get lastError() { return this._lastError; }
+	private _isExpectedDisconnect: boolean = false;
+	private _pendingReconnectRoomId: string | null = null;
 	private heartbeatInterval: number | null = null;
 	private lastReceivedHeartbeat: number = Date.now();
 	private fastHeartbeatThrottled = new Throttler(() => this.sendHeartbeat(), 250);
 	private _otherClients: ClientPresence[] = $state([]);
 	get otherClients() { return this._otherClients; }
+	private appState: AppState;
 	private idGen: IdGen;
 	readonly dispatchCommandQueue: DispatchCommandQueue;
 	private commandProcessor: CommandProcessor;
@@ -61,7 +66,9 @@ export class ServerConnection {
 		appState: AppState,
 		private getCurrentPageId: () => string | null,
 		private onStateDownloaded: (state: any) => void,
+		private onUnexpectedDisconnect: (error: string | null) => void,
 	) {
+		this.appState = appState;
 		this.idGen = appState.idGen;
 		this.dispatchCommandQueue = new DispatchCommandQueue(
 			this.sendCommands.bind(this),
@@ -80,8 +87,8 @@ export class ServerConnection {
 
 		watchState({
 			dependencies: () => [
-				globals.mousePosition.x,
-				globals.mousePosition.y,
+				globals.pageMousePosition?.x,
+				globals.pageMousePosition?.y,
 				this.idGen.getCurrentId(),
 				this.getCurrentPageId(),
 			],
@@ -91,6 +98,9 @@ export class ServerConnection {
 	}
 
 	setServerUrl(url: string): void {
+		if (this._serverUrl === url && this.state !== ServerConnectionState.Disconnected) {
+			return;
+		}
 		this.disconnect();
 		this._serverUrl = url;
 		this.connect();
@@ -99,6 +109,7 @@ export class ServerConnection {
 	connect() {
 		this.stateMachine.transitionTo(ServerConnectionState.Connecting);
 		this._lastError = null;
+		this._isExpectedDisconnect = false;
 		this.ws = new WebSocket(this._serverUrl);
 		this.ws.onmessage = (event) => this.onWsMessage(event);
 		this.ws.onclose = () => this.disconnect();
@@ -109,15 +120,55 @@ export class ServerConnection {
 		this.startTaskTimeout(2500);
 	}
 
+	/**
+	 * Disconnect from the server intentionally.
+	 * This marks the disconnect as expected, so no reconnection prompt will be shown.
+	 */
+	intentionalDisconnect() {
+		this._isExpectedDisconnect = true;
+		this.disconnect();
+	}
+
 	disconnect() {
+		// Track if this was an unexpected disconnect (was in room)
+		const wasInRoom = this.stateMachine.currentState === ServerConnectionState.InRoom;
+		
+		// Save room ID before clearing for potential reconnection
+		if (this._roomId) {
+			this._lastRoomId = this._roomId;
+		}
+		
 		this.stateMachine.transitionTo(ServerConnectionState.Disconnected);
 		if (this.ws?.readyState === WebSocket.OPEN || this.ws?.readyState === WebSocket.CONNECTING) {
-			this.ws?.close();
+			this.ws.onclose = null;
+			this.ws.close();
 		}
 		this.ws = null;
 		this._ownUserId = null;
+		this._roomId = null;
+		this._otherClients = [];
+		this.idGen.removePrefix();
 		this.clearTaskTimeout();
 		this.clearHeartbeat();
+		
+		// Notify about unexpected disconnect if we were in room and it wasn't intentional
+		if (wasInRoom && !this._isExpectedDisconnect && this._lastRoomId) {
+			this.onUnexpectedDisconnect(this._lastError);
+		}
+	}
+
+	/**
+	 * Attempt to reconnect to the last room with download intent.
+	 * Returns true if reconnection was initiated, false if not possible.
+	 */
+	reconnect(): boolean {
+		if (!this._lastRoomId || !this._serverUrl) {
+			return false;
+		}
+		this.connect();
+		// We'll join the room after connection is established
+		this._pendingReconnectRoomId = this._lastRoomId;
+		return true;
 	}
 
 	joinRoom(roomId: string, uploadData?: unknown): void {
@@ -170,6 +221,9 @@ export class ServerConnection {
 			case "heartbeat_response":
 				this.handleHeartbeatResponseMessage(message);
 				break;
+			case "room_info":
+				// TODO
+				break;
 			case "error":
 				this.handleErrorMessage(message);
 				break;
@@ -193,6 +247,13 @@ export class ServerConnection {
 		this.stateMachine.transitionTo(ServerConnectionState.Connected);
 		this._availableRooms = message.availableRooms ?? [];
 		this.clearTaskTimeout();
+		
+		// Auto-join room if we're reconnecting
+		if (this._pendingReconnectRoomId) {
+			const roomId = this._pendingReconnectRoomId;
+			this._pendingReconnectRoomId = null;
+			this.joinRoom(roomId); // Download intent (no upload data)
+		}
 	}
 
 	private async handleRoomJoinedMessage(message: RoomJoinedMessage): Promise<void> {
@@ -248,9 +309,25 @@ export class ServerConnection {
 		this.idGen.replaceFromJsonIfHigher(message.highestIdCounter);
 	}
 
+	/**
+	 * Check if a user is currently connected to the room.
+	 * Returns true for own user or any user in otherClients.
+	 */
+	isUserConnected(userId: string): boolean {
+		if (this._ownUserId === userId) {
+			return true;
+		}
+		return this._otherClients.some(client => client.userId === userId);
+	}
+
 	private handleErrorMessage(message: ErrorMessage): void {
 		console.error("Server error:", message);
 		this._lastError = message.message;
+		if (this.state === ServerConnectionState.JoiningRoom && message.code === ErrorCode.ROOM_NOT_FOUND) {
+			this.stateMachine.transitionTo(ServerConnectionState.Connected);
+			this.clearTaskTimeout();
+			return;
+		}
 		this.disconnect();
 	}
 
@@ -291,9 +368,10 @@ export class ServerConnection {
 			this.disconnect();
 			return;
 		}
+		const pageMousePosition = globals.pageMousePosition;
 		this.sendMessage({
 			type: "heartbeat",
-			cursor: globals.mousePosition,
+			cursor: pageMousePosition ?? { x: 0, y: 0 },
 			currentPageId: this.getCurrentPageId(),
 			localIdCounter: this.idGen.getCurrentId(),
 		});

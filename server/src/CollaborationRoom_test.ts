@@ -35,6 +35,7 @@ function createTestConfig(overrides: Partial<RoomConfig> = {}): RoomConfig {
 		maxClients: 10,
 		snapshotIntervalMs: 30000,
 		heartbeatIntervalMs: 1000,
+		heartbeatFastDelayMs: 50,
 		commandBuffer: {
 			bufferTimeMs: 50,
 			maxBatchSize: 100,
@@ -294,7 +295,7 @@ describe("CollaborationRoom", () => {
 		});
 
 		describe("with upload intent", () => {
-			it("should add client successfully", () => {
+			it("should add client successfully when room is empty", () => {
 				const client = createMockClient("socket-1");
 				const result = room.addClient(client, "upload");
 
@@ -303,6 +304,31 @@ describe("CollaborationRoom", () => {
 				assertEquals(result.userId, "u1");
 				assertEquals(result.stateData, undefined);
 				assertEquals(room.getClientCount(), 1);
+			});
+
+			it("should add client successfully when state is not initialized even if not empty", () => {
+				mockRoomState.isStateInitialized = () => false;
+				room.addClient(createMockClient("socket-1"), "upload");
+
+				const client = createMockClient("socket-2");
+				const result = room.addClient(client, "upload");
+				assertEquals(result.type, "room_joined");
+				assertEquals(room.getClientCount(), 2);
+			});
+
+			it("should throw UPLOAD_NOT_AUTHORIZED when state is initialized and room is not empty", () => {
+				// Setup initialized state
+				room.setRoomState("socket-setup", createTestState());
+
+				// Add first client (allowed because room is empty)
+				room.addClient(createMockClient("socket-1"), "download");
+
+				// Add second client with upload intent (should fail)
+				const client2 = createMockClient("socket-2");
+				assertThrows(
+					() => room.addClient(client2, "upload"),
+					AppError,
+				);
 			});
 		});
 
@@ -345,6 +371,37 @@ describe("CollaborationRoom", () => {
 
 			room.addClient(createMockClient("socket-2"), "upload");
 			assertEquals(room.getClientCount(), 2);
+		});
+	});
+
+	describe("getAllowedIntents", () => {
+		it("should return both download and upload when state is initialized and no clients connected", () => {
+			room.setRoomState("socket-setup", createTestState());
+
+			const intents = room.getAllowedIntents();
+			assertEquals(intents.sort(), ["download", "upload"].sort());
+		});
+
+		it("should return only download when state is initialized and clients are connected", () => {
+			room.setRoomState("socket-setup", createTestState());
+
+			room.addClient(createMockClient("socket-1"), "download");
+
+			const intents = room.getAllowedIntents();
+			assertEquals(intents, ["download"]);
+		});
+
+		it("should return only upload when state is not initialized", () => {
+			// Room is not initialized by default in beforeEach
+			const intents = room.getAllowedIntents();
+			assertEquals(intents, ["upload"]);
+		});
+
+		it("should return only upload when state is not initialized even if clients are connected", () => {
+			room.addClient(createMockClient("socket-1"), "upload");
+
+			const intents = room.getAllowedIntents();
+			assertEquals(intents, ["upload"]);
 		});
 	});
 
@@ -605,6 +662,156 @@ describe("CollaborationRoom", () => {
 					assertEquals(message.clients.length, 2);
 				}
 			});
+
+			it("should schedule fast heartbeat broadcast after receiving client heartbeat", () => {
+				const client1 = createMockClient("socket-1");
+				const client2 = createMockClient("socket-2");
+				room.addClient(client1, "upload");
+				room.addClient(client2, "upload");
+
+				// Trigger heartbeat from client
+				room.handleHeartbeat(client1);
+
+				// Before fast delay - no message yet
+				time.tick(config.heartbeatFastDelayMs - 1);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 0);
+
+				// At fast delay - should broadcast
+				time.tick(1);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
+				const message = (client1.sendMessage as ReturnType<typeof spy>).calls[0].args[0] as ServerMessage;
+				assertEquals(message.type, "heartbeat_response");
+			});
+
+			it("should not schedule multiple fast heartbeats when receiving multiple client heartbeats", () => {
+				const client1 = createMockClient("socket-1");
+				const client2 = createMockClient("socket-2");
+				room.addClient(client1, "upload");
+				room.addClient(client2, "upload");
+
+				// Trigger multiple heartbeats
+				room.handleHeartbeat(client1);
+				room.handleHeartbeat(client2);
+				room.handleHeartbeat(client1);
+
+				// Wait for fast delay
+				time.tick(config.heartbeatFastDelayMs);
+
+				// Should only have one broadcast
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
+			});
+
+			it("should restart regular interval after fast heartbeat", () => {
+				const client1 = createMockClient("socket-1");
+				room.addClient(client1, "upload");
+
+				// Trigger fast heartbeat
+				room.handleHeartbeat(client1);
+				time.tick(config.heartbeatFastDelayMs);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
+
+				// After regular interval, should get another heartbeat
+				time.tick(config.heartbeatIntervalMs);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 2);
+			});
+
+			it("should cancel regular interval during fast heartbeat scheduling", () => {
+				const client1 = createMockClient("socket-1");
+				room.addClient(client1, "upload");
+
+				// At t=0, trigger fast heartbeat - fast delay (50ms) is sooner than regular (1000ms)
+				room.handleHeartbeat(client1);
+
+				// Fast delay fires at t=50
+				time.tick(config.heartbeatFastDelayMs);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
+
+				// Regular interval would have fired at t=1000, but now next is at t=50+1000=1050
+				// Advance to t=1000 - no additional message
+				time.tick(config.heartbeatIntervalMs - config.heartbeatFastDelayMs);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
+
+				// Advance to t=1050 - second message
+				time.tick(config.heartbeatFastDelayMs);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 2);
+			});
+
+			it("should not schedule fast heartbeat if regular is sooner", () => {
+				const client1 = createMockClient("socket-1");
+				room.addClient(client1, "upload");
+
+				// Advance to 10ms before regular heartbeat would fire
+				time.tick(config.heartbeatIntervalMs - 10);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 0);
+
+				// Trigger fast heartbeat - but fast delay (50ms) would fire AFTER regular (10ms away)
+				room.handleHeartbeat(client1);
+
+				// Advance 10ms - regular heartbeat should fire (not rescheduled for fast delay)
+				time.tick(10);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
+			});
+
+			it("should properly reschedule after command flush broadcasts heartbeat", () => {
+				let onFlushCallback: ((commands: Command[]) => void) | undefined;
+				const captureFlushCommandBuffer: ICommandBuffer = {
+					addCommands: spy(),
+					flush: spy(),
+					getBufferSize: () => 0,
+					clear: spy(),
+					dispose: spy(),
+				};
+
+				room.dispose();
+				room = new CollaborationRoom(
+					"test-room",
+					config,
+					mockCompression,
+					mockDatabase,
+					{
+						createRoomState: () => createMockRoomState(true),
+						createCommandBuffer: (_config, onFlush) => {
+							onFlushCallback = onFlush;
+							return captureFlushCommandBuffer;
+						},
+					},
+				);
+
+				const client1 = createMockClient("socket-1");
+				room.addClient(client1, "upload");
+
+				// Schedule fast heartbeat
+				room.handleHeartbeat(client1);
+
+				// Before fast delay, trigger command flush (which broadcasts heartbeat immediately)
+				time.tick(config.heartbeatFastDelayMs - 10);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 0);
+
+				// Flush commands - broadcasts command_batch + heartbeat_response
+				onFlushCallback?.([{
+					type: "page.add",
+					commandId: "cmd-1",
+					userId: "u1",
+					pageId: "new-page",
+					data: {},
+				} as PageAddCommand]);
+
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 2);
+				const message1 = (client1.sendMessage as ReturnType<typeof spy>).calls[0].args[0] as ServerMessage;
+				const message2 = (client1.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
+				assertEquals(message1.type, "command_batch");
+				assertEquals(message2.type, "heartbeat_response");
+
+				// The fast heartbeat timer should have been cancelled
+				// Next heartbeat should be at full interval after the command flush
+				time.tick(config.heartbeatIntervalMs - 1);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 2);
+
+				time.tick(1);
+				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 3);
+				const message3 = (client1.sendMessage as ReturnType<typeof spy>).calls[2].args[0] as ServerMessage;
+				assertEquals(message3.type, "heartbeat_response");
+			});
 		});
 
 		describe("snapshot timer", () => {
@@ -741,7 +948,7 @@ describe("CollaborationRoom", () => {
 			const client1 = createMockClient("socket-1");
 			const client2 = createMockClient("socket-2");
 			room.addClient(client1, "upload");
-			room.addClient(client2, "upload");
+			room.addClient(client2, "download");
 
 			// Simulate buffer flush
 			const commands: Command[] = [
@@ -755,15 +962,18 @@ describe("CollaborationRoom", () => {
 
 			onFlushCallback?.(commands);
 
-			// Both clients should receive command batch
-			assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
-			assertSpyCalls(client2.sendMessage as ReturnType<typeof spy>, 1);
+			// Both clients should receive command batch and heartbeat response
+			assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 2);
+			assertSpyCalls(client2.sendMessage as ReturnType<typeof spy>, 2);
 
 			const message1 = (client1.sendMessage as ReturnType<typeof spy>).calls[0].args[0] as ServerMessage;
 			assertEquals(message1.type, "command_batch");
 			if (message1.type === "command_batch") {
 				assertEquals(message1.commands, commands);
 			}
+
+			const message2 = (client1.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
+			assertEquals(message2.type, "heartbeat_response");
 		});
 
 		it("should not broadcast when flush has no commands", () => {

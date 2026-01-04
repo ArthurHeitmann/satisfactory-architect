@@ -77,6 +77,23 @@ export interface ObjectModifyCommand extends CommandBase {
 	data: unknown; // Full node/edge JSON replacement
 }
 
+// State variable names that can be updated via StateVarUpdateCommand
+export type StateVarName = "currentPageId" | "name";
+
+// State variable update command - for variables that don't fit page->object pattern
+// Note: These are stored on server but NOT applied on other clients
+export interface StateVarUpdateCommand extends CommandBase {
+	type: "statevar.update";
+	name: StateVarName;
+	value: unknown;
+}
+
+export interface ViewUpdateCommand extends CommandBase {
+	type: "view.update";
+	pageId: string;
+	data: unknown;
+}
+
 // Union of all command types
 export type Command =
 	| PageAddCommand
@@ -85,7 +102,9 @@ export type Command =
 	| PageReorderCommand
 	| ObjectAddCommand
 	| ObjectDeleteCommand
-	| ObjectModifyCommand;
+	| ObjectModifyCommand
+	| StateVarUpdateCommand
+	| ViewUpdateCommand;
 
 // Helper type for command type strings
 export type CommandType = Command["type"];
@@ -96,10 +115,16 @@ export type ClientMessage =
 	| JoinRoomMessage
 	| CommandBatchMessage
 	| HeartbeatMessage
-	| UploadStateMessage;
+	| UploadStateMessage
+	| GetRoomInfoMessage;
 
 export interface CreateRoomMessage extends VersionInfo {
 	type: "create_room";
+}
+
+export interface GetRoomInfoMessage {
+	type: "get_room_info";
+	roomId: string;
 }
 
 export type JoinRoomIntent = "download" | "upload";
@@ -134,6 +159,7 @@ export type ServerMessage =
 	| UploadConfirmationMessage
 	| CommandBatchMessage
 	| HeartbeatResponseMessage
+	| RoomInfoMessage
 	| ErrorMessage;
 
 export interface WelcomeMessage extends VersionInfo {
@@ -150,6 +176,15 @@ export interface RoomJoinedMessage {
 
 export interface UploadConfirmationMessage {
 	type: "upload_confirmation";
+}
+
+export interface RoomInfoMessage {
+	type: "room_info";
+	info: {
+		roomId: string;
+		clientCount: number;
+		allowedIntents: JoinRoomIntent[];
+	} | null;
 }
 
 export interface HeartbeatResponseMessage {

@@ -57,6 +57,7 @@ function createServer(): CollaborationServer {
 		serverProtocolVersion: envConfig.serverProtocolVersion,
 		serverBufferMs: envConfig.serverBufferMs,
 		heartbeatIntervalMs: envConfig.heartbeatIntervalMs,
+		heartbeatFastDelayMs: envConfig.heartbeatFastDelayMs,
 		snapshotIntervalMs: envConfig.snapshotIntervalMs,
 		maxRoomsPerServer: envConfig.maxRoomsPerServer,
 		maxClientsPerRoom: envConfig.maxClientsPerRoom,
@@ -138,7 +139,12 @@ function startServer() {
 	};
 
 	// Start server
-	Deno.serve({ port: envConfig.port }, handler);
+	Deno.serve({
+		port: envConfig.port,
+		onListen: ({ port, hostname }) => {
+			console.log(`✅ WebSocket Server is running at ws://${hostname ?? "localhost"}:${port}`);
+		},
+	}, handler);
 
 	// Graceful shutdown
 	Deno.addSignalListener("SIGINT", () => {

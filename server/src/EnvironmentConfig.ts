@@ -12,6 +12,7 @@ export interface EnvironmentConfig {
 	// Timing
 	serverBufferMs: number;
 	heartbeatIntervalMs: number;
+	heartbeatFastDelayMs: number;
 	heartbeatTimeoutMs: number;
 	maxMissedHeartbeats: number;
 	snapshotIntervalMs: number;
@@ -41,6 +42,7 @@ export function loadEnvironmentConfig(): EnvironmentConfig {
 		// Timing
 		serverBufferMs: getEnvNumber("SERVER_BUFFER_MS", 50),
 		heartbeatIntervalMs: getEnvNumber("HEARTBEAT_INTERVAL_MS", 1000),
+		heartbeatFastDelayMs: getEnvNumber("HEARTBEAT_FAST_DELAY_MS", 50),
 		heartbeatTimeoutMs: getEnvNumber("HEARTBEAT_TIMEOUT_MS", 5000),
 		maxMissedHeartbeats: getEnvNumber("MAX_MISSED_HEARTBEATS", 3),
 		snapshotIntervalMs: getEnvNumber("SNAPSHOT_INTERVAL_MS", 30000),

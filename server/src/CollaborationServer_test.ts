@@ -2,7 +2,7 @@
  * CollaborationServer unit tests
  */
 
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertExists } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
 import { FakeTime } from "@std/testing/time";
@@ -17,7 +17,8 @@ import { WebSocketReadyState } from "./types_server.ts";
 import type { CompressionService } from "./compression.ts";
 import type { DatabaseManager } from "./persistence.ts";
 import type {
-CompressedData,
+	CompressedData,
+	RoomInfoMessage,
 	RoomJoinedMessage,
 	ServerMessage,
 	UploadConfirmationMessage,
@@ -37,6 +38,7 @@ function createTestConfig(overrides: Partial<ServerConfig> = {}): ServerConfig {
 		serverProtocolVersion: 1,
 		serverBufferMs: 50,
 		heartbeatIntervalMs: 1000,
+		heartbeatFastDelayMs: 50,
 		snapshotIntervalMs: 30000,
 		maxRoomsPerServer: 100,
 		maxClientsPerRoom: 10,
@@ -103,6 +105,7 @@ function createMockRoom(roomId: string): CollaborationRoom {
 		handleHeartbeat: spy(),
 		setRoomState: spy(),
 		getClientCount: () => 0,
+		getAllowedIntents: () => ["download", "upload"],
 		isEmpty: () => true,
 		broadcast: spy(),
 		dispose: spy(),
@@ -130,12 +133,20 @@ function createMockCompression(): CompressionService {
 	} as unknown as CompressionService;
 }
 
+interface MockRoomData {
+	roomId: string;
+	createdAt: number;
+	lastActivity: number;
+}
+
 /** Creates a mock DatabaseManager */
-function createMockDatabase(): DatabaseManager {
+function createMockDatabase(roomsMap = new Map<string, MockRoomData>()): DatabaseManager {
 	return {
-		upsertRoom: spy(),
-		getRoom: spy(() => null),
-		listRooms: spy(() => []),
+		upsertRoom: spy((roomId: string) => {
+			roomsMap.set(roomId, { roomId, createdAt: Date.now(), lastActivity: Date.now() });
+		}),
+		getRoom: spy((roomId: string) => roomsMap.get(roomId) || null),
+		listRooms: spy(() => Array.from(roomsMap.values())),
 		saveSnapshot: spy(),
 		loadSnapshot: spy(() => null),
 		saveCommand: spy(),
@@ -157,13 +168,15 @@ describe("CollaborationServer", () => {
 	let mockClient: ICollaborationClient;
 	let createdClients: Map<string, ICollaborationClient>;
 	let createdRooms: Map<string, CollaborationRoom>;
+	let dbRooms: Map<string, MockRoomData>;
 	let time: FakeTime;
 
 	beforeEach(() => {
 		time = new FakeTime();
 		config = createTestConfig();
 		mockCompression = createMockCompression();
-		mockDatabase = createMockDatabase();
+		dbRooms = new Map();
+		mockDatabase = createMockDatabase(dbRooms);
 		createdClients = new Map();
 		createdRooms = new Map();
 
@@ -381,6 +394,32 @@ describe("CollaborationServer", () => {
 			assertEquals(errorMessage.type, "error");
 		});
 
+		it("should join room from database if not in memory", () => {
+			const socket = createMockSocket("socket-joiner-db");
+			server.handleConnection(socket);
+
+			const roomId = "db-room-id";
+			mockDatabase.upsertRoom(roomId);
+
+			server.handleMessage(socket, JSON.stringify({
+				type: "join_room",
+				roomId: roomId,
+				serverProtocolVersion: 1,
+				intent: "upload",
+			}));
+
+			// welcome message
+			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 1);
+			
+			// room_joined message
+			const joinerClient = createdClients.get("socket-joiner-db");
+			assertExists(joinerClient);
+			assertSpyCalls(joinerClient.sendMessage as ReturnType<typeof spy>, 1);
+			const joinResponse = (joinerClient.sendMessage as ReturnType<typeof spy>).calls[0].args[0] as RoomJoinedMessage;
+			assertEquals(joinResponse.type, "room_joined");
+			assertEquals(joinResponse.roomId, roomId);
+		});
+
 		it("should reject incompatible version", () => {
 			const socket = createMockSocket("socket-joiner");
 			server.handleConnection(socket);
@@ -394,6 +433,76 @@ describe("CollaborationServer", () => {
 
 			const errorMessage = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
 			assertEquals(errorMessage.type, "error");
+		});
+	});
+
+	describe("handleMessage - get_room_info", () => {
+		it("should return room info if room exists", () => {
+			const socket = createMockSocket("socket-info");
+			server.handleConnection(socket); // Call 0: welcome
+
+			// Create a room first
+			server.handleMessage(socket, JSON.stringify({
+				type: "create_room",
+				serverProtocolVersion: 1,
+			}));
+			// Note: create_room sends room_joined to client.sendMessage, not socket.sendMessage
+
+			const roomId = "test-room-id";
+
+			// Request info
+			server.handleMessage(socket, JSON.stringify({
+				type: "get_room_info",
+				roomId: roomId,
+			}));
+
+			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
+			const infoResponse = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as RoomInfoMessage;
+			assertEquals(infoResponse.type, "room_info");
+			assertExists(infoResponse.info);
+			if (infoResponse.info) {
+				assertEquals(infoResponse.info.roomId, roomId);
+				assertEquals(infoResponse.info.clientCount, 0); // Mock room returns 0
+				assertEquals(infoResponse.info.allowedIntents, ["download", "upload"]);
+			}
+		});
+
+		it("should return null if room does not exist", () => {
+			const socket = createMockSocket("socket-info-missing");
+			server.handleConnection(socket);
+
+			server.handleMessage(socket, JSON.stringify({
+				type: "get_room_info",
+				roomId: "non-existent-room",
+			}));
+
+			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
+			const infoResponse = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as RoomInfoMessage;
+			assertEquals(infoResponse.type, "room_info");
+			assertEquals(infoResponse.info, null);
+		});
+
+		it("should return room info for room in database but not in memory", () => {
+			const socket = createMockSocket("socket-info-db");
+			server.handleConnection(socket);
+
+			// Manually add room to mock database
+			const roomId = "db-room-id-info";
+			mockDatabase.upsertRoom(roomId);
+
+			// Request info
+			server.handleMessage(socket, JSON.stringify({
+				type: "get_room_info",
+				roomId: roomId,
+			}));
+
+			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
+			const infoResponse = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as RoomInfoMessage;
+			assertEquals(infoResponse.type, "room_info");
+			assertExists(infoResponse.info);
+			if (infoResponse.info) {
+				assertEquals(infoResponse.info.roomId, roomId);
+			}
 		});
 	});
 
@@ -646,6 +755,7 @@ describe("CollaborationServer", () => {
 			}));
 
 			server.dispose();
+			dbRooms.clear(); // Clear DB too for this test
 
 			assertEquals(server.getAvailableRooms(), []);
 		});

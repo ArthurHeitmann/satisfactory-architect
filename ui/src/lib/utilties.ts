@@ -121,6 +121,29 @@ export function randomId(): string {
 	return Math.random().toString(36).substring(2, 10);
 }
 
+export function generateUUID(): string {
+	// Try to use crypto.randomUUID if available (https or localhost)
+	if (typeof crypto !== "undefined" && crypto.randomUUID) {
+		try {
+			return crypto.randomUUID();
+		} catch {
+			// Fall through to fallback implementation
+		}
+	}
+	
+	// Fallback: generate a UUID v4-like string using Math.random()
+	// Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+	const randomShort = () => Math.floor(Math.random() * 65536).toString(16).padStart(4, "0");
+	
+	return [
+		randomShort() + randomShort(),
+		randomShort(),
+		"4" + randomShort().slice(1),
+		((Math.floor(Math.random() * 4) + 8)).toString(16) + randomShort().slice(1),
+		randomShort() + randomShort() + randomShort(),
+	].join("-");
+}
+
 export function copyText(text: string) {
 	if (navigator.clipboard && window.isSecureContext) {
 		return navigator.clipboard.writeText(text);
@@ -310,4 +333,31 @@ export function arraysEqual<T extends Primitive>(a: T[], b: T[]): boolean {
 		}
 	}
 	return true;
+}
+
+const CURSOR_COLORS = [
+	"#e74c3c", // Red
+	"#3498db", // Blue
+	"#2ecc71", // Green
+	"#9b59b6", // Purple
+	"#f39c12", // Orange
+	"#1abc9c", // Teal
+	"#e91e63", // Pink
+	"#00bcd4", // Cyan
+	"#ff5722", // Deep Orange
+	"#8bc34a", // Light Green
+];
+
+/**
+ * Get a deterministic color based on a string seed.
+ * Uses a simple hash function to select from predefined colors.
+ */
+export function getColorFromSeed(seed: string): string {
+	let hash = 0;
+	for (let i = 0; i < seed.length; i++) {
+		hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	const index = Math.abs(hash) % CURSOR_COLORS.length;
+	return CURSOR_COLORS[index];
 }

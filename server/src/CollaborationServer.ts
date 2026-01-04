@@ -6,8 +6,10 @@ import type {
 	ClientMessage,
 	CommandBatchMessage,
 	CreateRoomMessage,
+	GetRoomInfoMessage,
 	HeartbeatMessage,
 	JoinRoomMessage,
+	RoomInfoMessage,
 	RoomListItem,
 	UploadConfirmationMessage,
 	UploadStateMessage,
@@ -108,6 +110,9 @@ export class CollaborationServer {
 				case "join_room":
 					this.handleJoinRoom(socket.socketId, message);
 					break;
+				case "get_room_info":
+					this.handleGetRoomInfo(socket.socketId, message);
+					break;
 				case "command_batch":
 					this.handleCommandBatch(socket.socketId, message);
 					break;
@@ -145,7 +150,15 @@ export class CollaborationServer {
 	 * Get list of available rooms (for welcome message)
 	 */
 	public getAvailableRooms(): RoomListItem[] {
-		return Array.from(this.rooms.keys()).map((roomId) => ({ roomId }));
+		const activeRoomIds = new Set(this.rooms.keys());
+		const dbRooms = this.database.listRooms();
+
+		const allRoomIds = new Set(activeRoomIds);
+		for (const room of dbRooms) {
+			allRoomIds.add(room.roomId);
+		}
+
+		return Array.from(allRoomIds).map((roomId) => ({ roomId }));
 	}
 
 	/**
@@ -193,19 +206,24 @@ export class CollaborationServer {
 		const roomId = this.generateRoomId();
 		const room = this.createRoom(roomId);
 
-		// Create client and add to room
-		const client = this.getOrCreateClient(
-			socketId,
-			message.serverProtocolVersion,
-		);
-		const joinResponse = room.addClient(client, "upload"); // New room creator uploads initial state
+		try {
+			// Create client and add to room
+			const client = this.getOrCreateClient(
+				socketId,
+				message.serverProtocolVersion,
+			);
+			const joinResponse = room.addClient(client, "upload"); // New room creator uploads initial state
 
-		// Register room and update database
-		this.rooms.set(roomId, room);
-		this.socketIdToRoomId.set(socketId, roomId);
-		this.database.upsertRoom(roomId);
+			// Register room and update database
+			this.rooms.set(roomId, room);
+			this.socketIdToRoomId.set(socketId, roomId);
+			this.database.upsertRoom(roomId);
 
-		client.sendMessage(joinResponse);
+			client.sendMessage(joinResponse);
+		} catch (error) {
+			room.dispose();
+			throw error;
+		}
 	}
 
 	/**
@@ -226,7 +244,7 @@ export class CollaborationServer {
 			);
 		}
 
-		const room = this.rooms.get(message.roomId);
+		const room = this.getOrLoadRoom(message.roomId);
 		if (!room) {
 			throw new AppError(
 				ErrorCode.ROOM_NOT_FOUND,
@@ -236,15 +254,56 @@ export class CollaborationServer {
 			);
 		}
 
-		// Create client and add to room
-		const client = this.getOrCreateClient(
-			socketId,
-			message.serverProtocolVersion,
-		);
-		const joinResponse = room.addClient(client, message.intent);
+		try {
+			// Create client and add to room
+			const client = this.getOrCreateClient(
+				socketId,
+				message.serverProtocolVersion,
+			);
+			const joinResponse = room.addClient(client, message.intent);
 
-		this.socketIdToRoomId.set(socketId, message.roomId);
-		client.sendMessage(joinResponse);
+			this.rooms.set(message.roomId, room);
+			this.socketIdToRoomId.set(socketId, message.roomId);
+			client.sendMessage(joinResponse);
+		} catch (error) {
+			if (!this.rooms.has(message.roomId)) {
+				room.dispose();
+			}
+			throw error;
+		}
+	}
+
+	/**
+	 * Handle get room info request
+	 */
+	private handleGetRoomInfo(
+		socketId: string,
+		message: GetRoomInfoMessage,
+	): void {
+		const socket = this.socketIdToSocket.get(socketId);
+		if (!socket) {
+			return;
+		}
+
+		const room = this.getOrLoadRoom(message.roomId);
+		const isTemporary = room && !this.rooms.has(message.roomId);
+
+		const response: RoomInfoMessage = {
+			type: "room_info",
+			info: room
+				? {
+					roomId: room.roomId,
+					clientCount: room.getClientCount(),
+					allowedIntents: room.getAllowedIntents(),
+				}
+				: null,
+		};
+
+		socket.sendMessage(response);
+
+		if (isTemporary && room) {
+			room.dispose();
+		}
 	}
 
 	/**
@@ -332,6 +391,21 @@ export class CollaborationServer {
 	}
 
 	/**
+	 * Get room by ID, loading from database if necessary.
+	 * Does NOT add to this.rooms automatically.
+	 */
+	private getOrLoadRoom(roomId: string): CollaborationRoom | null {
+		const room = this.rooms.get(roomId);
+		if (room) return room;
+
+		const roomInfo = this.database.getRoom(roomId);
+		if (roomInfo) {
+			return this.createRoom(roomId);
+		}
+		return null;
+	}
+
+	/**
 	 * Create new room
 	 */
 	private createRoom(roomId: string): CollaborationRoom {
@@ -339,6 +413,7 @@ export class CollaborationServer {
 			maxClients: this.config.maxClientsPerRoom,
 			snapshotIntervalMs: this.config.snapshotIntervalMs,
 			heartbeatIntervalMs: this.config.heartbeatIntervalMs,
+			heartbeatFastDelayMs: this.config.heartbeatFastDelayMs,
 			commandBuffer: {
 				bufferTimeMs: this.config.serverBufferMs,
 				maxBatchSize: this.config.maxCommandBatchSize,

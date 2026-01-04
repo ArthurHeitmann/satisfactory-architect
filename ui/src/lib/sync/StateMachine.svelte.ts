@@ -25,7 +25,6 @@ export class StateMachine<State extends string | number> {
 		if (!allowedTransitions.includes(newState)) {
 			throw new Error(`Invalid state transition from ${this._currentState} to ${newState}`);
 		}
-		console.log(`State transition: ${this._currentState} -> ${newState}`);
 		this._currentState = newState;
 	}
 }

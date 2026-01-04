@@ -41,6 +41,7 @@ export interface ServerConfig {
 	serverProtocolVersion: number;
 	serverBufferMs: number; // 50ms default
 	heartbeatIntervalMs: number; // 1000ms default
+	heartbeatFastDelayMs: number; // 50ms default
 	snapshotIntervalMs: number; // 30000ms default
 	maxRoomsPerServer: number;
 	maxClientsPerRoom: number;

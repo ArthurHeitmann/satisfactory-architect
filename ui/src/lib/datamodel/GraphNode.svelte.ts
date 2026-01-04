@@ -62,8 +62,9 @@ export interface GraphNodeResourceJointProperties {
 	jointType: "input" | "output";
 	layoutOrientation: LayoutOrientation | undefined;
 	locked: boolean;
-	jointDragType?: JointDragType;	// TODO syncing (TODO distinguish between users)
+	jointDragType?: JointDragType;
 	dragStartNodeId?: Id;
+	dragOwnerUserId?: string | null;	// userId of the user performing the drag (null = local only, not synced)
 }
 export interface GraphNodeSplitterMergerProperties {
 	type: "splitter" | "merger";

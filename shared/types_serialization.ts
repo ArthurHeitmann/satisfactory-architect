@@ -74,6 +74,7 @@ export interface AppStateJson {
 	version: number;
 	type: string;
 	idGen: string; // Serialized as string representation of number
+	name?: string; // Optional name for the project/save
 	currentPageId: Id;
 	pages: GraphPageJson[];
 }

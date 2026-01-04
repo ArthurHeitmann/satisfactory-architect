@@ -1,242 +1,762 @@
 <script lang="ts">
 	import { ServerConnectionState } from "$lib/sync/ServerConnection.svelte";
 	import type { ShowConnectionOverlayEvent, EventStream } from "$lib/EventStream.svelte";
-	import { getContext, onMount } from "svelte";
+	import { getContext, onMount, untrack } from "svelte";
 	import type { AppState } from "$lib/datamodel/AppState.svelte";
+	import { localStorageState } from "$lib/localStorageState.svelte";
+	import { assertUnreachable, copyText } from "$lib/utilties";
+    import { fade } from "svelte/transition";
 
 	interface Props {
 		event: ShowConnectionOverlayEvent;
 		dismissEventStream: EventStream;
 		onclose: () => void;
 	}
-	const {
-		onclose,
-	}: Props = $props();
+	const { event, onclose }: Props = $props();
 
 	const appState = getContext("app-state") as AppState;
 	const serverConnection = appState.serverConnection;
 
-	let serverUrl = $state(serverConnection.serverUrl);
-	$effect(() => {
-		serverUrl = serverConnection.serverUrl;
-	});
-	let roomId = $state("");
-	let uploadData = $state(false);
+	// Local UI state (only for things not driven by server state)
+	let activeTab: "join" | "create" = $state("join");
+	let showServerSettings = $state(false);
 
-	function onUrlChange() {
-		serverConnection.setServerUrl(serverUrl);
+	// Recent rooms (stored in localStorage)
+	interface RecentRoom {
+		roomId: string;
+		serverUrl: string;
+		name?: string;
+		lastJoined: number;
 	}
 
-	function onConnect() {
+	// Persistent state via localStorage stores
+	const lastServerUrlStore = localStorageState("lastServerUrl", serverConnection.serverUrl);
+	const recentRoomsStore = localStorageState<RecentRoom[]>("recentRooms", []);
+	const recentRoomsSorted = $derived([...$recentRoomsStore].sort((a, b) => b.lastJoined - a.lastJoined));
+
+	// Form state
+	let roomIdInput = $state("");
+	let newRoomName = $state("");
+	let serverUrlInput = $state($lastServerUrlStore);
+
+	// Save recent rooms to localStorage (only called on successful join)
+	function saveRecentRoom(roomId: string, serverUrl: string, name?: string) {
+		const rooms = [...$recentRoomsStore];
+		const existing = rooms.findIndex(f => f.roomId === roomId && f.serverUrl === serverUrl);
+		if (existing >= 0) {
+			rooms[existing].lastJoined = Date.now();
+			if (name) rooms[existing].name = name;
+		} else {
+			rooms.unshift({ roomId, serverUrl, name, lastJoined: Date.now() });
+		}
+		$recentRoomsStore = rooms;
+	}
+
+	function clearRecentRooms() {
+		$recentRoomsStore = [];
+	}
+
+	// update current room name in local storage
+	$effect(() => {
+		if (serverConnection.state !== ServerConnectionState.InRoom) {
+			return;
+		}
+		const name = appState.name;
+		const rooms = untrack(() => [...$recentRoomsStore]);
+		const existing = rooms.findIndex(f => f.roomId === serverConnection.roomId && f.serverUrl === serverConnection.serverUrl);
+		if (existing >= 0) {
+			rooms[existing].name = name;
+			$recentRoomsStore = rooms;
+		}
+	});
+
+	function waitForConnected(): Promise<boolean> {
+		function isConnected(state: ServerConnectionState) {
+			return state !== ServerConnectionState.Disconnected && state !== ServerConnectionState.Connecting;
+		}
+		return new Promise((resolve) => {
+			if (isConnected(serverConnection.state)) {
+				resolve(true);
+				return;
+			}
+			const unwatch = $effect.root(() => {
+				$effect(() => {
+					if (isConnected(serverConnection.state)) {
+						unwatch();
+						resolve(true);
+					} else if (serverConnection.state === ServerConnectionState.Disconnected) {
+						unwatch();
+						resolve(false);
+					}
+				});
+			});
+		});
+	}
+
+	// View is primarily driven by server state
+	type CurrentView = "choose-room" | "current-session" | "loading" | "joining" | "connection-error" | "server-settings";
+	const currentView: CurrentView = $derived.by(() => {
+		switch (serverConnection.state) {
+			case ServerConnectionState.Disconnected:
+				if (showServerSettings) {
+					return "server-settings";
+				} else if (serverConnection.lastError) {
+					return "connection-error";
+				} else {
+					return "server-settings";
+				}
+			case ServerConnectionState.Connecting:
+				return "loading";
+			case ServerConnectionState.Connected:
+				if (showServerSettings) {
+					return "server-settings";
+				} else {
+					return "choose-room";
+				}
+			case ServerConnectionState.JoiningRoom:
+			case ServerConnectionState.UploadingState:
+				return "joining";
+			case ServerConnectionState.InRoom:
+				return "current-session";
+			default:
+				assertUnreachable(serverConnection.state);
+		}
+	});
+
+	async function joinRoom(roomId: string, serverUrl?: string) {
+		if (serverUrl) {
+			serverConnection.setServerUrl(serverUrl);
+		}
+		await waitForConnected();
+		if (serverConnection.state === ServerConnectionState.Connected) {
+			serverConnection.joinRoom(roomId);
+		}
+		else {
+			// TODO: handle error
+		}
+	}
+
+	// Actions
+	function handleJoinRoom() {
+		let roomId: string;
+		let customServerUrl: string | undefined = undefined;
+		const roomIdStr = roomIdInput.trim();
+		// if (roomIdStr.startsWith("ws://") || roomIdStr.startsWith("wss://")) {
+		// 	roomId = roomIdStr.split("/").pop() || "";
+		// 	if (!roomId) {
+		// 		// TODO
+		// 		return;
+		// 	}
+		// 	customServerUrl = roomIdStr.substring(0, roomIdStr.length - roomId.length - 1);
+		// }
+		// else {
+			roomId = roomIdStr.trim();
+		// }
+		
+		joinRoom(roomId, customServerUrl);
+	}
+
+	function handleJoinRecentRoom(room: RecentRoom) {
+		joinRoom(room.roomId, room.serverUrl);
+	}
+
+	async function handleCreateRoom() {
+		if (serverConnection.state === ServerConnectionState.Disconnected) {
+			serverConnection.connect();
+			if (!await waitForConnected()) return; // TODO
+		}
+		
+		if (serverConnection.state === ServerConnectionState.Connected) {
+			if (newRoomName) {
+				appState.name = newRoomName;
+			}
+			serverConnection.createRoom(appState.toJSON());
+		}
+	}
+
+	async function handleLeaveRoom() {
+		serverConnection.intentionalDisconnect();
+		activeTab = "join";
+		// await waitForDisconnected();
 		serverConnection.connect();
 	}
 
-	function onDisconnect() {
-		serverConnection.disconnect();
+	function handleTryAgain() {
+		serverConnection.connect();
 	}
 
-	function onJoinRoom() {
-		serverConnection.joinRoom(roomId, uploadData ? appState.toJSON() : undefined);
+	function handleCancelReconnect() {
+		serverConnection.intentionalDisconnect();
 	}
 
-	function onCreateRoom() {
-		serverConnection.createRoom(appState.toJSON());
+	function handleServerSettingsSave() {
+		$lastServerUrlStore = serverUrlInput;
+		serverConnection.setServerUrl(serverUrlInput);
+		showServerSettings = false;
 	}
 
+	function handleCopyRoomId() {
+		if (serverConnection.roomId) {
+			copyText(serverConnection.roomId);
+		}
+	}
+
+	function openServerSettings() {
+		serverUrlInput = serverConnection.serverUrl || $lastServerUrlStore;
+		showServerSettings = true;
+	}
+
+	function closeServerSettings() {
+		showServerSettings = false;
+	}
+
+	// Initialize - load server URL from storage and auto-connect
 	onMount(() => {
-		if (serverConnection.state === ServerConnectionState.Disconnected && serverUrl) {
+		const savedUrl = $lastServerUrlStore;
+		if (savedUrl && serverConnection.state === ServerConnectionState.Disconnected && !serverConnection.serverUrl) {
+			serverConnection.setServerUrl(savedUrl);
+		}
+		
+		if (serverConnection.state === ServerConnectionState.Disconnected && serverConnection.serverUrl) {
 			serverConnection.connect();
 		}
 	});
 
+	// Save room to recent only when successfully joined
 	$effect(() => {
-		if (serverConnection.roomId) {
-			roomId = serverConnection.roomId;
+		if (serverConnection.state === ServerConnectionState.InRoom && serverConnection.roomId) {
+			untrack(() => {
+				saveRecentRoom(serverConnection.roomId!, serverConnection.serverUrl, appState.name);
+			});
 		}
 	});
 
-	const stateLabel = $derived.by(() => {
-		switch (serverConnection.state) {
-			case ServerConnectionState.Disconnected: return "Disconnected";
-			case ServerConnectionState.Connecting: return "Connecting...";
-			case ServerConnectionState.Connected: return "Connected (No Room)";
-			case ServerConnectionState.JoiningRoom: return "Joining Room...";
-			case ServerConnectionState.UploadingState: return "Uploading State...";
-			case ServerConnectionState.InRoom: return "In Room";
-			default: return "Unknown";
-		}
-	});
-
-	const canConnect = $derived(serverConnection.state === ServerConnectionState.Disconnected);
-	const canDisconnect = $derived(serverConnection.state !== ServerConnectionState.Disconnected);
-	const canJoinOrCreate = $derived(serverConnection.state === ServerConnectionState.Connected);
+	const isInRoomSelection = $derived(currentView === "choose-room" || currentView === "joining" || currentView === "loading");
 </script>
 
-<div class="background" onclick={onclose}></div>
-<div class="prompt">
-	<h2>Server Connection</h2>
-	
-	<div class="field">
-		<label for="server-url">Server URL</label>
-		<input 
-			id="server-url" 
-			type="text" 
-			bind:value={serverUrl} 
-			onchange={onUrlChange}
-			placeholder="ws://localhost:8080"
-		/>
-	</div>
+<div class="overlay-background" onclick={onclose}></div>
+<div class="overlay-container">
+	{#if isInRoomSelection}
+		{@const isLoading = currentView === "joining" || currentView === "loading"}
+		<!-- Join/Create Room Views -->
+		<div class="overlay-header">
+			<h2>New Collaboration Session</h2>
+			<button class="close-btn" onclick={onclose}>✕</button>
+		</div>
 
-	<div class="status">
-		Status: <span class="state-label">{stateLabel}</span>
-		{#if serverConnection.lastError}
-			<div class="error">{serverConnection.lastError}</div>
+		{#if isLoading}
+			<div class="blocking-overlay" transition:fade={{ duration: 50 }}>
+				<div class="spinner"></div>
+			</div>
 		{/if}
-	</div>
 
-	<div class="actions">
-		{#if canConnect}
-			<button onclick={onConnect}>Connect</button>
+		<div class="tabs">
+			<button 
+				class="tab" 
+				class:active={activeTab === "join"}
+				onclick={() => activeTab = "join"}
+			>
+				Join Room
+			</button>
+			<button 
+				class="tab" 
+				class:active={activeTab === "create"}
+				onclick={() => activeTab = "create"}
+			>
+				Create New Room
+			</button>
+		</div>
+
+		{#if activeTab === "join"}
+			<!-- Join Room Tab -->
+			<div class="overlay-content">
+				<div class="field">
+					<input 
+						type="text" 
+						bind:value={roomIdInput}
+						placeholder="Paste Session ID..."
+						disabled={isLoading}
+					/>
+				</div>
+				<button 
+					class="btn primary" 
+					onclick={handleJoinRoom}
+					disabled={!roomIdInput.trim() || isLoading}
+				>
+					{#if currentView === "joining"}
+						Joining...
+					{:else}
+						Join Session
+					{/if}
+				</button>
+				<p class="warning-text">
+					Warning: This will overwrite any unsaved local changes.
+				</p>
+				{#if serverConnection.lastError}
+					<p class="error-text">{serverConnection.lastError}</p>
+				{/if}
+
+				{#if recentRoomsSorted.length > 0}
+					<div class="divider"></div>
+					<div class="recent-rooms">
+						<div class="recent-header">
+							<h3>Recent Sessions</h3>
+							<button class="clear-btn" onclick={clearRecentRooms}>Clear</button>
+						</div>
+						<div class="room-list">
+							{#each recentRoomsSorted as room}
+								<button 
+									class="room-item"
+									onclick={() => handleJoinRecentRoom(room)}
+									disabled={isLoading}
+								>
+									<span class="room-name">{room.name || "Unnamed Room"}</span>
+									<span class="room-id">{room.roomId}</span>
+								</button>
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{:else}
+			<!-- Create Room Tab -->
+			<div class="overlay-content">
+				<div class="field">
+					<label for="new-room-name">Room Name (Optional)</label>
+					<input 
+						id="new-room-name"
+						type="text" 
+						bind:value={newRoomName}
+						placeholder='e.g., "Turbo Motor Production"'
+						disabled={isLoading}
+					/>
+				</div>
+				<button 
+					class="btn primary" 
+					onclick={handleCreateRoom}
+					disabled={isLoading}
+				>
+					{#if isLoading}
+						Creating...
+					{:else}
+						Create & Host
+					{/if}
+				</button>
+			</div>
 		{/if}
-		{#if canDisconnect}
-			<button onclick={onDisconnect}>Disconnect</button>
-		{/if}
-	</div>
 
-	<hr />
+		<div class="overlay-footer">
+			<button class="link-btn" onclick={openServerSettings}>
+				Advanced: Server Settings
+			</button>
+		</div>
 
-	<div class="field">
-		<label for="room-id">Room ID</label>
-		<input 
-			id="room-id" 
-			type="text" 
-			bind:value={roomId} 
-			disabled={!canJoinOrCreate}
-			placeholder="Enter room ID"
-		/>
-	</div>
+	{:else if currentView === "current-session"}
+		<!-- Current Session View -->
+		<div class="overlay-header">
+			<h2>Active Session</h2>
+			<button class="close-btn" onclick={onclose}>✕</button>
+		</div>
 
-	<div class="field checkbox">
-		<input 
-			id="upload-data" 
-			type="checkbox" 
-			bind:checked={uploadData} 
-			disabled={!canJoinOrCreate}
-		/>
-		<label for="upload-data">Upload current state</label>
-	</div>
+		<div class="overlay-content">
+			<div class="field">
+				<label for="room-name">Room Name</label>
+				<input 
+					id="room-name"
+					type="text" 
+					bind:value={appState.name}
+					placeholder="Unnamed Room"
+				/>
+			</div>
 
-	<div class="actions">
-		<button 
-			onclick={onJoinRoom} 
-			disabled={!canJoinOrCreate || !roomId}
-		>
-			Join Room
-		</button>
-		<button 
-			onclick={onCreateRoom} 
-			disabled={!canJoinOrCreate}
-		>
-			Create New Room
-		</button>
-	</div>
+			<div class="field">
+				<label for="session-id">Shareable Session ID</label>
+				<div class="copy-field">
+					<input 
+						id="session-id"
+						type="text" 
+						readonly
+						value={serverConnection.roomId ?? ""}
+					/>
+					<button class="btn secondary" onclick={handleCopyRoomId}>
+						Copy
+					</button>
+				</div>
+			</div>
 
-	<div class="footer">
-		<button class="close-button" onclick={onclose}>Close</button>
-	</div>
+			<div class="divider"></div>
+
+			<button class="btn danger" onclick={handleLeaveRoom}>
+				Leave Session
+			</button>
+		</div>
+
+	{:else if currentView === "connection-error"}
+		<!-- Connection Error View -->
+		<div class="overlay-header">
+			<h2>Connection Issue</h2>
+			<button class="close-btn" onclick={onclose}>✕</button>
+		</div>
+
+		<div class="overlay-content centered">
+			<div class="warning-icon">⚠</div>
+			<h3>Could not connect to server.</h3>
+			<p class="subtitle">
+				{serverConnection.lastError || "Please check your internet connection."}
+			</p>
+			<div class="button-stack">
+				<button class="btn primary" onclick={handleTryAgain}>
+					Try Again
+				</button>
+				<button class="btn secondary" onclick={openServerSettings}>
+					Change Server Settings
+				</button>
+			</div>
+		</div>
+
+	{:else if currentView === "server-settings"}
+		<!-- Server Settings View -->
+		<div class="overlay-header">
+			<h2>Server Settings</h2>
+			<button class="close-btn" onclick={onclose}>✕</button>
+		</div>
+
+		<div class="overlay-content">
+			<div class="field">
+				<label for="server-url">Server URL</label>
+				<input 
+					id="server-url"
+					type="text" 
+					bind:value={serverUrlInput}
+					placeholder="ws://localhost:8080"
+				/>
+			</div>
+
+			<div class="status-row">
+				<span>Status:</span>
+				<span class="status-text">
+					{serverConnection.state === ServerConnectionState.Disconnected ? "Disconnected" : "Connected"}
+				</span>
+			</div>
+
+			<div class="button-row">
+				<button
+					class="btn primary" onclick={handleServerSettingsSave}
+					disabled={serverConnection.state !== ServerConnectionState.Disconnected && serverConnection.serverUrl === serverUrlInput}
+				>
+					Connect
+				</button>
+				<button class="btn secondary" onclick={closeServerSettings}>
+					Cancel
+				</button>
+			</div>
+		</div>
+	{:else}
+		{untrack(() => { throw new Error(`Unhandled view: ${currentView}`); })}
+	{/if}
 </div>
 
 <style lang="scss">
-	.background {
-		position: absolute;
+	.overlay-background {
+		position: fixed;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
 		background-color: var(--popup-block-area-background-color);
+		z-index: 1000;
 	}
 
-	.prompt {
-		position: absolute;
+	.overlay-container {
+		position: fixed;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		background-color: var(--popup-background-color);
 		border: 1px solid var(--popup-border-color);
-		padding: 24px;
-		border-radius: 8px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-		width: 400px;
+		border-radius: var(--rounded-border-radius-big);
+		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+		width: 420px;
+		max-width: 90vw;
+		max-height: 80vh;
+		display: flex;
+		flex-direction: column;
+		z-index: 1001;
+		overflow: hidden;
+	}
+
+	.overlay-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 16px 20px;
+		border-bottom: 1px solid var(--popup-border-color);
+
+		h2 {
+			font-size: 1.25rem;
+			font-weight: 600;
+			margin: 0;
+		}
+
+		.close-btn {
+			width: 28px;
+			height: 28px;
+			border-radius: var(--rounded-border-radius);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1rem;
+			color: var(--background-500);
+			
+			&:hover {
+				background-color: var(--popup-button-hover-background-color);
+				color: var(--text);
+			}
+		}
+	}
+
+	.tabs {
+		display: flex;
+		border-bottom: 1px solid var(--popup-border-color);
+
+		.tab {
+			flex: 1;
+			padding: 12px 16px;
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: var(--background-500);
+			border-bottom: 2px solid transparent;
+			transition: all 0.15s ease;
+
+			&:hover {
+				color: var(--text);
+				background-color: var(--popup-button-hover-background-color);
+			}
+
+			&.active {
+				color: var(--primary);
+				border-bottom-color: var(--primary);
+			}
+		}
+	}
+
+	.overlay-content {
+		padding: 20px;
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
+		overflow-y: auto;
 
-		h2 {
-			margin: 0;
-			font-size: 1.5rem;
-		}
+		&.centered {
+			align-items: center;
+			text-align: center;
+			padding: 40px 20px;
 
-		hr {
-			width: 100%;
-			border: 0;
-			border-top: 1px solid var(--popup-border-color);
-			margin: 8px 0;
+			h3 {
+				margin: 0;
+				font-size: 1.1rem;
+				font-weight: 600;
+			}
+
+			.subtitle {
+				color: var(--background-500);
+				margin: 0;
+			}
 		}
+	}
+
+	.overlay-footer {
+		padding: 12px 20px;
+		border-top: 1px solid var(--popup-border-color);
+		display: flex;
+		justify-content: center;
+	}
+
+	.blocking-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.4);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 10;
 	}
 
 	.field {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 6px;
 
 		label {
-			font-size: 0.9rem;
-			font-weight: bold;
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: var(--background-600);
 		}
 
 		input[type="text"] {
-			padding: 8px;
-			border-radius: 4px;
+			padding: 10px 12px;
+			border-radius: var(--rounded-border-radius);
 			border: 1px solid var(--popup-border-color);
 			background-color: var(--background);
-			color: var(--text);
-		}
+			font-size: 0.95rem;
 
-		&.checkbox {
-			flex-direction: row;
-			align-items: center;
-			gap: 8px;
+			&:focus {
+				border-color: var(--primary);
+				outline: none;
+			}
 
-			label {
-				font-weight: normal;
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+
+			&::placeholder {
+				color: var(--background-400);
 			}
 		}
 	}
 
-	.status {
-		font-size: 0.9rem;
-		.state-label {
-			font-weight: bold;
-			color: var(--primary);
-		}
-		.error {
-			color: var(--underflow-color);
-			margin-top: 4px;
-			font-size: 0.8rem;
-		}
-	}
-
-	.actions {
+	.copy-field {
 		display: flex;
 		gap: 8px;
 
-		button {
+		input {
 			flex: 1;
-			padding: 8px;
-			border-radius: 4px;
+		}
+
+		.btn {
+			flex-shrink: 0;
+		}
+	}
+
+	.btn {
+		padding: 10px 16px;
+		border-radius: var(--rounded-border-radius);
+		font-size: 0.95rem;
+		font-weight: 500;
+		transition: all 0.15s ease;
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		&.primary {
+			background-color: var(--primary);
+			color: white;
+
+			&:hover:not(:disabled) {
+				filter: brightness(1.1);
+			}
+
+			&:active:not(:disabled) {
+				filter: brightness(0.95);
+			}
+		}
+
+		&.secondary {
 			background-color: var(--popup-button-background-color);
-			color: var(--text);
-			cursor: pointer;
+
+			&:hover:not(:disabled) {
+				background-color: var(--popup-button-hover-background-color);
+			}
+
+			&:active:not(:disabled) {
+				background-color: var(--popup-button-active-background-color);
+			}
+		}
+
+		&.danger {
+			background-color: var(--danger-color);
+			color: white;
+
+			&:hover:not(:disabled) {
+				background-color: var(--danger-hover-color);
+			}
+		}
+	}
+
+	.link-btn {
+		font-size: 0.85rem;
+		color: var(--background-500);
+		text-decoration: none;
+		
+		&:hover {
+			color: var(--primary);
+			text-decoration: underline;
+		}
+	}
+
+	.divider {
+		height: 1px;
+		background-color: var(--popup-border-color);
+		margin: 4px 0;
+	}
+
+	.warning-text {
+		color: var(--warning-color);
+		font-size: 0.85rem;
+		margin: 0;
+	}
+
+	.error-text {
+		color: var(--danger-color);
+		font-size: 0.85rem;
+		margin: 0;
+	}
+
+	.recent-rooms {
+		.recent-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 8px;
+
+			h3 {
+				font-size: 0.9rem;
+				font-weight: 600;
+				margin: 0;
+				color: var(--background-600);
+			}
+
+			.clear-btn {
+				font-size: 0.75rem;
+				color: var(--background-500);
+				padding: 2px 6px;
+				border-radius: var(--rounded-border-radius);
+
+				&:hover {
+					color: var(--danger-color);
+					background-color: var(--popup-button-hover-background-color);
+				}
+			}
+		}
+
+		.room-list {
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+			max-height: 132px;
+			overflow-y: auto;
+			scrollbar-width: thin;
+			scrollbar-color: var(--recipe-selector-scrollbar-color) transparent;
+			&::-webkit-scrollbar {
+				width: 8px;
+				background-color: transparent;
+			}
+		}
+
+		.room-item {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			padding: 10px 12px;
+			border-radius: var(--rounded-border-radius);
+			text-align: left;
+			transition: background-color 0.15s ease;
 
 			&:hover:not(:disabled) {
 				background-color: var(--popup-button-hover-background-color);
@@ -250,19 +770,67 @@
 				opacity: 0.5;
 				cursor: not-allowed;
 			}
+
+			.room-name {
+				font-weight: 500;
+			}
+
+			.room-id {
+				font-size: 0.8rem;
+				color: var(--background-500);
+				font-family: monospace;
+			}
 		}
 	}
 
-	.footer {
+	.status-row {
 		display: flex;
-		justify-content: flex-end;
-		margin-top: 8px;
+		align-items: center;
+		gap: 8px;
+		font-size: 0.95rem;
 
-		.close-button {
-			padding: 8px 16px;
-			border-radius: 4px;
-			background-color: var(--background-200);
-			color: var(--text);
+		.status-text {
+			font-weight: 500;
 		}
+	}
+
+	.button-row {
+		display: flex;
+		gap: 8px;
+
+		.btn {
+			flex: 1;
+		}
+	}
+
+	.button-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		width: 100%;
+		max-width: 250px;
+		margin-top: 8px;
+	}
+
+	.spinner {
+		width: 40px;
+		height: 40px;
+		border: 3px solid var(--popup-border-color);
+		border-top-color: var(--primary);
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+		margin-bottom: 16px;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.warning-icon {
+		font-size: 3rem;
+		color: var(--warning-color);
+		margin-bottom: 8px;
 	}
 </style>

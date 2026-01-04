@@ -11,13 +11,15 @@
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties, GraphNodeSplitterMergerProperties, GraphNodeTextNoteProperties, JointDragType } from "../../datamodel/GraphNode.svelte";
 	import { blockStateChanges, globals, unblockStateChanges } from "../../datamodel/globals.svelte";
 	import TextNoteNodeView from "./TextNoteNodeView.svelte";
+	import type { ServerConnection } from "$lib/sync/ServerConnection.svelte";
 
 	interface Props {
 		node: GraphNode;
 	}
 	const { node }: Props = $props();
 
-	const commandQueue = node.context.appState.serverConnection.dispatchCommandQueue;
+	const serverConnection: ServerConnection = node.context.appState.serverConnection;
+	const commandQueue = serverConnection.dispatchCommandQueue;
 	commandQueue.watchNodeOrEdgeChange(() => node);
 
 	const eventStream = getContext("event-stream") as EventStream;
@@ -33,11 +35,19 @@
 	
 	const isMovingResourceJoint = node.properties.type === "resource-joint" && node.properties.jointDragType !== undefined;
 	const jointDragType = isMovingResourceJoint ? node.properties.jointDragType! : null;
-	const enableEvents = $derived(page.userEventsPriorityNodeId ? page.userEventsPriorityNodeId === node.id : true);
+	const dragOwnerUserId = isMovingResourceJoint ? (node.properties as GraphNodeResourceJointProperties).dragOwnerUserId : null;
+	// Only allow interactions if we are the drag owner (or no owner is set for local-only drags)
+	const isOwnDrag = $derived(
+		!dragOwnerUserId || serverConnection.ownUserId === dragOwnerUserId
+	);
+	const enableEvents = $derived(
+		(page.userEventsPriorityNodeId ? page.userEventsPriorityNodeId === node.id : true) && isOwnDrag
+	);
 	// svelte-ignore state_referenced_locally
 	let dragStartPoint = $state(isMovingResourceJoint ? position : null);
 	let newNodeDragHasFinished = $state(false);
 	let enableWindowClick = $state(false);
+	let ownerCheckInterval: number | null = null;
 
 	const contextMenuItems = $derived.by(() => {
 		const items: ContextMenuItem[] = [];
@@ -156,27 +166,52 @@
 
 	let dragType: "moveSelf" | "moveSelected" | "moveNewResourceJoint" | null = isMovingResourceJoint ? "moveNewResourceJoint" : null;
 	// svelte-ignore state_referenced_locally
-	const connectableNodes = isMovingResourceJoint ? page.getResourceJointAttachableNodes(node as GraphNode<GraphNodeResourceJointProperties>) : [];
+	const connectableNodes = isMovingResourceJoint && isOwnDrag ? page.getResourceJointAttachableNodes(node as GraphNode<GraphNodeResourceJointProperties>) : [];
 	const indirectlyConnectableNodes = connectableNodes
 		.filter(n => n.parentNode)
 		.map(n => ({ node: page.nodes.get(n.parentNode!)!, joint: n }))
 		.filter(n => n.node);
 	
+	/**
+	 * Cleanup orphaned drag state when the drag owner disconnects.
+	 * Multiple users may trigger this cleanup simultaneously, but since they
+	 * apply the same non-conflicting modifications, this is safe.
+	 */
+	function checkDragOwnerConnected(): void {
+		if (!dragOwnerUserId) return;
+		if (!serverConnection.isUserConnected(dragOwnerUserId)) {
+			// Owner disconnected, clean up the orphaned drag state
+			page.onResourceJointDragEnd(node);
+		}
+	}
+
 	onMount(() => {
-		for (const n of [...connectableNodes, ...indirectlyConnectableNodes.map(n => n.node)]) {
-			page.highlightedNodes.attachable.add(n.id);
+		// Only highlight attachable nodes for the drag owner
+		if (isOwnDrag) {
+			for (const n of [...connectableNodes, ...indirectlyConnectableNodes.map(n => n.node)]) {
+				page.highlightedNodes.attachable.add(n.id);
+			}
 		}
 
-		if (jointDragType === "click-to-connect") {
+		if (jointDragType === "click-to-connect" && isOwnDrag) {
 			page.userEventsPriorityNodeId = node.id;
 			setTimeout(() => {
 				enableWindowClick = true;
 			}, 0);
 		}
+
+		// Start interval to check if drag owner is still connected
+		if (dragOwnerUserId && dragOwnerUserId !== serverConnection.ownUserId) {
+			ownerCheckInterval = window.setInterval(checkDragOwnerConnected, 1000);
+		}
 	});
 	onDestroy(() => {
 		if (page.userEventsPriorityNodeId === node.id) {
 			page.userEventsPriorityNodeId = null;
+		}
+		if (ownerCheckInterval !== null) {
+			window.clearInterval(ownerCheckInterval);
+			ownerCheckInterval = null;
 		}
 	});
 
@@ -240,12 +275,14 @@
 
 	function startMoveResourceJoint(jointDragType: JointDragType, preferredJointType?: "input" | "output") {
 		blockStateChanges();
+		// Only set owner if connected to server, otherwise null for local-only
+		const ownerUserId = serverConnection.ownUserId;
 		let newNode: GraphNode<GraphNodeResourceJointProperties>;
 		if (node.properties.type === "resource-joint") {
-			newNode = page.startMovingRecipeResourceJoint(node, position, preferredJointType ?? node.properties.jointType, jointDragType, node.properties.resourceClassName, node.properties.layoutOrientation);
+			newNode = page.startMovingRecipeResourceJoint(node, position, preferredJointType ?? node.properties.jointType, jointDragType, node.properties.resourceClassName, node.properties.layoutOrientation, ownerUserId);
 		} else if (node.properties.type === "splitter" || node.properties.type === "merger") {
 			const jointType = node.properties.type === "splitter" ? "output" : "input";
-			newNode = page.startMovingRecipeResourceJoint(node, position, preferredJointType ?? jointType, jointDragType, node.properties.resourceClassName);
+			newNode = page.startMovingRecipeResourceJoint(node, position, preferredJointType ?? jointType, jointDragType, node.properties.resourceClassName, undefined, ownerUserId);
 		} else {
 			throw new Error("Node is not a resource joint or splitter/merger node, cannot start moving resource joint");
 		}

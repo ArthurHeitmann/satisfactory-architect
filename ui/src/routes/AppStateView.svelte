@@ -45,9 +45,27 @@
 	const commandQueue = app.serverConnection.dispatchCommandQueue;
 	commandQueue.watchPageList(() => Array.from(app.pages.values()));
 	commandQueue.watchPageOrder(() => Array.from(app.pages.values()));
+	commandQueue.watchStateVar("currentPageId", () => app.currentPage?.id ?? null);
+	commandQueue.watchStateVar("name", () => app.name);
 
 	const eventStream = new EventStream();
 	setContext("overlay-layer-event-stream", eventStream);
+
+	// Handle unexpected disconnects by showing a reconnection prompt
+	app.setOnUnexpectedDisconnect((error) => {
+		const message = error ?? "The connection to the server was lost unexpectedly.";
+		eventStream.emit({
+			type: "confirmationPrompt",
+			message: message + "\n\nWould you like to reconnect?",
+			confirmLabel: "Reconnect",
+			cancelLabel: "Dismiss",
+			onAnswer: (answer) => {
+				if (answer === true) {
+					app.serverConnection.reconnect();
+				}
+			},
+		});
+	});
 
 	function onMouseEvent(event: MouseEvent) {
 		globals.mousePosition.x = event.clientX;
