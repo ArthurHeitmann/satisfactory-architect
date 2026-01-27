@@ -753,6 +753,38 @@ describe("CollaborationServer", () => {
 		});
 	});
 
+	describe("broadcastAll", () => {
+		it("should send message to all connected sockets", () => {
+			const socket1 = createMockSocket("socket-1");
+			const socket2 = createMockSocket("socket-2");
+			const socket3 = createMockSocket("socket-3");
+
+			server.handleConnection(socket1);
+			server.handleConnection(socket2);
+			server.handleConnection(socket3);
+
+			server.broadcastAll({
+				type: "user_message",
+				message: "Server is shutting down...",
+			});
+
+			assertSpyCalls(socket1.sendMessage as ReturnType<typeof spy>, 2); // welcome + broadcast
+			assertSpyCalls(socket2.sendMessage as ReturnType<typeof spy>, 2);
+			assertSpyCalls(socket3.sendMessage as ReturnType<typeof spy>, 2);
+
+			// Verify the broadcast message content
+			assertSpyCall(socket1.sendMessage as ReturnType<typeof spy>, 1, {
+				args: [{ type: "user_message", message: "Server is shutting down..." }],
+			});
+			assertSpyCall(socket2.sendMessage as ReturnType<typeof spy>, 1, {
+				args: [{ type: "user_message", message: "Server is shutting down..." }],
+			});
+			assertSpyCall(socket3.sendMessage as ReturnType<typeof spy>, 1, {
+				args: [{ type: "user_message", message: "Server is shutting down..." }],
+			});
+		});
+	});
+
 	describe("unknown message type", () => {
 		it("should log warning for unknown message type", async () => {
 			const socket = createMockSocket("socket-1");

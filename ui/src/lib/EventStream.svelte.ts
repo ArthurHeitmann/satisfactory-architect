@@ -74,6 +74,7 @@ export interface ConfirmationPromptEvent extends EventBase {
 	message: string;
 	confirmLabel?: string;
 	cancelLabel?: string;
+	hideCancelButton?: boolean;
 	onAnswer: (answer: boolean|null) => void;
 }
 

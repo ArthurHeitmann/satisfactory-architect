@@ -138,6 +138,7 @@ export type ServerMessage =
 	| CommandBatchMessage
 	| HeartbeatResponseMessage
 	| RoomInfoMessage
+	| UserMessage
 	| ErrorMessage;
 
 export interface WelcomeMessage extends VersionInfo {
@@ -169,6 +170,11 @@ export interface HeartbeatResponseMessage {
 	type: "heartbeat_response";
 	clients: ClientPresence[];
 	highestIdCounter: string;
+}
+
+export interface UserMessage {
+	type: "user_message";
+	message: string;
 }
 
 export interface ErrorMessage {

@@ -42,7 +42,8 @@
 		}
 	})();
 
-	const commandQueue = app.serverConnection.dispatchCommandQueue;
+	const serverConnection = app.serverConnection;
+	const commandQueue = serverConnection.dispatchCommandQueue;
 	commandQueue.watchPageList(() => Array.from(app.pages.values()));
 	commandQueue.watchPageOrder(() => Array.from(app.pages.values()));
 	commandQueue.watchStateVar("currentPageId", () => app.currentPage?.id ?? null);
@@ -51,8 +52,18 @@
 	const eventStream = new EventStream();
 	setContext("overlay-layer-event-stream", eventStream);
 
+	serverConnection.onUserMessage = (message) => {
+		eventStream.emit({
+			type: "confirmationPrompt",
+			message: message,
+			confirmLabel: "OK",
+			hideCancelButton: true,
+			onAnswer: () => {},
+		});
+	};
+
 	// Handle unexpected disconnects by showing a reconnection prompt
-	app.setOnUnexpectedDisconnect((error) => {
+	serverConnection.onUnexpectedDisconnect = (error) => {
 		const message = error ?? "The connection to the server was lost unexpectedly.";
 		eventStream.emit({
 			type: "confirmationPrompt",
@@ -65,7 +76,7 @@
 				}
 			},
 		});
-	});
+	};
 
 	function onMouseEvent(event: MouseEvent) {
 		globals.mousePosition.x = event.clientX;

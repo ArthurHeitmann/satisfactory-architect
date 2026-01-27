@@ -11,6 +11,7 @@ import type {
 	JoinRoomMessage,
 	RoomInfoMessage,
 	RoomListItem,
+	ServerMessage,
 	UploadConfirmationMessage,
 	UploadStateMessage,
 	WelcomeMessage,
@@ -171,6 +172,15 @@ export class CollaborationServer {
 		this.clients.clear();
 		this.socketIdToRoomId.clear();
 		this.socketIdToSocket.clear();
+	}
+
+	/**
+	 * Broadcast a message to all connected sockets
+	 */
+	public broadcastAll(message: ServerMessage): void {
+		for (const socket of this.socketIdToSocket.values()) {
+			socket.sendMessage(message);
+		}
 	}
 
 	/**

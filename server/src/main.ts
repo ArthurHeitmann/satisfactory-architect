@@ -154,7 +154,16 @@ function startServer() {
 	}, handler);
 
 	// Graceful shutdown
-	Deno.addSignalListener("SIGINT", () => {
+	Deno.addSignalListener("SIGINT", async () => {
+		console.log("🛑 Shutdown initiated, notifying clients...");
+		server.broadcastAll({
+			type: "user_message",
+			message: "Server is restarting...",
+		});
+
+		// Wait 1 second for clients to receive the message
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+
 		server.dispose();
 		Deno.exit(0);
 	});

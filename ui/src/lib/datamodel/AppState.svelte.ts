@@ -17,7 +17,6 @@ export class AppState {
 	readonly serverConnection: ServerConnection;
 	private debouncedSave: Debouncer<(json: any) => void>;
 	readonly asJson: any;
-	private _onUnexpectedDisconnect: ((error: string | null) => void) | null = null;
 
 	constructor(idGen: IdGen, currentPageId: Id, pages: GraphPage[]) {
 		this.idGen = idGen;	// TODO sync
@@ -29,7 +28,6 @@ export class AppState {
 			this,
 			() => this.currentPageId,
 			(json) => this.replaceFromJSON(json),
-			(error) => this._onUnexpectedDisconnect?.(error),
 		);
 		
 		this.debouncedSave = new Debouncer(this.saveToLocalStorage.bind(this), 1500);
@@ -191,9 +189,5 @@ export class AppState {
 		if (trackStateChanges()) {
 			writeToLocalStorage(StorageKeys.appState, json)
 		}
-	}
-
-	setOnUnexpectedDisconnect(callback: (error: string | null) => void): void {
-		this._onUnexpectedDisconnect = callback;
 	}
 }

@@ -37,7 +37,9 @@
 	<div class="message">{event.message}</div>
 	<div class="buttons">
 		<button class="confirm" onclick={() => answerWith(true)}>{event.confirmLabel ?? "Confirm"}</button>
-		<button class="cancel" onclick={() => answerWith(false)}>{event.cancelLabel ?? "Cancel"}</button>
+		{#if !event.hideCancelButton}
+			<button class="cancel" onclick={() => answerWith(false)}>{event.cancelLabel ?? "Cancel"}</button>
+		{/if}
 	</div>
 </div>
 

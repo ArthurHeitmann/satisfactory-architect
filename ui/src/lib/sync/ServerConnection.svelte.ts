@@ -61,19 +61,18 @@ export class ServerConnection {
 	private fastHeartbeatThrottled = new Throttler(() => this.sendHeartbeat(), 250);
 	private _otherClients: ClientPresence[] = $state([]);
 	get otherClients() { return this._otherClients; }
-	private appState: AppState;
 	private idGen: IdGen;
 	readonly dispatchCommandQueue: DispatchCommandQueue;
 	private commandProcessor: CommandProcessor;
 	private isUpdatingState: boolean = false;
+	onUnexpectedDisconnect: ((error: string | null) => void) | null = null;
+	onUserMessage: ((message: string) => void) | null = null;
 
 	constructor(
 		appState: AppState,
 		private getCurrentPageId: () => string | null,
 		private onStateDownloaded: (state: any) => void,
-		private onUnexpectedDisconnect: (error: string | null) => void,
 	) {
-		this.appState = appState;
 		this.idGen = appState.idGen;
 		const compressionService = new CompressionService();
 		compressionService.registerProvider(new ZstdCompressionProvider());
@@ -164,7 +163,7 @@ export class ServerConnection {
 		
 		// Notify about unexpected disconnect if we were in room and it wasn't intentional
 		if (wasInRoom && !this._isExpectedDisconnect && this._lastRoomId) {
-			this.onUnexpectedDisconnect(this._lastError);
+			this.onUnexpectedDisconnect?.(this._lastError);
 		}
 	}
 
@@ -236,6 +235,9 @@ export class ServerConnection {
 			case "heartbeat_response":
 				this.handleHeartbeatResponseMessage(message);
 				break;
+			case "user_message":
+				this.onUserMessage?.(message.message);
+				break;	
 			case "room_info":
 				// TODO
 				break;
