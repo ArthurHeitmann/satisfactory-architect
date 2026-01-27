@@ -24,7 +24,7 @@ Command,
 	ServerMessage,
 	UploadConfirmationMessage,
 	WelcomeMessage,
-} from "../shared/types_shared.ts";
+} from "../shared/messages.ts";
 import { CompressedData, CompressionService } from "../shared/CompressionService.ts";
 import { AppStateJson } from "../shared/types_serialization.ts";
 

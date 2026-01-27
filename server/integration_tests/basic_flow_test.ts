@@ -12,7 +12,7 @@ import type {
 	RoomJoinedMessage,
 	CommandBatchMessage,
 	WelcomeMessage,
-} from "../shared/types_shared.ts";
+} from "../shared/messages.ts";
 
 Deno.test({
 	name: "Basic Collaboration Flow",

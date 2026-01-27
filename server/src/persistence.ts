@@ -3,7 +3,7 @@
  */
 
 import type { RoomInfo } from "./types_server.ts";
-import { ErrorCode } from "../shared/types_shared.ts";
+import { ErrorCode } from "../shared/messages.ts";
 import { AppError } from "./errors/AppError.ts";
 import { CompressedData, CompressionMethod } from "../shared/CompressionService.ts";
 

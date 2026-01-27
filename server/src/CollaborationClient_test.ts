@@ -11,7 +11,7 @@ import {
 	type ClientConfig,
 } from "./CollaborationClient.ts";
 import type { WebSocketAdapter } from "./types_server.ts";
-import type { HeartbeatMessage, ServerMessage } from "../shared/types_shared.ts";
+import type { HeartbeatMessage, ServerMessage } from "../shared/messages.ts";
 import { WebSocketReadyState } from "./types_server.ts";
 
 // ============================================================================

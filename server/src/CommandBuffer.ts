@@ -2,7 +2,7 @@
  * Command buffering and batching for collaborative operations
  */
 
-import type { Command } from "../shared/types_shared.ts";
+import type { Command } from "../shared/messages.ts";
 
 export interface CommandBufferConfig {
 	bufferTimeMs: number; // How long to buffer commands (50ms default)

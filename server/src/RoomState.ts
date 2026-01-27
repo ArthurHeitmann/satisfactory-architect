@@ -13,8 +13,8 @@ import type {
 	PageReorderCommand,
 	StateVarUpdateCommand,
 	ViewUpdateCommand,
-} from "../shared/types_shared.ts";
-import { ErrorCode } from "../shared/types_shared.ts";
+} from "../shared/messages.ts";
+import { ErrorCode } from "../shared/messages.ts";
 import { AppError } from "./errors/AppError.ts";
 import type {
 	AppStateJson,

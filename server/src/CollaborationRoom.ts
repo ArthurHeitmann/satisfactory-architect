@@ -10,8 +10,8 @@ import type {
 	JoinRoomIntent,
 	RoomJoinedMessage,
 	ServerMessage,
-} from "../shared/types_shared.ts";
-import { ErrorCode } from "../shared/types_shared.ts";
+} from "../shared/messages.ts";
+import { ErrorCode } from "../shared/messages.ts";
 import { AppError } from "./errors/AppError.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";
 import { Scheduler } from "./utils/Scheduler.ts";

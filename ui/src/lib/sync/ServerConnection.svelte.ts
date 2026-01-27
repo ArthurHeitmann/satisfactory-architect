@@ -5,7 +5,7 @@ import type { Id, IdGen } from "$lib/datamodel/IdGen.svelte.js";
 import { watchState } from "$lib/utilities.svelte";
 import { assertUnreachable, Throttler } from "$lib/utilties";
 import { tick } from "svelte";
-import { type ClientMessage, type RoomListItem, type ServerMessage, type WelcomeMessage, type UploadConfirmationMessage, type RoomJoinedMessage, type CommandBatchMessage, type HeartbeatResponseMessage, type ErrorMessage, type CursorPosition, type ClientPresence, type Command, ErrorCode } from "../../../../server/shared/types_shared.js";
+import { type ClientMessage, type RoomListItem, type ServerMessage, type WelcomeMessage, type UploadConfirmationMessage, type RoomJoinedMessage, type CommandBatchMessage, type HeartbeatResponseMessage, type ErrorMessage, type CursorPosition, type ClientPresence, type Command, ErrorCode } from "../../../../server/shared/messages";
 import { WebSocketMessageMiddleware } from "../../../../server/shared/WebSocketMessageMiddleware";
 import { CommandProcessor } from "./CommandProcessor";
 import { DispatchCommandQueue } from "./DispatchCommandQueue";

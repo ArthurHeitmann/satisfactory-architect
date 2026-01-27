@@ -2,7 +2,7 @@
  * Deno WebSocket server entry point for collaboration server
  */
 
-import type { ClientMessage, ServerMessage } from "../shared/types_shared.ts";
+import type { ClientMessage, ServerMessage } from "../shared/messages.ts";
 import type { ServerConfig, WebSocketAdapter } from "./types_server.ts";
 import { WebSocketReadyState } from "./types_server.ts";
 import { CollaborationServer } from "./CollaborationServer.ts";

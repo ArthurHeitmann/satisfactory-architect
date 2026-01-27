@@ -14,8 +14,8 @@ import type {
 	UploadConfirmationMessage,
 	UploadStateMessage,
 	WelcomeMessage,
-} from "../shared/types_shared.ts";
-import { ErrorCode } from "../shared/types_shared.ts";
+} from "../shared/messages.ts";
+import { ErrorCode } from "../shared/messages.ts";
 import type { ServerConfig, WebSocketAdapter } from "./types_server.ts";
 import { AppError } from "./errors/AppError.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";

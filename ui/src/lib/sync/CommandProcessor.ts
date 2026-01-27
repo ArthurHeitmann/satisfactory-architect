@@ -4,7 +4,7 @@ import { GraphNode } from "$lib/datamodel/GraphNode.svelte";
 import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
 import { assertUnreachable } from "$lib/utilties";
 import type { GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../../../../server/shared/types_serialization";
-import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, PageReorderCommand, StateVarUpdateCommand } from "../../../../server/shared/types_shared";
+import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, PageReorderCommand, StateVarUpdateCommand } from "../../../../server/shared/messages";
 
 export class CommandProcessor {
 	constructor(

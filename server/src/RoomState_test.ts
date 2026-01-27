@@ -6,7 +6,7 @@ import { assertEquals, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { RoomState } from "./RoomState.ts";
 import type { AppStateJson, GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../shared/types_serialization.ts";
-import type { Command, ObjectAddCommand, ObjectDeleteCommand, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, PageReorderCommand, StateVarUpdateCommand, ViewUpdateCommand } from "../shared/types_shared.ts";
+import type { Command, ObjectAddCommand, ObjectDeleteCommand, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, PageReorderCommand, StateVarUpdateCommand, ViewUpdateCommand } from "../shared/messages.ts";
 
 // ============================================================================
 // Test Helpers

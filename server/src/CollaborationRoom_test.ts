@@ -19,7 +19,7 @@ import type {
 	Command,
 	PageAddCommand,
 	ServerMessage,
-} from "../shared/types_shared.ts";
+} from "../shared/messages.ts";
 import { AppError } from "./errors/AppError.ts";
 import type { AppStateJson } from "../shared/types_serialization.ts";
 import { setImmediate } from "node:timers";
