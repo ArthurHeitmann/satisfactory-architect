@@ -1,4 +1,4 @@
-import type { Id } from "../../../../shared/types_serialization.js";
+import type { Id } from "../../../../server/shared/types_serialization.js";
 
 export type { Id };
 

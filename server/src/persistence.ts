@@ -3,8 +3,9 @@
  */
 
 import type { RoomInfo } from "./types_server.ts";
-import { CompressedData, ErrorCode } from "../../shared/types_shared.ts";
+import { ErrorCode } from "../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
+import { CompressedData, CompressionMethod } from "../shared/CompressionService.ts";
 
 // Database interface for testing
 export interface DatabaseAdapter {
@@ -16,21 +17,10 @@ export interface DatabaseAdapter {
 // Room state snapshot for persistence
 export interface RoomSnapshot {
 	roomId: string;
-	stateData: CompressedData; // Compressed JSON with method indicator
+	stateData: CompressedData;
 	timestamp: number;
 	clientCount: number;
 }
-
-// Command record for audit log
-export interface CommandRecord {
-	commandId: string;
-	roomId: string;
-	userId: string; // User ID who sent the command (e.g., "u1", "u2")
-	timestamp: number;
-	commandType: string;
-	payload: Uint8Array; // Compressed JSON
-}
-
 /**
  * Database manager interface for dependency injection
  */
@@ -143,11 +133,6 @@ export class DatabaseManager implements IDatabaseManager {
 	 */
 	public saveSnapshot(snapshot: RoomSnapshot): void {
 		try {
-			let dataToSave = snapshot.stateData.data;
-			if (!(dataToSave instanceof Uint8Array)) {
-				dataToSave = new Uint8Array(dataToSave);
-			}
-
 			this.db.execute(
 				`
 				INSERT OR REPLACE INTO room_states (room_id, state_data, compression_method, timestamp)
@@ -155,7 +140,7 @@ export class DatabaseManager implements IDatabaseManager {
 			`,
 				[
 					snapshot.roomId,
-					dataToSave,
+					snapshot.stateData.data,
 					snapshot.stateData.method,
 					snapshot.timestamp,
 				],
@@ -203,7 +188,7 @@ export class DatabaseManager implements IDatabaseManager {
 
 			const row = rows[0];
 			const stateData: CompressedData = {
-				method: row.compression_method as CompressedData["method"],
+				method: row.compression_method as CompressionMethod,
 				data: row.state_data,
 			};
 

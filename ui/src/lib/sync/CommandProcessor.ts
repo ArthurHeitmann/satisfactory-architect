@@ -3,8 +3,8 @@ import { GraphEdge } from "$lib/datamodel/GraphEdge.svelte";
 import { GraphNode } from "$lib/datamodel/GraphNode.svelte";
 import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
 import { assertUnreachable } from "$lib/utilties";
-import type { GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../../../../shared/types_serialization";
-import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, PageReorderCommand, StateVarUpdateCommand } from "../../../../shared/types_shared";
+import type { GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../../../../server/shared/types_serialization";
+import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, PageReorderCommand, StateVarUpdateCommand } from "../../../../server/shared/types_shared";
 
 export class CommandProcessor {
 	constructor(
@@ -18,37 +18,42 @@ export class CommandProcessor {
 			if (this.getUserId() === command.userId) {
 				continue; // Skip own commands
 			}
-			switch (command.type) {
-				case "page.add":
-					this.handlePageAddCommand(command);
-					break;
-				case "page.delete":
-					this.handlePageDeleteCommand(command);
-					break;
-				case "page.modify":
-					this.handlePageModifyCommand(command);
-					break;
-				case "page.reorder":
-					this.handlePageReorderCommand(command);
-					break;
-				case "object.add":
-					this.handleObjectAddCommand(command);
-					break;
-				case "object.delete":
-					this.handleObjectDeleteCommand(command);
-					break;
-				case "object.modify":
-					this.handleObjectModifyCommand(command);
-					break;
-				case "statevar.update":
-					this.handleStateVarUpdateCommand(command);
-					break;
-				case "view.update":
-					// View updates are intentionally NOT applied to other clients
-					// They are only stored on the server for persistence
-					break;
-				default:
-					assertUnreachable(command);
+			try {
+				switch (command.type) {
+					case "page.add":
+						this.handlePageAddCommand(command);
+						break;
+					case "page.delete":
+						this.handlePageDeleteCommand(command);
+						break;
+					case "page.modify":
+						this.handlePageModifyCommand(command);
+						break;
+					case "page.reorder":
+						this.handlePageReorderCommand(command);
+						break;
+					case "object.add":
+						this.handleObjectAddCommand(command);
+						break;
+					case "object.delete":
+						this.handleObjectDeleteCommand(command);
+						break;
+					case "object.modify":
+						this.handleObjectModifyCommand(command);
+						break;
+					case "statevar.update":
+						this.handleStateVarUpdateCommand(command);
+						break;
+					case "view.update":
+						// View updates are intentionally NOT applied to other clients
+						// They are only stored on the server for persistence
+						break;
+					default:
+						assertUnreachable(command);
+				}
+			} catch (error) {
+				console.error(`Error applying command ${command.commandId} of type ${command.type}:}`);
+				console.error(error);
 			}
 		}
 	}

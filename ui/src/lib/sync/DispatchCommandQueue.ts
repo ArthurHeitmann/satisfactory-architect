@@ -3,7 +3,7 @@ import { GraphNode } from "$lib/datamodel/GraphNode.svelte";
 import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
 import { watchState } from "$lib/utilities.svelte";
 import { arraysEqual, assertUnreachable, generateUUID } from "$lib/utilties";
-import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, ObjectType, StateVarUpdateCommand, StateVarName, ViewUpdateCommand } from "../../../../shared/types_shared";
+import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, ObjectType, StateVarUpdateCommand, StateVarName, ViewUpdateCommand } from "../../../../server/shared/types_shared";
 
 export class DispatchCommandQueue {
 	private queue: Command[] = [];

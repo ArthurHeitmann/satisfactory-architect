@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
 import { CommandBuffer } from "./CommandBuffer.ts";
-import type { Command, ObjectAddCommand, ObjectModifyCommand, PageAddCommand } from "../../shared/types_shared.ts";
+import type { Command, ObjectAddCommand, ObjectModifyCommand, PageAddCommand } from "../shared/types_shared.ts";
+import { GraphNodeJson, GraphPageJson } from "../shared/types_serialization.ts";
 
 // Command presets for reuse across tests
 const createObjectAddCommand = (id: string, timestamp: number): ObjectAddCommand => ({
@@ -13,7 +14,7 @@ const createObjectAddCommand = (id: string, timestamp: number): ObjectAddCommand
 	pageId: "page-1",
 	objectId: `node-${id}`,
 	objectType: "node",
-	data: { id: `node-${id}` },
+	data: { id: `node-${id}` } as GraphNodeJson,
 });
 
 const createObjectModifyCommand = (id: string, timestamp: number, data: Record<string, unknown>): ObjectModifyCommand => ({
@@ -40,7 +41,7 @@ const createPageAddCommand = (id: string, timestamp: number): PageAddCommand => 
 		name: "New Page",
 		nodes: {},
 		edges: {},
-	},
+	} as GraphPageJson,
 });
 
 describe("CommandBuffer", () => {

@@ -6,7 +6,7 @@ import type {
 	CursorPosition,
 	HeartbeatMessage,
 	ServerMessage,
-} from "../../shared/types_shared.ts";
+} from "../shared/types_shared.ts";
 import type { ClientInfo, WebSocketAdapter } from "./types_server.ts";
 import { Scheduler } from "./utils/Scheduler.ts";
 

@@ -14,8 +14,8 @@ import type {
 	UploadConfirmationMessage,
 	UploadStateMessage,
 	WelcomeMessage,
-} from "../../shared/types_shared.ts";
-import { ErrorCode } from "../../shared/types_shared.ts";
+} from "../shared/types_shared.ts";
+import { ErrorCode } from "../shared/types_shared.ts";
 import type { ServerConfig, WebSocketAdapter } from "./types_server.ts";
 import { AppError } from "./errors/AppError.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";
@@ -23,9 +23,9 @@ import type { ClientConfig, ICollaborationClient } from "./CollaborationClient.t
 import { CollaborationClient } from "./CollaborationClient.ts";
 import type { RoomConfig } from "./CollaborationRoom.ts";
 import { CollaborationRoom } from "./CollaborationRoom.ts";
-import type { CompressionService } from "./compression.ts";
 import type { DatabaseManager } from "./persistence.ts";
-import { base64ToUint8Array, generateSecureId } from "./utils.ts";
+import { generateSecureId } from "./utils.ts";
+import { CompressionService } from "../shared/CompressionService.ts";
 
 /**
  * Factory functions for creating server dependencies
@@ -96,19 +96,17 @@ export class CollaborationServer {
 	/**
 	 * Handle incoming WebSocket message
 	 */
-	public handleMessage(
+	public async handleMessage(
 		socket: WebSocketAdapter,
-		rawMessage: string,
-	): void {
+		message: ClientMessage,
+	): Promise<void> {
 		try {
-			const message = JSON.parse(rawMessage) as ClientMessage;
-
 			switch (message.type) {
 				case "create_room":
-					this.handleCreateRoom(socket.socketId, message);
+					await this.handleCreateRoom(socket.socketId, message);
 					break;
 				case "join_room":
-					this.handleJoinRoom(socket.socketId, message);
+					await this.handleJoinRoom(socket.socketId, message);
 					break;
 				case "get_room_info":
 					this.handleGetRoomInfo(socket.socketId, message);
@@ -185,10 +183,10 @@ export class CollaborationServer {
 	/**
 	 * Handle create room request
 	 */
-	private handleCreateRoom(
+	private async handleCreateRoom(
 		socketId: string,
 		message: CreateRoomMessage,
-	): void {
+	): Promise<void> {
 		// Check version compatibility
 		if (!this.isVersionCompatible(message.serverProtocolVersion)) {
 			throw new AppError(
@@ -212,7 +210,7 @@ export class CollaborationServer {
 				socketId,
 				message.serverProtocolVersion,
 			);
-			const joinResponse = room.addClient(client, "upload"); // New room creator uploads initial state
+			const joinResponse = await room.addClient(client, "upload"); // New room creator uploads initial state
 
 			// Register room and update database
 			this.rooms.set(roomId, room);
@@ -229,7 +227,7 @@ export class CollaborationServer {
 	/**
 	 * Handle join room request
 	 */
-	private handleJoinRoom(socketId: string, message: JoinRoomMessage): void {
+	private async handleJoinRoom(socketId: string, message: JoinRoomMessage): Promise<void> {
 		// Check version compatibility
 		if (!this.isVersionCompatible(message.serverProtocolVersion)) {
 			throw new AppError(
@@ -260,7 +258,7 @@ export class CollaborationServer {
 				socketId,
 				message.serverProtocolVersion,
 			);
-			const joinResponse = room.addClient(client, message.intent);
+			const joinResponse = await room.addClient(client, message.intent);
 
 			this.rooms.set(message.roomId, room);
 			this.socketIdToRoomId.set(socketId, message.roomId);
@@ -376,11 +374,7 @@ export class CollaborationServer {
 			);
 		}
 
-		const decompressedState = this.compression.decompressJSON({
-			method: message.stateData.method,
-			data: base64ToUint8Array(message.stateData.data),
-		});
-		room.setRoomState(socketId, decompressedState);
+		room.setRoomState(socketId, message.stateData);
 		const client = this.clients.get(socketId);
 		if (client) {
 			const confirmationMessage: UploadConfirmationMessage = {

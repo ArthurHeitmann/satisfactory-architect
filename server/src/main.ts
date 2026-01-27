@@ -2,23 +2,30 @@
  * Deno WebSocket server entry point for collaboration server
  */
 
-import type { ServerMessage } from "../../shared/types_shared.ts";
+import type { ClientMessage, ServerMessage } from "../shared/types_shared.ts";
 import type { ServerConfig, WebSocketAdapter } from "./types_server.ts";
 import { WebSocketReadyState } from "./types_server.ts";
-import { CollaborationServer } from "./CollaborationServer.ts";;
-import { CompressionService } from "./compression.ts";
+import { CollaborationServer } from "./CollaborationServer.ts";
+import { ZstdCompressionProvider } from "./ZstdCompressionProvider.ts";
+import { WebSocketMessageMiddleware } from "../shared/WebSocketMessageMiddleware.ts";
 import { DatabaseManager } from "./persistence.ts";
 import { loadEnvironmentConfig } from "./EnvironmentConfig.ts";
 import { SqliteDatabaseAdapter } from "./SqliteDatabaseAdapter.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";
 import { generateSecureId } from "./utils.ts";
+import { CompressionService, ICompressionService } from "../shared/CompressionService.ts";
 
 // Deno WebSocket adapter
 class DenoWebSocketAdapter implements WebSocketAdapter {
+	public readonly middleware: WebSocketMessageMiddleware;
+	private sendQueue: Promise<void> = Promise.resolve();
+
 	constructor(
 		private ws: WebSocket,
+		compression: ICompressionService,
 		public readonly socketId: string = generateSecureId(16),
 	) {
+		this.middleware = new WebSocketMessageMiddleware(compression);
 	}
 
 	sendMessage(message: ServerMessage): void {
@@ -26,15 +33,18 @@ class DenoWebSocketAdapter implements WebSocketAdapter {
 			return;
 		}
 
-		try {
-			const serialized = JSON.stringify(message);
-			this.ws.send(serialized);
-		} catch (error) {
-			ErrorHandler.handle(error, {
-				source: "DenoWebSocketAdapter.sendMessage",
-				socketId: this.socketId,
-			});
-		}
+		// Use a promise chain to strictly preserve message ordering during async compression
+		this.sendQueue = this.sendQueue.then(async () => {
+			try {
+				const prepared = await this.middleware.prepareOutgoingMessage(message);
+				this.ws.send(prepared);
+			} catch (error) {
+				ErrorHandler.handle(error, {
+					source: "DenoWebSocketAdapter.sendMessage",
+					socketId: this.socketId,
+				});
+			}
+		});
 	}
 
 	close(): void {
@@ -47,9 +57,9 @@ class DenoWebSocketAdapter implements WebSocketAdapter {
 }
 
 /**
- * Main server setup
+ * Start WebSocket server
  */
-function createServer(): CollaborationServer {
+function startServer() {
 	const envConfig = loadEnvironmentConfig();
 
 	const config: ServerConfig = {
@@ -65,39 +75,36 @@ function createServer(): CollaborationServer {
 	};
 
 	const compression = new CompressionService(envConfig.compressionThreshold);
+	compression.registerProvider(new ZstdCompressionProvider());
+	compression.setDefaultMethod("zstd");
+
 	const dbAdapter = new SqliteDatabaseAdapter(envConfig.databasePath);
 	const database = new DatabaseManager(dbAdapter);
-
-	return new CollaborationServer(config, compression, database);
-}
-
-/**
- * Start WebSocket server
- */
-function startServer() {
-	const server = createServer();
-	const envConfig = loadEnvironmentConfig();
+	const server = new CollaborationServer(config, compression, database)
 
 	console.log(`🚀 Collaboration server starting on port ${envConfig.port}`);
 
 	const handler = (request: Request): Response => {
-		// Handle WebSocket upgrade
 		if (request.headers.get("upgrade") === "websocket") {
 			const { socket, response } = Deno.upgradeWebSocket(request);
-			const adapter = new DenoWebSocketAdapter(socket);
+			const adapter = new DenoWebSocketAdapter(socket, compression);
 
 			socket.onopen = () => {
 				console.log("Client connected");
 				try {
+					socket.send(adapter.middleware.sendInit());
 					server.handleConnection(adapter);
 				} catch (error) {
 					ErrorHandler.handle(error, { source: "WebSocket.onopen" });
 				}
 			};
 
-			socket.onmessage = (event) => {
+			socket.onmessage = async (event) => {
 				try {
-					server.handleMessage(adapter, event.data);
+					const msg = await adapter.middleware.processIncomingMessage(event.data);
+					if (msg) {
+						server.handleMessage(adapter, msg as ClientMessage); 
+					}
 				} catch (error) {
 					ErrorHandler.handle(error, {
 						source: "WebSocket.onmessage",
@@ -148,7 +155,6 @@ function startServer() {
 
 	// Graceful shutdown
 	Deno.addSignalListener("SIGINT", () => {
-		console.log("\n🛑 Shutting down server...");
 		server.dispose();
 		Deno.exit(0);
 	});
@@ -156,5 +162,5 @@ function startServer() {
 
 // Start server if this is the main module
 if (import.meta.main) {
-	startServer();
+	await startServer();
 }

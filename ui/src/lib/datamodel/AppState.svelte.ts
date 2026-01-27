@@ -4,7 +4,7 @@ import { dataModelVersion, saveDataType, StorageKeys } from "./constants";
 import { globals, trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
 import { IdGen, IdMapper, type Id, type PasteSource } from "./IdGen.svelte";
-import type { AppStateJson } from "../../../../shared/types_serialization.ts";
+import type { AppStateJson } from "../../../../server/shared/types_serialization";
 import { ServerConnection } from "$lib/sync/ServerConnection.svelte";
 
 export class AppState {

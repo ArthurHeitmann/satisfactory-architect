@@ -1,5 +1,5 @@
 import { gridSize } from "./constants";
-import type { IVector2D, GraphViewJson } from "../../../../shared/types_serialization.ts";
+import type { IVector2D, GraphViewJson } from "../../../../server/shared/types_serialization";
 
 export type { IVector2D };
 

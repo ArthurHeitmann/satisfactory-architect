@@ -3,7 +3,7 @@ import type { LayoutOrientation, GraphNode } from "./GraphNode.svelte";
 import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import type { IVector2D } from "./GraphView.svelte";
 import type { Id, IdMapper } from "./IdGen.svelte";
-import type { GraphEdgeJson } from "../../../../shared/types_serialization.ts";
+import type { GraphEdgeJson } from "../../../../server/shared/types_serialization";
 import { edgeArrowLength } from "./constants";
 import { canUseInvertedEdgeControlPoint, getNodeRadius } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, type JsonSerializable } from "./StateHistory.svelte";

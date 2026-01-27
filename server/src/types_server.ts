@@ -2,7 +2,7 @@
  * Server-only types and interfaces
  */
 
-import type { CursorPosition, ServerMessage } from "../../shared/types_shared.ts";
+import type { CursorPosition, ServerMessage } from "../shared/types_shared.ts";
 
 // WebSocket abstraction for testing
 export interface WebSocketAdapter {

@@ -5,7 +5,7 @@ import { SvelteSet } from "svelte/reactivity";
 import type { GraphPage, PageContext } from "./GraphPage.svelte";
 import { Vector2D, type IVector2D } from "./GraphView.svelte";
 import type { Id, IdGen, IdMapper, PasteSource } from "./IdGen.svelte";
-import type { GraphNodeJson } from "../../../../shared/types_serialization.ts";
+import type { GraphNodeJson } from "../../../../server/shared/types_serialization";
 import { gridSize, NodePriorities, productionNodeIconSize, productionNodeVerticalPadding, productionNodeHorizontalPadding } from "./constants";
 import { getNodeRadius } from "./nodeTypeProperties.svelte";
 import { applyJsonToObject, applyJsonToSet, type JsonSerializable } from "./StateHistory.svelte";

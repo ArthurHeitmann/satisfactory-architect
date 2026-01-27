@@ -129,7 +129,7 @@
 		}
 		await waitForConnected();
 		if (serverConnection.state === ServerConnectionState.Connected) {
-			serverConnection.joinRoom(roomId);
+			await serverConnection.joinRoom(roomId);
 		}
 		else {
 			// TODO: handle error
@@ -170,7 +170,7 @@
 			if (newRoomName) {
 				appState.name = newRoomName;
 			}
-			serverConnection.createRoom(appState.toJSON());
+			await serverConnection.createRoom(appState.toJSON());
 		}
 	}
 
@@ -207,7 +207,12 @@
 	}
 
 	function closeServerSettings() {
-		showServerSettings = false;
+		if (serverConnection.state === ServerConnectionState.Disconnected) {
+			onclose();
+		}
+		else {
+			showServerSettings = false;
+		}
 	}
 
 	// Initialize - load server URL from storage and auto-connect
@@ -327,7 +332,6 @@
 						id="new-room-name"
 						type="text" 
 						bind:value={newRoomName}
-						placeholder='e.g., "Turbo Motor Production"'
 						disabled={isLoading}
 					/>
 				</div>

@@ -13,15 +13,15 @@ import type {
 	PageReorderCommand,
 	StateVarUpdateCommand,
 	ViewUpdateCommand,
-} from "../../shared/types_shared.ts";
-import { ErrorCode } from "../../shared/types_shared.ts";
+} from "../shared/types_shared.ts";
+import { ErrorCode } from "../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
 import type {
 	AppStateJson,
 	GraphEdgeJson,
 	GraphNodeJson,
 	GraphPageJson,
-} from "../../shared/types_serialization.ts";
+} from "../shared/types_serialization.ts";
 
 /**
  * Room state interface for dependency injection

@@ -2,37 +2,23 @@
  * Shared message types between client and server
  */
 
-
-export type CompressionMethod = "none" | "lz4" | "zstd";
-
-export interface CompressedData {
-	method: CompressionMethod;
-	data: Uint8Array;
-}
-
-export interface CompressedDataJson {
-	method: CompressionMethod;
-	data: string; // Base64 encoded data
-}
+import type { AppStateJson, GraphEdgeJson, GraphNodeJson, GraphPageJson, GraphViewJson } from "./types_serialization.ts";
 
 
-// Server protocol version compatibility
 export interface VersionInfo {
 	serverProtocolVersion: number;
 }
 
-// Base command fields shared by all commands
 interface CommandBase {
-	commandId: string; // UUID for deduplication
-	userId: string; // Source user ID (assigned by room, e.g., "u1", "u2")
-	timestamp: number; // Client timestamp (for ordering)
+	commandId: string;
+	userId: string;
+	timestamp: number;
 }
 
-// Page commands
 export interface PageAddCommand extends CommandBase {
 	type: "page.add";
 	pageId: string;
-	data: unknown; // Full page JSON
+	data: GraphPageJson;
 }
 
 export interface PageDeleteCommand extends CommandBase {
@@ -43,23 +29,22 @@ export interface PageDeleteCommand extends CommandBase {
 export interface PageModifyCommand extends CommandBase {
 	type: "page.modify";
 	pageId: string;
-	data: Record<string, unknown>; // Properties to update
+	data: Partial<GraphPageJson>;
 }
 
 export interface PageReorderCommand extends CommandBase {
 	type: "page.reorder";
-	pageOrder: string[]; // New order of page IDs
+	pageOrder: string[];
 }
 
 export type ObjectType = "node" | "edge";
 
-// Object commands (nodes and edges)
 export interface ObjectAddCommand extends CommandBase {
 	type: "object.add";
 	pageId: string;
 	objectType: ObjectType;
 	objectId: string;
-	data: unknown; // Full node/edge JSON
+	data: GraphNodeJson | GraphEdgeJson;
 }
 
 export interface ObjectDeleteCommand extends CommandBase {
@@ -74,14 +59,11 @@ export interface ObjectModifyCommand extends CommandBase {
 	pageId: string;
 	objectType: ObjectType;
 	objectId: string;
-	data: unknown; // Full node/edge JSON replacement
+	data: Partial<GraphNodeJson> | Partial<GraphEdgeJson>;
 }
 
-// State variable names that can be updated via StateVarUpdateCommand
 export type StateVarName = "currentPageId" | "name";
 
-// State variable update command - for variables that don't fit page->object pattern
-// Note: These are stored on server but NOT applied on other clients
 export interface StateVarUpdateCommand extends CommandBase {
 	type: "statevar.update";
 	name: StateVarName;
@@ -91,10 +73,9 @@ export interface StateVarUpdateCommand extends CommandBase {
 export interface ViewUpdateCommand extends CommandBase {
 	type: "view.update";
 	pageId: string;
-	data: unknown;
+	data: GraphViewJson;
 }
 
-// Union of all command types
 export type Command =
 	| PageAddCommand
 	| PageDeleteCommand
@@ -106,10 +87,8 @@ export type Command =
 	| StateVarUpdateCommand
 	| ViewUpdateCommand;
 
-// Helper type for command type strings
 export type CommandType = Command["type"];
 
-// Client → Server messages
 export type ClientMessage =
 	| CreateRoomMessage
 	| JoinRoomMessage
@@ -144,15 +123,14 @@ export interface HeartbeatMessage {
 	type: "heartbeat";
 	cursor: CursorPosition;
 	currentPageId: string | null;
-	localIdCounter: string; // String to match UI's IdGen.toJSON() format
+	localIdCounter: string;
 }
 
 export interface UploadStateMessage {
 	type: "upload_state";
-	stateData: CompressedDataJson; // Compressed AppState
+	stateData: AppStateJson;
 }
 
-// Server → Client messages
 export type ServerMessage =
 	| WelcomeMessage
 	| RoomJoinedMessage
@@ -170,8 +148,8 @@ export interface WelcomeMessage extends VersionInfo {
 export interface RoomJoinedMessage {
 	type: "room_joined";
 	roomId: string;
-	userId: string; // User ID assigned by the room (e.g., "u1", "u2")
-	stateData?: CompressedDataJson; // Compressed AppState JSON (if download requested)
+	userId: string;
+	stateData?: AppStateJson;
 }
 
 export interface UploadConfirmationMessage {
@@ -190,23 +168,22 @@ export interface RoomInfoMessage {
 export interface HeartbeatResponseMessage {
 	type: "heartbeat_response";
 	clients: ClientPresence[];
-	highestIdCounter: string; // String to match UI's IdGen.toJSON() format
+	highestIdCounter: string;
 }
 
 export interface ErrorMessage {
 	type: "error";
 	message: string;
-	code?: ErrorCode; // Optional: error code (e.g., "VERSION_MISMATCH")
+	code?: ErrorCode;
 }
 
-// Common data structures
 export interface CursorPosition {
 	x: number;
 	y: number;
 }
 
 export interface ClientPresence {
-	userId: string; // User ID assigned by the room (e.g., "u1", "u2")
+	userId: string;
 	cursor: CursorPosition;
 	currentPageId: string | null;
 }
@@ -216,7 +193,6 @@ export interface RoomListItem {
 	// Future: clientCount, lastActivity, name, etc.
 }
 
-// Error codes
 export enum ErrorCode {
 	VERSION_MISMATCH = "VERSION_MISMATCH",
 	ROOM_NOT_FOUND = "ROOM_NOT_FOUND",

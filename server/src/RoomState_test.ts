@@ -5,8 +5,8 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { RoomState } from "./RoomState.ts";
-import type { AppStateJson, GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../../shared/types_serialization.ts";
-import type { Command } from "../../shared/types_shared.ts";
+import type { AppStateJson, GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../shared/types_serialization.ts";
+import type { Command, ObjectAddCommand, ObjectDeleteCommand, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, PageReorderCommand, StateVarUpdateCommand, ViewUpdateCommand } from "../shared/types_shared.ts";
 
 // ============================================================================
 // Test Helpers
@@ -84,26 +84,26 @@ const commands = {
 		type: "page.add" as const,
 		pageId,
 		data: { name: data.name ?? "New Page", ...data },
-	}),
+	} as PageAddCommand),
 
 	pageDelete: (pageId: string) => ({
 		...cmd(),
 		type: "page.delete" as const,
 		pageId,
-	}),
+	} as PageDeleteCommand),
 
 	pageModify: (pageId: string, data: Partial<GraphPageJson>) => ({
 		...cmd(),
 		type: "page.modify" as const,
 		pageId,
 		data,
-	}),
+	} as PageModifyCommand),
 
 	pageReorder: (pageOrder: string[]) => ({
 		...cmd(),
 		type: "page.reorder" as const,
 		pageOrder,
-	}),
+	} as PageReorderCommand),
 
 	objectAdd: (pageId: string, objectType: "node" | "edge", objectId: string, data: unknown) => ({
 		...cmd(),
@@ -112,7 +112,7 @@ const commands = {
 		objectType,
 		objectId,
 		data,
-	}),
+	} as ObjectAddCommand),
 
 	objectDelete: (pageId: string, objectType: "node" | "edge", objectId: string) => ({
 		...cmd(),
@@ -120,7 +120,7 @@ const commands = {
 		pageId,
 		objectType,
 		objectId,
-	}),
+	} as ObjectDeleteCommand),
 
 	objectModify: (pageId: string, objectType: "node" | "edge", objectId: string, data: unknown) => ({
 		...cmd(),
@@ -129,21 +129,21 @@ const commands = {
 		objectType,
 		objectId,
 		data,
-	}),
+	} as ObjectModifyCommand),
 
 	statevarUpdate: <T extends "currentPageId" | "name">(name: T, value: unknown) => ({
 		...cmd(),
 		type: "statevar.update" as const,
 		name,
 		value,
-	}),
+	} as StateVarUpdateCommand),
 
 	viewUpdate: (pageId: string, data: unknown) => ({
 		...cmd(),
 		type: "view.update" as const,
 		pageId,
 		data,
-	}),
+	} as ViewUpdateCommand),
 };
 
 /** Helper to apply command and verify hasChanged flag is set */

@@ -2,7 +2,7 @@
 import type {
 	ClientMessage,
 	ServerMessage,
-} from "../../shared/types_shared.ts";
+} from "../shared/types_shared.ts";
 
 export class TestServer {
 	private process: Deno.ChildProcess | null = null;
@@ -31,7 +31,7 @@ export class TestServer {
 		}
 
 		const command = new Deno.Command("deno", {
-			args: ["run", "--allow-net", "--allow-env", "--allow-read", "--allow-write", "src/main.ts"],
+			args: ["run", "-P", "src/main.ts"],
 			cwd: cwd,
 			env: {
 				PORT: this.port.toString(),
@@ -93,11 +93,16 @@ export class TestClient {
 			if (!this.ws) return reject("No WebSocket");
 
 			this.ws.onopen = () => {
+				this.ws?.send(`init:{"supported_compression_methods":["none"]}`);
 				resolve();
 			};
 
 			this.ws.onmessage = (event) => {
-				const msg = JSON.parse(event.data) as ServerMessage;
+				const data = event.data;
+				if (typeof data === "string" && data.startsWith("init:")) {
+					return;
+				}
+				const msg = JSON.parse(data) as ServerMessage;
 				this.handleMessage(msg);
 			};
 

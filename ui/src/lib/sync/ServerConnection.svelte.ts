@@ -5,10 +5,14 @@ import type { Id, IdGen } from "$lib/datamodel/IdGen.svelte.js";
 import { watchState } from "$lib/utilities.svelte";
 import { assertUnreachable, Throttler } from "$lib/utilties";
 import { tick } from "svelte";
-import { type ClientMessage, type RoomListItem, type ServerMessage, type WelcomeMessage, type UploadConfirmationMessage, type RoomJoinedMessage, type CommandBatchMessage, type HeartbeatResponseMessage, type ErrorMessage, type CompressedDataJson, type CursorPosition, type ClientPresence, type Command, ErrorCode } from "../../../../shared/types_shared.js";
+import { type ClientMessage, type RoomListItem, type ServerMessage, type WelcomeMessage, type UploadConfirmationMessage, type RoomJoinedMessage, type CommandBatchMessage, type HeartbeatResponseMessage, type ErrorMessage, type CursorPosition, type ClientPresence, type Command, ErrorCode } from "../../../../server/shared/types_shared.js";
+import { WebSocketMessageMiddleware } from "../../../../server/shared/WebSocketMessageMiddleware";
 import { CommandProcessor } from "./CommandProcessor";
 import { DispatchCommandQueue } from "./DispatchCommandQueue";
 import { StateMachine } from "./StateMachine.svelte.js";
+import { CompressionService } from "../../../../server/shared/CompressionService";
+import { ZstdCompressionProvider } from "./ZstdCompressionProvider";
+import type { AppStateJson } from "../../../../server/shared/types_serialization";
 
 export enum ServerConnectionState {
 	Disconnected = "Disconnected",
@@ -45,8 +49,9 @@ export class ServerConnection {
 	private _ownUserId: string | null = null;
 	get ownUserId() { return this._ownUserId; }
 	private ws: WebSocket | null = null;
+	private wsCompressionMiddleware: WebSocketMessageMiddleware;
 	private taskTimeout: number | null = null;
-	private uploadStateData: unknown | null = null;
+	private uploadStateData: AppStateJson | null = null;
 	private _lastError: string | null = $state(null);
 	get lastError() { return this._lastError; }
 	private _isExpectedDisconnect: boolean = false;
@@ -70,6 +75,9 @@ export class ServerConnection {
 	) {
 		this.appState = appState;
 		this.idGen = appState.idGen;
+		const compressionService = new CompressionService();
+		compressionService.registerProvider(new ZstdCompressionProvider());
+		this.wsCompressionMiddleware = new WebSocketMessageMiddleware(compressionService);
 		this.dispatchCommandQueue = new DispatchCommandQueue(
 			this.sendCommands.bind(this),
 			() => this.stateMachine.currentState === ServerConnectionState.InRoom,
@@ -110,13 +118,16 @@ export class ServerConnection {
 		this.stateMachine.transitionTo(ServerConnectionState.Connecting);
 		this._lastError = null;
 		this._isExpectedDisconnect = false;
+		this.wsCompressionMiddleware.reset();
 		this.ws = new WebSocket(this._serverUrl);
+		this.ws.binaryType = "arraybuffer";
+		this.ws.onopen = () => this.ws?.send(this.wsCompressionMiddleware.sendInit());
 		this.ws.onmessage = (event) => this.onWsMessage(event);
 		this.ws.onclose = () => this.disconnect();
 		this.ws.onerror = (e) => {
 			console.error("WebSocket error:", e);
 			this.disconnect();
-		}
+		};
 		this.startTaskTimeout(2500);
 	}
 
@@ -171,10 +182,10 @@ export class ServerConnection {
 		return true;
 	}
 
-	joinRoom(roomId: string, uploadData?: unknown): void {
+	async joinRoom(roomId: string, uploadData?: AppStateJson): Promise<void> {
 		this.stateMachine.transitionTo(ServerConnectionState.JoiningRoom);
 		this.uploadStateData = uploadData ?? null;
-		this.sendMessage({
+		await this.sendMessage({
 			type: "join_room",
 			roomId,
 			intent: uploadData ? "upload" : "download",
@@ -183,22 +194,26 @@ export class ServerConnection {
 		this.startTaskTimeout(5000);
 	}
 
-	createRoom(uploadData: unknown): void {
+	async createRoom(uploadData?: AppStateJson): Promise<void> {
 		this.stateMachine.transitionTo(ServerConnectionState.JoiningRoom);
 		this.uploadStateData = uploadData ?? null;
-		this.sendMessage({
+		await this.sendMessage({
 			type: "create_room",
 			serverProtocolVersion,
 		});
 		this.startTaskTimeout(5000);
 	}
 
-	private onWsMessage(event: MessageEvent): void {
-		let message: ServerMessage;
+	private async onWsMessage(event: MessageEvent): Promise<void> {
+		let message: ServerMessage | null = null;
 		try {
-			message = JSON.parse(event.data) as ServerMessage;
-		} catch {
-			console.warn("Failed to parse server message:", event.data);
+			message = await this.wsCompressionMiddleware.processIncomingMessage(event.data) as ServerMessage | null;
+		} catch (e) {
+			console.error("Failed to parse server message:", event.data);
+			console.error(e);
+			return;
+		}
+		if (message === null) {
 			return;
 		}
 		if (!("type" in message)) {
@@ -233,8 +248,9 @@ export class ServerConnection {
 		}
 	}
 
-	sendMessage(message: ClientMessage): void {
-		this.ws?.send(JSON.stringify(message));
+	async sendMessage(message: ClientMessage): Promise<void> {
+		const preparedMessage = await this.wsCompressionMiddleware.prepareOutgoingMessage(message);
+		this.ws?.send(preparedMessage);
 	}
 
 	private handleWelcomeMessage(message: WelcomeMessage): void {
@@ -262,9 +278,9 @@ export class ServerConnection {
 		this._roomId = message.roomId;
 		if (this.uploadStateData !== null) {
 			this.stateMachine.transitionTo(ServerConnectionState.UploadingState);
-			this.sendMessage({
+			await this.sendMessage({
 				type: "upload_state",
-				stateData: await noneCompress(this.uploadStateData),
+				stateData: this.uploadStateData,
 			});
 			this.uploadStateData = null;
 			this.startTaskTimeout(5000);
@@ -273,7 +289,7 @@ export class ServerConnection {
 			this.stateMachine.transitionTo(ServerConnectionState.InRoom);
 			this.onRoomJoined();
 			if (message.stateData) {
-				const state = noneDecompress(message.stateData);
+				const state = message.stateData;
 				this.onStateDownloaded(state);
 			}
 		}
@@ -357,7 +373,7 @@ export class ServerConnection {
 		this.lastReceivedHeartbeat = Date.now();
 	}
 
-	private sendHeartbeat(): void {
+	private async sendHeartbeat(): Promise<void> {
 		if (this.stateMachine.currentState !== ServerConnectionState.InRoom) {
 			return;
 		}
@@ -369,7 +385,7 @@ export class ServerConnection {
 			return;
 		}
 		const pageMousePosition = globals.pageMousePosition;
-		this.sendMessage({
+		await this.sendMessage({
 			type: "heartbeat",
 			cursor: pageMousePosition ?? { x: 0, y: 0 },
 			currentPageId: this.getCurrentPageId(),
@@ -384,52 +400,10 @@ export class ServerConnection {
 		}
 	}
 
-	private sendCommands(commands: Command[]): void {
-		this.sendMessage({
+	private async sendCommands(commands: Command[]): Promise<void> {
+		await this.sendMessage({
 			type: "command_batch",
 			commands,
 		});
 	}
-}
-
-async function noneCompress(data: unknown): Promise<CompressedDataJson> {
-	const bytes = new TextEncoder().encode(JSON.stringify(data));
-	return {
-		method: "none",
-		data: await uint8ArrayToBase64(bytes),
-	};
-}
-
-function noneDecompress(compressed: CompressedDataJson): unknown {
-	if (compressed.method !== "none") {
-		throw new Error(`Unsupported compression method: ${compressed.method}`);
-	}
-	const bytes = base64ToUint8Array(compressed.data);
-	const json = new TextDecoder().decode(bytes);
-	return JSON.parse(json);
-}
-
-async function uint8ArrayToBase64(bytes: Uint8Array): Promise<string> {
-	if ("toBase64" in bytes) {
-		return (bytes as any).toBase64();
-	}
-	return new Promise<string>((resolve) => {
-		const reader = new FileReader();
-		reader.onload = () => resolve((reader.result as string).split(",")[1]);
-		// @ts-ignore
-		reader.readAsDataURL(new Blob([bytes]));
-	});
-}
-
-function base64ToUint8Array(base64: string): Uint8Array {
-	if ("fromBase64" in Uint8Array) {
-		return (Uint8Array as any).fromBase64(base64);
-	}
-	const binaryString = atob(base64);
-	const len = binaryString.length;
-	const bytes = new Uint8Array(len);
-	for (let i = 0; i < len; i++) {
-		bytes[i] = binaryString.charCodeAt(i);
-	}
-	return bytes;
 }

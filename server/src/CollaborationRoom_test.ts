@@ -2,7 +2,7 @@
  * CollaborationRoom unit tests - testing all public interfaces
  */
 
-import { assertEquals, assertExists, assertThrows } from "@std/assert";
+import { assertEquals, assertExists, assertRejects, assertThrows } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
 import { FakeTime } from "@std/testing/time";
@@ -13,21 +13,23 @@ import {
 } from "./CollaborationRoom.ts";
 import type { IRoomState } from "./RoomState.ts";
 import type { ICommandBuffer } from "./CommandBuffer.ts";
-import type { ICompressionService } from "./compression.ts";
 import type { IDatabaseManager, RoomSnapshot } from "./persistence.ts";
 import type { ICollaborationClient } from "./CollaborationClient.ts";
 import type {
 	Command,
-	CompressedData,
 	PageAddCommand,
 	ServerMessage,
-} from "../../shared/types_shared.ts";
+} from "../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
-import type { AppStateJson } from "../../shared/types_serialization.ts";
+import type { AppStateJson } from "../shared/types_serialization.ts";
+import { setImmediate } from "node:timers";
+import { CompressedData, ICompressionService } from "../shared/CompressionService.ts";
 
 // ============================================================================
 // Test Helpers & Mocks
 // ============================================================================
+
+const flushPromises = () => new Promise(setImmediate);
 
 /** Default room configuration for tests */
 function createTestConfig(overrides: Partial<RoomConfig> = {}): RoomConfig {
@@ -167,16 +169,16 @@ function createMockCompression(): ICompressionService {
 		setDefaultMethod: spy(),
 		getDefaultMethod: () => "none" as const,
 		getSupportedMethods: () => ["none" as const],
-		compressJSON: spy((obj: unknown) => ({
+		compressJSON: spy((obj: unknown) => Promise.resolve({
 			method: "none" as const,
 			data: new TextEncoder().encode(JSON.stringify(obj)),
 		})),
-		decompressJSON: spy((compressed: CompressedData) => {
+		decompressJSON: spy((compressed: CompressedData) => new Promise(resolve => {
 			const data = compressed.data instanceof Uint8Array
 				? compressed.data
 				: new Uint8Array(compressed.data);
-			return JSON.parse(new TextDecoder().decode(data));
-		}),
+			resolve(JSON.parse(new TextDecoder().decode(data)));
+		})),
 	};
 }
 
@@ -256,7 +258,7 @@ describe("CollaborationRoom", () => {
 
 	describe("addClient", () => {
 		describe("with download intent", () => {
-			it("should add client successfully when state is initialized", () => {
+			it("should add client successfully when state is initialized", async () => {
 				// Initialize state first
 				mockRoomState = createMockRoomState(true);
 				const dependencies: RoomDependencies = {
@@ -273,31 +275,30 @@ describe("CollaborationRoom", () => {
 				);
 
 				const client = createMockClient("socket-1");
-				const result = room.addClient(client, "download");
+				const result = await room.addClient(client, "download");
 
 				assertEquals(result.type, "room_joined");
 				assertEquals(result.roomId, "test-room");
 				assertEquals(result.userId, "u1");
 				assertExists(result.stateData);
-				assertEquals(result.stateData.method, "none");
-				assertEquals(typeof result.stateData.data, "string");
+				assertEquals(typeof result.stateData, "object");
 				assertEquals(room.getClientCount(), 1);
 			});
 
-			it("should throw STATE_NOT_INITIALIZED when state is not initialized", () => {
+			it("should throw STATE_NOT_INITIALIZED when state is not initialized", async () => {
 				const client = createMockClient("socket-1");
 
-				assertThrows(
-					() => room.addClient(client, "download"),
+				await assertRejects(
+					async () => await room.addClient(client, "download"),
 					AppError,
 				);
 			});
 		});
 
 		describe("with upload intent", () => {
-			it("should add client successfully when room is empty", () => {
+			it("should add client successfully when room is empty", async () => {
 				const client = createMockClient("socket-1");
-				const result = room.addClient(client, "upload");
+				const result = await room.addClient(client, "upload");
 
 				assertEquals(result.type, "room_joined");
 				assertEquals(result.roomId, "test-room");
@@ -306,33 +307,33 @@ describe("CollaborationRoom", () => {
 				assertEquals(room.getClientCount(), 1);
 			});
 
-			it("should add client successfully when state is not initialized even if not empty", () => {
+			it("should add client successfully when state is not initialized even if not empty", async () => {
 				mockRoomState.isStateInitialized = () => false;
-				room.addClient(createMockClient("socket-1"), "upload");
+				await room.addClient(createMockClient("socket-1"), "upload");
 
 				const client = createMockClient("socket-2");
-				const result = room.addClient(client, "upload");
+				const result = await room.addClient(client, "upload");
 				assertEquals(result.type, "room_joined");
 				assertEquals(room.getClientCount(), 2);
 			});
 
-			it("should throw UPLOAD_NOT_AUTHORIZED when state is initialized and room is not empty", () => {
+			it("should throw UPLOAD_NOT_AUTHORIZED when state is initialized and room is not empty", async () => {
 				// Setup initialized state
 				room.setRoomState("socket-setup", createTestState());
 
 				// Add first client (allowed because room is empty)
-				room.addClient(createMockClient("socket-1"), "download");
+				await room.addClient(createMockClient("socket-1"), "download");
 
 				// Add second client with upload intent (should fail)
 				const client2 = createMockClient("socket-2");
-				assertThrows(
-					() => room.addClient(client2, "upload"),
+				await assertRejects(
+					async () => await room.addClient(client2, "upload"),
 					AppError,
 				);
 			});
 		});
 
-		it("should throw ROOM_FULL when max clients reached", () => {
+		it("should throw ROOM_FULL when max clients reached", async () => {
 			config = createTestConfig({ maxClients: 2 });
 			room.dispose();
 			room = new CollaborationRoom(
@@ -347,16 +348,16 @@ describe("CollaborationRoom", () => {
 			);
 
 			// Add up to maxClients - 1 (should succeed)
-			room.addClient(createMockClient("socket-1"), "upload");
+			await room.addClient(createMockClient("socket-1"), "upload");
 			assertEquals(room.getClientCount(), 1);
 
 			// Add one more to reach exactly maxClients (should still succeed)
-			room.addClient(createMockClient("socket-2"), "upload");
+			await room.addClient(createMockClient("socket-2"), "upload");
 			assertEquals(room.getClientCount(), 2);
 
 			// Adding one more beyond maxClients should throw
-			assertThrows(
-				() => room.addClient(createMockClient("socket-3"), "upload"),
+			await assertRejects(
+				async () => await room.addClient(createMockClient("socket-3"), "upload"),
 				AppError,
 			);
 
@@ -364,12 +365,12 @@ describe("CollaborationRoom", () => {
 			assertEquals(room.getClientCount(), 2);
 		});
 
-		it("should increment client count for each added client", () => {
-			room.addClient(createMockClient("socket-1"), "upload");
+		it("should increment client count for each added client", async () => {
+			await room.addClient(createMockClient("socket-1"), "upload");
 			assertEquals(room.getClientCount(), 1);
 			assertEquals(room.isEmpty(), false);
 
-			room.addClient(createMockClient("socket-2"), "upload");
+			await room.addClient(createMockClient("socket-2"), "upload");
 			assertEquals(room.getClientCount(), 2);
 		});
 	});
@@ -382,10 +383,10 @@ describe("CollaborationRoom", () => {
 			assertEquals(intents.sort(), ["download", "upload"].sort());
 		});
 
-		it("should return only download when state is initialized and clients are connected", () => {
+		it("should return only download when state is initialized and clients are connected", async () => {
 			room.setRoomState("socket-setup", createTestState());
 
-			room.addClient(createMockClient("socket-1"), "download");
+			await room.addClient(createMockClient("socket-1"), "download");
 
 			const intents = room.getAllowedIntents();
 			assertEquals(intents, ["download"]);
@@ -397,8 +398,8 @@ describe("CollaborationRoom", () => {
 			assertEquals(intents, ["upload"]);
 		});
 
-		it("should return only upload when state is not initialized even if clients are connected", () => {
-			room.addClient(createMockClient("socket-1"), "upload");
+		it("should return only upload when state is not initialized even if clients are connected", async () => {
+			await room.addClient(createMockClient("socket-1"), "upload");
 
 			const intents = room.getAllowedIntents();
 			assertEquals(intents, ["upload"]);
@@ -406,9 +407,9 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("removeClient", () => {
-		it("should remove an existing client", () => {
+		it("should remove an existing client", async () => {
 			const client = createMockClient("socket-1");
-			room.addClient(client, "upload");
+			await room.addClient(client, "upload");
 			assertEquals(room.getClientCount(), 1);
 
 			room.removeClient("socket-1");
@@ -416,8 +417,8 @@ describe("CollaborationRoom", () => {
 			assertEquals(room.isEmpty(), true);
 		});
 
-		it("should do nothing when removing non-existent client", () => {
-			room.addClient(createMockClient("socket-1"), "upload");
+		it("should do nothing when removing non-existent client", async () => {
+			await room.addClient(createMockClient("socket-1"), "upload");
 			assertEquals(room.getClientCount(), 1);
 
 			room.removeClient("non-existent");
@@ -460,9 +461,9 @@ describe("CollaborationRoom", () => {
 
 		assertSpyCalls(mockRoomState.applyCommands as ReturnType<typeof spy>, 0);
 		assertSpyCalls(mockCommandBuffer.addCommands as ReturnType<typeof spy>, 0);
-	});		it("should apply commands to room state", () => {
+	});		it("should apply commands to room state", async () => {
 			const client = createMockClient("socket-1");
-			room.addClient(client, "upload");
+			await room.addClient(client, "upload");
 
 			const commands: Command[] = [
 				{
@@ -481,9 +482,9 @@ describe("CollaborationRoom", () => {
 			});
 		});
 
-		it("should add commands to buffer for broadcasting", () => {
+		it("should add commands to buffer for broadcasting", async () => {
 			const client = createMockClient("socket-1");
-			room.addClient(client, "upload");
+			await room.addClient(client, "upload");
 
 			const commands: Command[] = [
 				{
@@ -502,7 +503,7 @@ describe("CollaborationRoom", () => {
 			});
 		});
 
-		it("should not add commands to buffer when applyCommands fails", () => {
+		it("should not add commands to buffer when applyCommands fails", async () => {
 			// Create a room state that throws on applyCommands
 			const failingRoomState = createMockRoomState(true);
 			failingRoomState.applyCommands = () => {
@@ -524,7 +525,7 @@ describe("CollaborationRoom", () => {
 			);
 
 			const client = createMockClient("socket-1");
-			room.addClient(client, "upload");
+			await room.addClient(client, "upload");
 
 			const commands: Command[] = [
 				{
@@ -542,11 +543,11 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("handleHeartbeat", () => {
-		it("should forward ID counter to room state", () => {
+		it("should forward ID counter to room state", async () => {
 			const client = createMockClient("socket-1", {
 				localIdCounter: "500",
 			});
-			room.addClient(client, "upload");
+			await room.addClient(client, "upload");
 
 			room.handleHeartbeat(client);
 
@@ -580,11 +581,11 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("broadcast", () => {
-		it("should send message to all clients", () => {
+		it("should send message to all clients", async () => {
 			const client1 = createMockClient("socket-1");
 			const client2 = createMockClient("socket-2");
-			room.addClient(client1, "upload");
-			room.addClient(client2, "upload");
+			await room.addClient(client1, "upload");
+			await room.addClient(client2, "upload");
 
 			const message: ServerMessage = {
 				type: "heartbeat_response",
@@ -598,11 +599,11 @@ describe("CollaborationRoom", () => {
 			assertSpyCalls(client2.sendMessage as ReturnType<typeof spy>, 1);
 		});
 
-		it("should exclude specified client from broadcast", () => {
+		it("should exclude specified client from broadcast", async () => {
 			const client1 = createMockClient("socket-1");
 			const client2 = createMockClient("socket-2");
-			room.addClient(client1, "upload");
-			room.addClient(client2, "upload");
+			await room.addClient(client1, "upload");
+			await room.addClient(client2, "upload");
 
 			const message: ServerMessage = {
 				type: "heartbeat_response",
@@ -619,11 +620,11 @@ describe("CollaborationRoom", () => {
 
 	describe("periodic timers", () => {
 		describe("heartbeat timer", () => {
-			it("should broadcast heartbeat response at configured interval", () => {
+			it("should broadcast heartbeat response at configured interval", async () => {
 				const client1 = createMockClient("socket-1");
 				const client2 = createMockClient("socket-2");
-				room.addClient(client1, "upload");
-				room.addClient(client2, "upload");
+				await room.addClient(client1, "upload");
+				await room.addClient(client2, "upload");
 
 				// Advance time to just before heartbeat interval - no message yet
 				time.tick(config.heartbeatIntervalMs - 1);
@@ -644,15 +645,15 @@ describe("CollaborationRoom", () => {
 				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 2);
 			});
 
-			it("should include all client presences in heartbeat response", () => {
+			it("should include all client presences in heartbeat response", async () => {
 				const client1 = createMockClient("socket-1", {
 					cursor: { x: 10, y: 20 },
 				});
 				const client2 = createMockClient("socket-2", {
 					cursor: { x: 30, y: 40 },
 				});
-				room.addClient(client1, "upload");
-				room.addClient(client2, "upload");
+				await room.addClient(client1, "upload");
+				await room.addClient(client2, "upload");
 
 				time.tick(config.heartbeatIntervalMs);
 
@@ -663,11 +664,11 @@ describe("CollaborationRoom", () => {
 				}
 			});
 
-			it("should schedule fast heartbeat broadcast after receiving client heartbeat", () => {
+			it("should schedule fast heartbeat broadcast after receiving client heartbeat", async () => {
 				const client1 = createMockClient("socket-1");
 				const client2 = createMockClient("socket-2");
-				room.addClient(client1, "upload");
-				room.addClient(client2, "upload");
+				await room.addClient(client1, "upload");
+				await room.addClient(client2, "upload");
 
 				// Trigger heartbeat from client
 				room.handleHeartbeat(client1);
@@ -683,11 +684,11 @@ describe("CollaborationRoom", () => {
 				assertEquals(message.type, "heartbeat_response");
 			});
 
-			it("should not schedule multiple fast heartbeats when receiving multiple client heartbeats", () => {
+			it("should not schedule multiple fast heartbeats when receiving multiple client heartbeats", async () => {
 				const client1 = createMockClient("socket-1");
 				const client2 = createMockClient("socket-2");
-				room.addClient(client1, "upload");
-				room.addClient(client2, "upload");
+				await room.addClient(client1, "upload");
+				await room.addClient(client2, "upload");
 
 				// Trigger multiple heartbeats
 				room.handleHeartbeat(client1);
@@ -701,9 +702,9 @@ describe("CollaborationRoom", () => {
 				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
 			});
 
-			it("should restart regular interval after fast heartbeat", () => {
+			it("should restart regular interval after fast heartbeat", async () => {
 				const client1 = createMockClient("socket-1");
-				room.addClient(client1, "upload");
+				await room.addClient(client1, "upload");
 
 				// Trigger fast heartbeat
 				room.handleHeartbeat(client1);
@@ -715,9 +716,9 @@ describe("CollaborationRoom", () => {
 				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 2);
 			});
 
-			it("should cancel regular interval during fast heartbeat scheduling", () => {
+			it("should cancel regular interval during fast heartbeat scheduling", async () => {
 				const client1 = createMockClient("socket-1");
-				room.addClient(client1, "upload");
+				await room.addClient(client1, "upload");
 
 				// At t=0, trigger fast heartbeat - fast delay (50ms) is sooner than regular (1000ms)
 				room.handleHeartbeat(client1);
@@ -736,9 +737,9 @@ describe("CollaborationRoom", () => {
 				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 2);
 			});
 
-			it("should not schedule fast heartbeat if regular is sooner", () => {
+			it("should not schedule fast heartbeat if regular is sooner", async () => {
 				const client1 = createMockClient("socket-1");
-				room.addClient(client1, "upload");
+				await room.addClient(client1, "upload");
 
 				// Advance to 10ms before regular heartbeat would fire
 				time.tick(config.heartbeatIntervalMs - 10);
@@ -752,7 +753,7 @@ describe("CollaborationRoom", () => {
 				assertSpyCalls(client1.sendMessage as ReturnType<typeof spy>, 1);
 			});
 
-			it("should properly reschedule after command flush broadcasts heartbeat", () => {
+			it("should properly reschedule after command flush broadcasts heartbeat", async () => {
 				let onFlushCallback: ((commands: Command[]) => void) | undefined;
 				const captureFlushCommandBuffer: ICommandBuffer = {
 					addCommands: spy(),
@@ -778,7 +779,7 @@ describe("CollaborationRoom", () => {
 				);
 
 				const client1 = createMockClient("socket-1");
-				room.addClient(client1, "upload");
+				await room.addClient(client1, "upload");
 
 				// Schedule fast heartbeat
 				room.handleHeartbeat(client1);
@@ -815,7 +816,7 @@ describe("CollaborationRoom", () => {
 		});
 
 		describe("snapshot timer", () => {
-			it("should save snapshot at configured interval when state has changed", () => {
+			it("should save snapshot at configured interval when state has changed", async () => {
 				// Make state appear changed
 				let hasChanged = true;
 				mockRoomState.consumeStateChanges = spy(() => {
@@ -845,6 +846,7 @@ describe("CollaborationRoom", () => {
 
 				// Advance by 1 more ms to reach exactly the interval
 				time.tick(1);
+				await flushPromises();
 				assertSpyCalls(mockDatabase.saveSnapshot as ReturnType<typeof spy>, 1);
 
 				// Advance by half interval - no additional save
@@ -853,6 +855,7 @@ describe("CollaborationRoom", () => {
 
 				// Advance to complete the second interval - second save
 				time.tick(config.snapshotIntervalMs / 2);
+				await flushPromises();
 				assertSpyCalls(mockDatabase.saveSnapshot as ReturnType<typeof spy>, 2);
 			});
 
@@ -894,11 +897,11 @@ describe("CollaborationRoom", () => {
 			assertSpyCalls(mockCommandBuffer.dispose as ReturnType<typeof spy>, 1);
 		});
 
-		it("should disconnect all clients", () => {
+		it("should disconnect all clients", async () => {
 			const client1 = createMockClient("socket-1");
 			const client2 = createMockClient("socket-2");
-			room.addClient(client1, "upload");
-			room.addClient(client2, "upload");
+			await room.addClient(client1, "upload");
+			await room.addClient(client2, "upload");
 
 			room.dispose();
 
@@ -906,9 +909,9 @@ describe("CollaborationRoom", () => {
 			assertSpyCalls(client2.disconnect as ReturnType<typeof spy>, 1);
 		});
 
-		it("should clear all clients from room", () => {
-			room.addClient(createMockClient("socket-1"), "upload");
-			room.addClient(createMockClient("socket-2"), "upload");
+		it("should clear all clients from room", async () => {
+			await room.addClient(createMockClient("socket-1"), "upload");
+			await room.addClient(createMockClient("socket-2"), "upload");
 
 			room.dispose();
 
@@ -918,7 +921,7 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("command flush callback", () => {
-		it("should broadcast commands when buffer flushes", () => {
+		it("should broadcast commands when buffer flushes", async () => {
 			// Create room with real command buffer to test flush behavior
 			let onFlushCallback: ((commands: Command[]) => void) | undefined;
 
@@ -947,8 +950,8 @@ describe("CollaborationRoom", () => {
 
 			const client1 = createMockClient("socket-1");
 			const client2 = createMockClient("socket-2");
-			room.addClient(client1, "upload");
-			room.addClient(client2, "download");
+			await room.addClient(client1, "upload");
+			await room.addClient(client2, "download");
 
 			// Simulate buffer flush
 			const commands: Command[] = [
@@ -976,7 +979,7 @@ describe("CollaborationRoom", () => {
 			assertEquals(message2.type, "heartbeat_response");
 		});
 
-		it("should not broadcast when flush has no commands", () => {
+		it("should not broadcast when flush has no commands", async () => {
 			let onFlushCallback: ((commands: Command[]) => void) | undefined;
 
 			room.dispose();
@@ -995,7 +998,7 @@ describe("CollaborationRoom", () => {
 			);
 
 			const client = createMockClient("socket-1");
-			room.addClient(client, "upload");
+			await room.addClient(client, "upload");
 
 			// Simulate empty flush
 			onFlushCallback?.([]);
@@ -1032,7 +1035,7 @@ describe("CollaborationRoom", () => {
 			assertSpyCalls(mockCompression.compressJSON as ReturnType<typeof spy>, 1);
 		});
 
-		it("should decompress state data when loading snapshot", () => {
+		it("should decompress state data when loading snapshot", async () => {
 			// Pre-populate database with a snapshot
 			const stateData = createTestState();
 			const compressed: CompressedData = {
@@ -1058,6 +1061,8 @@ describe("CollaborationRoom", () => {
 					createCommandBuffer: () => mockCommandBuffer,
 				},
 			);
+
+			await flushPromises();
 
 			// Decompression should have been called during load
 			assertSpyCalls(mockCompression.decompressJSON as ReturnType<typeof spy>, 1);

@@ -3,7 +3,7 @@ import { untrack } from "svelte";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
 import { type IdGen, type Id, IdMapper, type PasteSource } from "./IdGen.svelte";
 import { clipboardDataType, dataModelVersion, NodePriorities } from "./constants";
-import type { GraphPageJson } from "../../../../shared/types_serialization.ts";
+import type { GraphPageJson } from "../../../../server/shared/types_serialization";
 import { isNodeAttachable } from "./nodeTypeProperties.svelte";
 import { applyJsonToMap, applyJsonToSet, StateHistory, type JsonSerializable } from "./StateHistory.svelte";
 import { GraphEdge, type GraphEdgeProperties } from "./GraphEdge.svelte";

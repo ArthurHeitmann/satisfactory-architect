@@ -1,5 +1,5 @@
 import { AppError } from "./AppError.ts";
-import { ErrorCode, ErrorMessage } from "../../../shared/types_shared.ts";
+import { ErrorCode, ErrorMessage } from "../../shared/types_shared.ts";
 
 export class ErrorHandler {
 	public static handle(
@@ -22,14 +22,15 @@ export class ErrorHandler {
 			);
 		}
 
-		this.logError(appError);
-
 		if (appError.isClientVisible) {
 			return {
 				type: "error",
 				code: appError.code,
 				message: appError.message,
 			};
+		}
+		else {
+			this.logError(appError);
 		}
 
 		return null;

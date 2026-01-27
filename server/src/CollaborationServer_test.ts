@@ -14,18 +14,19 @@ import type { CollaborationRoom } from "./CollaborationRoom.ts";
 import type { ICollaborationClient } from "./CollaborationClient.ts";
 import type { ServerConfig, WebSocketAdapter } from "./types_server.ts";
 import { WebSocketReadyState } from "./types_server.ts";
-import type { CompressionService } from "./compression.ts";
 import type { DatabaseManager } from "./persistence.ts";
 import type {
-	CompressedData,
+ClientMessage,
+Command,
+	HeartbeatMessage,
 	RoomInfoMessage,
 	RoomJoinedMessage,
 	ServerMessage,
 	UploadConfirmationMessage,
 	WelcomeMessage,
-} from "../../shared/types_shared.ts";
-
-import { uint8ArrayToBase64 } from "./utils.ts";
+} from "../shared/types_shared.ts";
+import { CompressedData, CompressionService } from "../shared/CompressionService.ts";
+import { AppStateJson } from "../shared/types_serialization.ts";
 
 // ============================================================================
 // Test Helpers & Mocks
@@ -219,14 +220,14 @@ describe("CollaborationServer", () => {
 			assertEquals(message.serverProtocolVersion, config.serverProtocolVersion);
 		});
 
-		it("should include available rooms in welcome message", () => {
+		it("should include available rooms in welcome message", async () => {
 			// Create a room first
 			const socket1 = createMockSocket("socket-1");
 			server.handleConnection(socket1);
-			server.handleMessage(socket1, JSON.stringify({
+			await server.handleMessage(socket1, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			// Connect new client
 			const socket2 = createMockSocket("socket-2");
@@ -239,27 +240,27 @@ describe("CollaborationServer", () => {
 	});
 
 	describe("handleMessage - create_room", () => {
-		it("should create a new room", () => {
+		it("should create a new room", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			assertEquals(createdRooms.size, 1);
 			assertEquals(createdRooms.has("test-room-id"), true);
 		});
 
-		it("should add creator client to room", () => {
+		it("should add creator client to room", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			assertSpyCalls(mockRoom.addClient as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockRoom.addClient as ReturnType<typeof spy>, 0, {
@@ -267,14 +268,14 @@ describe("CollaborationServer", () => {
 			});
 		});
 
-		it("should send room_joined message to creator", () => {
+		it("should send room_joined message to creator", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			assertSpyCalls(mockClient.sendMessage as ReturnType<typeof spy>, 1);
 			const message = (mockClient.sendMessage as ReturnType<typeof spy>).calls[0].args[0] as RoomJoinedMessage;
@@ -282,14 +283,14 @@ describe("CollaborationServer", () => {
 			assertEquals(message.roomId, "test-room-id");
 		});
 
-		it("should upsert room in database", () => {
+		it("should upsert room in database", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			assertSpyCalls(mockDatabase.upsertRoom as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockDatabase.upsertRoom as ReturnType<typeof spy>, 0, {
@@ -297,14 +298,14 @@ describe("CollaborationServer", () => {
 			});
 		});
 
-		it("should reject incompatible version", () => {
+		it("should reject incompatible version", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 999,
-			}));
+			});
 
 			// Error message should be sent
 			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2); // welcome + error
@@ -314,26 +315,26 @@ describe("CollaborationServer", () => {
 	});
 
 	describe("handleMessage - join_room", () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			// Create a room first
 			const socket = createMockSocket("socket-creator");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 		});
 
-		it("should join existing room with download intent", () => {
+		it("should join existing room with download intent", async () => {
 			const socket = createMockSocket("socket-joiner");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "join_room",
 				roomId: "test-room-id",
 				serverProtocolVersion: 1,
 				intent: "download",
-			}));
+			});
 
 			assertSpyCalls(mockRoom.addClient as ReturnType<typeof spy>, 2); // creator + joiner
 			const lastCall = (mockRoom.addClient as ReturnType<typeof spy>).calls[1];
@@ -342,16 +343,16 @@ describe("CollaborationServer", () => {
 			assertEquals(lastCall.args[1], "download");
 		});
 
-		it("should join existing room with upload intent", () => {
+		it("should join existing room with upload intent", async () => {
 			const socket = createMockSocket("socket-joiner");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "join_room",
 				roomId: "test-room-id",
 				serverProtocolVersion: 1,
 				intent: "upload",
-			}));
+			});
 
 			const lastCall = (mockRoom.addClient as ReturnType<typeof spy>).calls[1];
 			const joinerClient = createdClients.get("socket-joiner");
@@ -359,16 +360,16 @@ describe("CollaborationServer", () => {
 			assertEquals(lastCall.args[1], "upload");
 		});
 
-		it("should send room_joined message to joiner", () => {
+		it("should send room_joined message to joiner", async () => {
 			const socket = createMockSocket("socket-joiner");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "join_room",
 				roomId: "test-room-id",
 				serverProtocolVersion: 1,
 				intent: "download",
-			}));
+			});
 
 			const joinerClient = createdClients.get("socket-joiner");
 			assertSpyCalls(joinerClient!.sendMessage as ReturnType<typeof spy>, 1);
@@ -377,16 +378,16 @@ describe("CollaborationServer", () => {
 			assertEquals(sentMessage.roomId, "test-room-id");
 		});
 
-		it("should reject non-existent room", () => {
+		it("should reject non-existent room", async () => {
 			const socket = createMockSocket("socket-joiner");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "join_room",
 				roomId: "non-existent-room",
 				serverProtocolVersion: 1,
 				intent: "download",
-			}));
+			});
 
 			// welcome + error
 			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
@@ -394,19 +395,19 @@ describe("CollaborationServer", () => {
 			assertEquals(errorMessage.type, "error");
 		});
 
-		it("should join room from database if not in memory", () => {
+		it("should join room from database if not in memory", async () => {
 			const socket = createMockSocket("socket-joiner-db");
 			server.handleConnection(socket);
 
 			const roomId = "db-room-id";
 			mockDatabase.upsertRoom(roomId);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "join_room",
 				roomId: roomId,
 				serverProtocolVersion: 1,
 				intent: "upload",
-			}));
+			});
 
 			// welcome message
 			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 1);
@@ -420,16 +421,16 @@ describe("CollaborationServer", () => {
 			assertEquals(joinResponse.roomId, roomId);
 		});
 
-		it("should reject incompatible version", () => {
+		it("should reject incompatible version", async () => {
 			const socket = createMockSocket("socket-joiner");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "join_room",
 				roomId: "test-room-id",
 				serverProtocolVersion: 999,
 				intent: "download",
-			}));
+			});
 
 			const errorMessage = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
 			assertEquals(errorMessage.type, "error");
@@ -437,24 +438,24 @@ describe("CollaborationServer", () => {
 	});
 
 	describe("handleMessage - get_room_info", () => {
-		it("should return room info if room exists", () => {
+		it("should return room info if room exists", async () => {
 			const socket = createMockSocket("socket-info");
 			server.handleConnection(socket); // Call 0: welcome
 
 			// Create a room first
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 			// Note: create_room sends room_joined to client.sendMessage, not socket.sendMessage
 
 			const roomId = "test-room-id";
 
 			// Request info
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "get_room_info",
 				roomId: roomId,
-			}));
+			});
 
 			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
 			const infoResponse = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as RoomInfoMessage;
@@ -467,14 +468,14 @@ describe("CollaborationServer", () => {
 			}
 		});
 
-		it("should return null if room does not exist", () => {
+		it("should return null if room does not exist", async () => {
 			const socket = createMockSocket("socket-info-missing");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "get_room_info",
 				roomId: "non-existent-room",
-			}));
+			});
 
 			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
 			const infoResponse = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as RoomInfoMessage;
@@ -482,7 +483,7 @@ describe("CollaborationServer", () => {
 			assertEquals(infoResponse.info, null);
 		});
 
-		it("should return room info for room in database but not in memory", () => {
+		it("should return room info for room in database but not in memory", async () => {
 			const socket = createMockSocket("socket-info-db");
 			server.handleConnection(socket);
 
@@ -491,10 +492,10 @@ describe("CollaborationServer", () => {
 			mockDatabase.upsertRoom(roomId);
 
 			// Request info
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "get_room_info",
 				roomId: roomId,
-			}));
+			});
 
 			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
 			const infoResponse = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as RoomInfoMessage;
@@ -507,17 +508,17 @@ describe("CollaborationServer", () => {
 	});
 
 	describe("handleMessage - command_batch", () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			// Create room and join client
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 		});
 
-		it("should forward commands to room", () => {
+		it("should forward commands to room", async () => {
 			const socket = createMockSocket("socket-1");
 
 			const commands = [
@@ -528,13 +529,13 @@ describe("CollaborationServer", () => {
 					type: "page.add",
 					pageId: "page-1",
 					data: {},
-				},
+				} as Command,
 			];
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "command_batch",
 				commands,
-			}));
+			});
 
 			assertSpyCalls(mockRoom.handleCommandBatch as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockRoom.handleCommandBatch as ReturnType<typeof spy>, 0, {
@@ -542,14 +543,14 @@ describe("CollaborationServer", () => {
 			});
 		});
 
-	it("should send error for commands from unknown client", () => {
+	it("should send error for commands from unknown client", async () => {
 		const socket = createMockSocket("unknown-socket");
 		server.handleConnection(socket);
 
-		server.handleMessage(socket, JSON.stringify({
+		await server.handleMessage(socket, {
 			type: "command_batch",
 			commands: [],
-		}));
+		});
 
 		// Should send error message to socket (welcome + error)
 		assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
@@ -562,26 +563,26 @@ describe("CollaborationServer", () => {
 	});
 
 	describe("handleMessage - heartbeat", () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			// Create room and join client
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 		});
 
-		it("should update client from heartbeat", () => {
+		it("should update client from heartbeat", async () => {
 			const socket = createMockSocket("socket-1");
-			const heartbeatMessage = {
+			const heartbeatMessage: HeartbeatMessage = {
 				type: "heartbeat",
 				cursor: { x: 100, y: 200 },
 				currentPageId: "page-1",
 				localIdCounter: "500",
 			};
 
-			server.handleMessage(socket, JSON.stringify(heartbeatMessage));
+			await server.handleMessage(socket, heartbeatMessage);
 
 			assertSpyCalls(mockClient.updateFromHeartbeat as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockClient.updateFromHeartbeat as ReturnType<typeof spy>, 0, {
@@ -589,15 +590,15 @@ describe("CollaborationServer", () => {
 			});
 		});
 
-		it("should forward heartbeat to room", () => {
+		it("should forward heartbeat to room", async () => {
 			const socket = createMockSocket("socket-1");
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "heartbeat",
 				cursor: { x: 100, y: 200 },
 				currentPageId: "page-1",
 				localIdCounter: "500",
-			}));
+			});
 
 			assertSpyCalls(mockRoom.handleHeartbeat as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockRoom.handleHeartbeat as ReturnType<typeof spy>, 0, {
@@ -605,55 +606,46 @@ describe("CollaborationServer", () => {
 			});
 		});
 
-	it("should send error for heartbeat from unknown client", () => {
-		const socket = createMockSocket("unknown-socket");
-		server.handleConnection(socket);
+		it("should send error for heartbeat from unknown client", async () => {
+			const socket = createMockSocket("unknown-socket");
+			server.handleConnection(socket);
 
-		server.handleMessage(socket, JSON.stringify({
-			type: "heartbeat",
-			cursor: { x: 0, y: 0 },
-			currentPageId: null,
-			localIdCounter: "0",
-		}));
+			await server.handleMessage(socket, {
+				type: "heartbeat",
+				cursor: { x: 0, y: 0 },
+				currentPageId: null,
+				localIdCounter: "0",
+			});
 
-		// Should send error message to socket (welcome + error)
-		assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
-		const errorMsg = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
-		assertEquals(errorMsg.type, "error");
+			// Should send error message to socket (welcome + error)
+			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2);
+			const errorMsg = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
+			assertEquals(errorMsg.type, "error");
 
-		assertSpyCalls(mockRoom.handleHeartbeat as ReturnType<typeof spy>, 0);
-	});
+			assertSpyCalls(mockRoom.handleHeartbeat as ReturnType<typeof spy>, 0);
+		});
 	});
 
 	describe("handleMessage - upload_state", () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			// Create room and join client
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 		});
 
-		it("should decompress and set room state", () => {
+		it("should pass state data to room directly", async () => {
 			const socket = createMockSocket("socket-1");
 			const testState = { test: "state" };
-			const bytes = new TextEncoder().encode(JSON.stringify(testState));
-			const stateData = {
-				method: "none",
-				data: uint8ArrayToBase64(bytes),
-			};
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "upload_state",
-				stateData,
-			}));
-
-			assertSpyCalls(mockCompression.decompressJSON as ReturnType<typeof spy>, 1);
-			assertSpyCall(mockCompression.decompressJSON as ReturnType<typeof spy>, 0, {
-				args: [{method: stateData.method, data: bytes}],
+				stateData: testState as unknown as AppStateJson,
 			});
+
 			assertSpyCalls(mockRoom.setRoomState as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockRoom.setRoomState as ReturnType<typeof spy>, 0, {
 				args: ["socket-1", testState],
@@ -663,14 +655,14 @@ describe("CollaborationServer", () => {
 			assertEquals(confirmationMessage.type, "upload_confirmation");
 		});
 
-		it("should reject upload from client not in room", () => {
+		it("should reject upload from client not in room", async () => {
 			const socket = createMockSocket("unknown-socket");
 			server.handleConnection(socket);
 
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "upload_state",
-				stateData: { method: "none", data: "" },
-			}));
+				stateData: { test: "state" } as unknown as AppStateJson,
+			});
 
 			// Should send error
 			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2); // welcome + error
@@ -680,13 +672,13 @@ describe("CollaborationServer", () => {
 	});
 
 	describe("handleDisconnection", () => {
-		it("should remove client from server", () => {
+		it("should remove client from server", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			server.handleDisconnection(socket);
 
@@ -698,13 +690,13 @@ describe("CollaborationServer", () => {
 			});
 		});
 
-		it("should dispose empty room after last client leaves", () => {
+		it("should dispose empty room after last client leaves", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			server.handleDisconnection(socket);
 
@@ -718,13 +710,13 @@ describe("CollaborationServer", () => {
 			assertEquals(rooms, []);
 		});
 
-		it("should return list of room IDs", () => {
+		it("should return list of room IDs", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			const rooms = server.getAvailableRooms();
 			assertEquals(rooms.length, 1);
@@ -733,26 +725,26 @@ describe("CollaborationServer", () => {
 	});
 
 	describe("dispose", () => {
-		it("should dispose all rooms", () => {
+		it("should dispose all rooms", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			server.dispose();
 
 			assertSpyCalls(mockRoom.dispose as ReturnType<typeof spy>, 1);
 		});
 
-		it("should clear all internal state", () => {
+		it("should clear all internal state", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "create_room",
 				serverProtocolVersion: 1,
-			}));
+			});
 
 			server.dispose();
 			dbRooms.clear(); // Clear DB too for this test
@@ -762,28 +754,14 @@ describe("CollaborationServer", () => {
 	});
 
 	describe("unknown message type", () => {
-		it("should log warning for unknown message type", () => {
+		it("should log warning for unknown message type", async () => {
 			const socket = createMockSocket("socket-1");
 			server.handleConnection(socket);
 
 			// Should not throw
-			server.handleMessage(socket, JSON.stringify({
+			await server.handleMessage(socket, {
 				type: "unknown_type",
-			}));
-		});
-	});
-
-	describe("malformed messages", () => {
-		it("should handle invalid JSON gracefully", () => {
-			const socket = createMockSocket("socket-1");
-			server.handleConnection(socket);
-
-			// Should not throw, should send error
-			server.handleMessage(socket, "not valid json");
-
-			// Error should be logged (we can't easily verify socket.sendMessage
-			// since error goes to the socket passed to handleMessage)
-			// Just verify it doesn't throw
+			} as unknown as ClientMessage);
 		});
 	});
 });

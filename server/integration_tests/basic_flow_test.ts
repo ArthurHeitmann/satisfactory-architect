@@ -3,18 +3,16 @@ import { assertEquals, assertExists } from "@std/assert";
 import { TestServer, TestClient } from "./test_utils.ts";
 import type {
 	AppStateJson,
+	GraphNodeJson,
 	GraphPageJson,
-} from "../../shared/types_serialization.ts";
+} from "../shared/types_serialization.ts";
 import type {
 	PageAddCommand,
 	ObjectAddCommand,
 	RoomJoinedMessage,
 	CommandBatchMessage,
 	WelcomeMessage,
-	CompressedDataJson,
-} from "../../shared/types_shared.ts";
-
-import { base64ToUint8Array, uint8ArrayToBase64 } from "../src/utils.ts";
+} from "../shared/types_shared.ts";
 
 Deno.test({
 	name: "Basic Collaboration Flow",
@@ -62,17 +60,11 @@ Deno.test({
 				currentPageId: "page1",
 				pages: [],
 			};
-			const stateJson = JSON.stringify(initialState);
-			const initialBytes = new TextEncoder().encode(stateJson);
-			const compressedState: CompressedDataJson = {
-				method: "none",
-				data: uint8ArrayToBase64(initialBytes),
-			};
 
 			console.log("Client 1 uploading state...");
 			client1.send({
 				type: "upload_state",
-				stateData: compressedState,
+				stateData: initialState,
 			});
 
 			await client1.waitForMessageType("upload_confirmation");
@@ -100,10 +92,7 @@ Deno.test({
 			// Verify downloaded state
 			assertExists(joined2.stateData, "Client 2 should receive state data");
 			
-			const compressed = joined2.stateData as CompressedDataJson;
-			assertEquals(compressed.method, "none");
-			const receivedBytes = base64ToUint8Array(compressed.data);
-			const receivedState = JSON.parse(new TextDecoder().decode(receivedBytes)) as AppStateJson;
+			const receivedState = joined2.stateData as AppStateJson;
 			
 			assertEquals(receivedState.type, "app-state");
 			// Client 1 sends heartbeat with "0", which overwrites the uploaded "100"
@@ -165,7 +154,7 @@ Deno.test({
 					id: "node1",
 					position: { x: 100, y: 100 },
 					// ... minimal node data
-				},
+				} as GraphNodeJson,
 			};
 
 			console.log("Client 2 sending command...");
@@ -205,9 +194,7 @@ Deno.test({
 			// Verify state has the new page
 			// The server should have applied `page.add` to the state.
 			assertExists(joined3.stateData);
-			const compressed3 = joined3.stateData as CompressedDataJson;
-			const bytes3 = base64ToUint8Array(compressed3.data);
-			const state3 = JSON.parse(new TextDecoder().decode(bytes3)) as AppStateJson;
+			const state3 = joined3.stateData as AppStateJson;
 			
 			if (state3 && state3.pages) {
 				console.log("Client 3 downloaded state pages:", state3.pages.length);

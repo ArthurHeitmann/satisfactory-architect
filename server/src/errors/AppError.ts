@@ -1,4 +1,4 @@
-import { ErrorCode } from "../../../shared/types_shared.ts";
+import { ErrorCode } from "../../shared/types_shared.ts";
 
 export interface ErrorContext {
 	socketId?: string;

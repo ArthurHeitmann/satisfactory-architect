@@ -6,17 +6,15 @@ import type {
 	ClientPresence,
 	Command,
 	CommandBatchMessage,
-	CompressedDataJson,
 	HeartbeatResponseMessage,
 	JoinRoomIntent,
 	RoomJoinedMessage,
 	ServerMessage,
-} from "../../shared/types_shared.ts";
-import { ErrorCode } from "../../shared/types_shared.ts";
+} from "../shared/types_shared.ts";
+import { ErrorCode } from "../shared/types_shared.ts";
 import { AppError } from "./errors/AppError.ts";
 import { ErrorHandler } from "./errors/ErrorHandler.ts";
 import { Scheduler } from "./utils/Scheduler.ts";
-import { uint8ArrayToBase64 } from "./utils.ts";
 import type { IRoomState } from "./RoomState.ts";
 import { RoomState } from "./RoomState.ts";
 import type { ICollaborationClient } from "./CollaborationClient.ts";
@@ -25,9 +23,9 @@ import {
 	type CommandBufferConfig,
 	type ICommandBuffer,
 } from "./CommandBuffer.ts";
-import type { ICompressionService } from "./compression.ts";
 import type { IDatabaseManager, RoomSnapshot } from "./persistence.ts";
-import { AppStateJson } from "../../shared/types_serialization.ts";
+import { AppStateJson } from "../shared/types_serialization.ts";
+import { ICompressionService } from "../shared/CompressionService.ts";
 
 export interface RoomConfig {
 	maxClients: number; // 10 default
@@ -60,6 +58,7 @@ export class CollaborationRoom {
 	private nextHeartbeatTime: number = 0;
 	private roomState: IRoomState;
 	private commandBuffer: ICommandBuffer;
+	private loadingSnapshot: Promise<void> | null = null;
 
 	constructor(
 		public readonly roomId: string,
@@ -88,10 +87,10 @@ export class CollaborationRoom {
 	/**
 	 * Add client to room
 	 */
-	public addClient(
+	public async addClient(
 		client: ICollaborationClient,
 		intent: JoinRoomIntent,
-	): RoomJoinedMessage {
+	): Promise<RoomJoinedMessage> {
 		if (this.clients.size >= this.config.maxClients) {
 			throw new AppError(
 				ErrorCode.ROOM_FULL,
@@ -104,6 +103,7 @@ export class CollaborationRoom {
 				true,
 			);
 		}
+		await this.loadingSnapshot;
 
 		// Check if download is requested but state is not initialized
 		if (intent === "download" && !this.canDownload()) {
@@ -128,16 +128,12 @@ export class CollaborationRoom {
 		client.assignUserId(userId);
 		this.clients.set(client.socketId, client);
 
-		let stateData: CompressedDataJson | undefined;
+		let stateData: AppStateJson | undefined;
 
 		if (intent === "download") {
 			// Client wants to download existing room state
 			const rawState = this.roomState.getState();
-			const compressed = this.compression.compressJSON(rawState);
-			stateData = {
-				method: compressed.method,
-				data: uint8ArrayToBase64(compressed.data),
-			};
+			stateData = rawState;
 		}
 
 		console.log(
@@ -210,8 +206,8 @@ export class CollaborationRoom {
 	/**
 	 * Set room state (from upload)
 	 */
-	public setRoomState(socketId: string, stateData: unknown): void {
-		this.roomState.setState(stateData as AppStateJson);
+	public setRoomState(socketId: string, stateData: AppStateJson): void {
+		this.roomState.setState(stateData);
 		this.saveSnapshot();
 		const client = this.clients.get(socketId);
 		const identifier = client?.hasUserId() ? client.userId : socketId;
@@ -337,7 +333,7 @@ export class CollaborationRoom {
 	/**
 	 * Save room state snapshot to database
 	 */
-	private saveSnapshot(): void {
+	private async saveSnapshot(): Promise<void> {
 		const { data: stateData, hasChanged } = this.roomState.consumeStateChanges();
 
 		// Skip saving if state hasn't changed or is null
@@ -346,14 +342,13 @@ export class CollaborationRoom {
 		}
 
 		try {
-			const compressed = this.compression.compressJSON(stateData);
+			const compressed = await this.compression.compressJSON(stateData);
 			const snapshot: RoomSnapshot = {
 				roomId: this.roomId,
 				stateData: compressed,
 				timestamp: Date.now(),
 				clientCount: this.clients.size,
 			};
-
 			this.database.saveSnapshot(snapshot);
 		} catch (error) {
 			ErrorHandler.handle(error, {
@@ -366,11 +361,11 @@ export class CollaborationRoom {
 	/**
 	 * Load room state from database
 	 */
-	private loadSnapshot(): void {
+	private async loadSnapshot(): Promise<void> {
 		try {
 			const snapshot = this.database.loadSnapshot(this.roomId);
 			if (snapshot) {
-				const decompressedState = this.compression.decompressJSON(
+				const decompressedState = await this.compression.decompressJSON(
 					snapshot.stateData,
 				);
 				this.roomState.setState(decompressedState as AppStateJson);
@@ -399,7 +394,7 @@ export class CollaborationRoom {
 		);
 
 		// Load existing snapshot on startup
-		this.loadSnapshot();
+		this.loadingSnapshot = this.loadSnapshot();
 	}
 
 	/**

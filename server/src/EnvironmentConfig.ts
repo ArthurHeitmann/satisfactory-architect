@@ -2,7 +2,8 @@
  * Environment configuration with defaults
  */
 
-import { CompressionMethod } from "../../shared/types_shared.ts";
+import { CompressionMethod } from "../shared/CompressionService.ts";
+
 
 export interface EnvironmentConfig {
 	// Server
@@ -60,7 +61,7 @@ export function loadEnvironmentConfig(): EnvironmentConfig {
 			"COMPRESSION_METHOD",
 			"none",
 		) as CompressionMethod,
-		compressionThreshold: getEnvNumber("COMPRESSION_THRESHOLD", 500),
+		compressionThreshold: getEnvNumber("COMPRESSION_THRESHOLD", 200),
 	};
 }
 
