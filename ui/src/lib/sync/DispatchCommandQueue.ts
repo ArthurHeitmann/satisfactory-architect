@@ -94,6 +94,7 @@ export class DispatchCommandQueue {
 	private watch<T>(options: {
 		dependencies: () => T,
 		onChange: (value: T) => void,
+		onInitialize?: (value: T) => void,
 	}) {
 		watchState({
 			dependencies: options.dependencies,
@@ -102,7 +103,8 @@ export class DispatchCommandQueue {
 				if (!this.isUpdatingState()) {
 					options.onChange(value);
 				}
-			}
+			},
+			onInitialize: options.onInitialize,
 		});
 	}
 
@@ -155,6 +157,9 @@ export class DispatchCommandQueue {
 		let previousIds = new Set(options.getItems().map(options.getId));
 		this.watch({
 			dependencies: () => options.getItems(),
+			onInitialize: (initialList) => {
+				previousIds = new Set(initialList.map(options.getId));
+			},
 			onChange: (changedList) => {
 				const currentIds = new Set(changedList.map(options.getId));
 				// Added
@@ -286,7 +291,10 @@ export class DispatchCommandQueue {
 					options.onOrderChanged(currentOrder);
 				}
 				previousOrder = currentOrder;
-			}
+			},
+			onInitialize: (initialOrder) => {
+				previousOrder = initialOrder;
+			},
 		});
 	}
 
@@ -323,6 +331,9 @@ export class DispatchCommandQueue {
 					previousValue = newValue;
 				}
 			},
+			onInitialize: (initialValue) => {
+				previousValue = initialValue;
+			}
 		});
 	}
 

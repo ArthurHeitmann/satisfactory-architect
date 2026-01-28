@@ -312,6 +312,28 @@ describe("CollaborationServer", () => {
 			const errorMessage = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
 			assertEquals(errorMessage.type, "error");
 		});
+
+		it("should reject if client is already in a room", async () => {
+			const socket = createMockSocket("socket-1");
+			server.handleConnection(socket);
+
+			// First create a room
+			await server.handleMessage(socket, {
+				type: "create_room",
+				serverProtocolVersion: 1,
+			});
+
+			// Try to create another room
+			await server.handleMessage(socket, {
+				type: "create_room",
+				serverProtocolVersion: 1,
+			});
+
+			// Error message should be sent
+			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2); // welcome + error
+			const errorMessage = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
+			assertEquals(errorMessage.type, "error");
+		});
 	});
 
 	describe("handleMessage - join_room", () => {
@@ -432,6 +454,32 @@ describe("CollaborationServer", () => {
 				intent: "download",
 			});
 
+			const errorMessage = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
+			assertEquals(errorMessage.type, "error");
+		});
+
+		it("should reject if client is already in a room", async () => {
+			const socket = createMockSocket("socket-joiner");
+			server.handleConnection(socket);
+
+			// First join the room
+			await server.handleMessage(socket, {
+				type: "join_room",
+				roomId: "test-room-id",
+				serverProtocolVersion: 1,
+				intent: "download",
+			});
+
+			// Try to join again
+			await server.handleMessage(socket, {
+				type: "join_room",
+				roomId: "test-room-id",
+				serverProtocolVersion: 1,
+				intent: "download",
+			});
+
+			// Error message should be sent
+			assertSpyCalls(socket.sendMessage as ReturnType<typeof spy>, 2); // welcome + error
 			const errorMessage = (socket.sendMessage as ReturnType<typeof spy>).calls[1].args[0] as ServerMessage;
 			assertEquals(errorMessage.type, "error");
 		});

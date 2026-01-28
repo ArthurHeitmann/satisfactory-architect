@@ -197,6 +197,16 @@ export class CollaborationServer {
 		socketId: string,
 		message: CreateRoomMessage,
 	): Promise<void> {
+		// Check if client is already in a room
+		if (this.socketIdToRoomId.has(socketId)) {
+			throw new AppError(
+				ErrorCode.ALREADY_IN_ROOM,
+				{ socketId },
+				`Already connected to a room. Leave the current room before creating a new one.`,
+				true,
+			);
+		}
+
 		// Check version compatibility
 		if (!this.isVersionCompatible(message.serverProtocolVersion)) {
 			throw new AppError(
@@ -238,6 +248,16 @@ export class CollaborationServer {
 	 * Handle join room request
 	 */
 	private async handleJoinRoom(socketId: string, message: JoinRoomMessage): Promise<void> {
+		// Check if client is already in a room
+		if (this.socketIdToRoomId.has(socketId)) {
+			throw new AppError(
+				ErrorCode.ALREADY_IN_ROOM,
+				{ socketId, requestedRoomId: message.roomId },
+				`Already connected to a room. Leave the current room before joining another.`,
+				true,
+			);
+		}
+
 		// Check version compatibility
 		if (!this.isVersionCompatible(message.serverProtocolVersion)) {
 			throw new AppError(

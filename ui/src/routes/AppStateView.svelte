@@ -4,8 +4,8 @@
 	import PagesBar from "$lib/components/PagesBar/PagesBar.svelte";
 	import PageView from "$lib/components/PageView/PageView.svelte";
 	import { AppState } from "$lib/datamodel/AppState.svelte";
-	import { StorageKeys } from "$lib/datamodel/constants";
-	import { darkTheme, globals } from "$lib/datamodel/globals.svelte";
+	import { changelog, latestAppVersion, StorageKeys } from "$lib/datamodel/constants";
+	import { appVersion, darkTheme, globals } from "$lib/datamodel/globals.svelte";
 	import { starterSaveJson } from "$lib/datamodel/starterSave";
 	import { EventStream } from "$lib/EventStream.svelte";
 	import { loadFormLocalStorage } from "$lib/localStorageState.svelte";
@@ -23,6 +23,16 @@
 		};
 		applyTheme($darkTheme);
 		darkTheme.subscribe(applyTheme);
+
+		// Check for version update and show changelog
+		if ($appVersion < latestAppVersion) {
+			eventStream.emit({
+				type: "showChangelog",
+				changelog: changelog,
+				previousVersion: $appVersion,
+			});
+			$appVersion = latestAppVersion;
+		}
 	});
 
 	const app = (() => {

@@ -13,6 +13,8 @@ const DEFAULT_ERROR_MESSAGES: { [K in ErrorCode]: string } = {
 		"Client and server versions are incompatible.",
 	[ErrorCode.ROOM_NOT_FOUND]: "The requested room does not exist.",
 	[ErrorCode.ROOM_FULL]: "The room has reached its maximum capacity.",
+	[ErrorCode.ALREADY_IN_ROOM]:
+		"You are already connected to a room. Leave first before joining another.",
 	[ErrorCode.INVALID_MESSAGE]: "The received message format is invalid.",
 	[ErrorCode.INTERNAL_ERROR]: "An internal server error occurred.",
 	[ErrorCode.UPLOAD_NOT_AUTHORIZED]:

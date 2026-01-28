@@ -14,6 +14,7 @@
 
 :root.light-theme, :root:not(.dark-theme) {
 	--text: #0f0f0f;
+	--text-muted: var(--background-600);
 	--background: #f0f0f0;
 	--background-50: #f2f2f2;
 	--background-100: #e6e6e6;
@@ -121,6 +122,7 @@
 }
 :root.dark-theme {
 	--text: #f0f0f0;
+	--text-muted: var(--background-700);
 	--background: #0f0f0f;
 	--background-50: #0d0d0d;
 	--background-100: #1a1a1a;

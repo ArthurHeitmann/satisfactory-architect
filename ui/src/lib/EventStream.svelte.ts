@@ -2,7 +2,7 @@ import type { SvgPresetName } from "./components/icons/svgPresets";
 import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
 import type { GraphPage } from "./datamodel/GraphPage.svelte";
 
-export type EventType = "" | "showContextMenu" | "showProductionSelector" | "confirmationPrompt" | "showColorPicker" | "showIconPicker" | "showConnectionOverlay";
+export type EventType = "" | "showContextMenu" | "showProductionSelector" | "confirmationPrompt" | "showColorPicker" | "showIconPicker" | "showConnectionOverlay" | "showChangelog";
 
 export interface EventBase {
 	type: EventType;
@@ -98,8 +98,14 @@ export interface ShowConnectionOverlayEvent extends EventBase {
 	type: "showConnectionOverlay";
 }
 
+export interface ShowChangelogEvent extends EventBase {
+	type: "showChangelog";
+	changelog: Record<number, string[]>;
+	previousVersion: number;
+}
+
 export interface EmptyEvent extends EventBase {
 	type: "";
 }
 
-export type AllowedEventTypes = EmptyEvent | ShowContextMenuEvent | ShowProductionSelectorEvent | ConfirmationPromptEvent | ShowColorPickerEvent | ShowIconPickerEvent | ShowConnectionOverlayEvent;
+export type AllowedEventTypes = EmptyEvent | ShowContextMenuEvent | ShowProductionSelectorEvent | ConfirmationPromptEvent | ShowColorPickerEvent | ShowIconPickerEvent | ShowConnectionOverlayEvent | ShowChangelogEvent;

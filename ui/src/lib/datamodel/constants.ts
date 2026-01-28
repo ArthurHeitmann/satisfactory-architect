@@ -27,3 +27,8 @@ export class StorageKeys {
 
 export const saveDataType = "app-state";
 export const clipboardDataType = "factory-data";
+
+
+export const changelog: Record<number, string[]> = {
+	1: ["Initial release"],
+};

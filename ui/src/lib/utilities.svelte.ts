@@ -3,6 +3,7 @@ import { untrack } from "svelte";
 interface WatchOptions<T> {
 	dependencies: () => T;
 	onChange: (value: T) => void;
+	onInitialize?: (value: T) => void;
 	guard?: () => boolean;
 }
 
@@ -17,6 +18,9 @@ export function watchState<T>(options: WatchOptions<T>) {
 			untrack(() => options.onChange(value));
 		} else {
 			hasInitialized = true;
+			if (options.onInitialize) {
+				untrack(() => options.onInitialize!(value));
+			}
 		}
 	});
 }
