@@ -204,6 +204,10 @@
 		if (dragOwnerUserId && dragOwnerUserId !== serverConnection.ownUserId) {
 			ownerCheckInterval = window.setInterval(checkDragOwnerConnected, 1000);
 		}
+
+		if (isMovingResourceJoint) {
+			blockStateChanges();
+		}
 	});
 	onDestroy(() => {
 		if (page.userEventsPriorityNodeId === node.id) {
@@ -212,6 +216,9 @@
 		if (ownerCheckInterval !== null) {
 			window.clearInterval(ownerCheckInterval);
 			ownerCheckInterval = null;
+		}
+		if (isMovingResourceJoint) {
+			unblockStateChanges();
 		}
 	});
 
@@ -274,7 +281,6 @@
 	}
 
 	function startMoveResourceJoint(jointDragType: JointDragType, preferredJointType?: "input" | "output") {
-		blockStateChanges();
 		// Only set owner if connected to server, otherwise null for local-only
 		const ownerUserId = serverConnection.ownUserId;
 		let newNode: GraphNode<GraphNodeResourceJointProperties>;
@@ -322,7 +328,6 @@
 		if (newNodeDragHasFinished) {
 			return;
 		}
-		unblockStateChanges();
 		page.clearHighlightedNodes();
 
 		const targetNode = getInRangeJointNode();
@@ -345,7 +350,6 @@
 				newNodeDragHasFinished = true;
 				const edge = page.edges.get(node.edges.values().next().value || "");
 				const isInput = edge?.endNodeId === node.id;
-				blockStateChanges();
 				eventStream.emit({
 					type: "showProductionSelector",
 					page: page,
@@ -355,7 +359,6 @@
 					requiredInputsClassName: isInput ? node.properties.resourceClassName : undefined,
 					requiredOutputsClassName: !isInput ? node.properties.resourceClassName : undefined,
 					onSelect: (details) => {
-						unblockStateChanges();
 						const point = page.screenToPageCoords({x: e.clientX, y: e.clientY});
 						const newNode = page.makeNewNode(details, point);
 						let destJoint: GraphNode | null = null;
@@ -398,7 +401,6 @@
 						}
 					},
 					onCancel: () => {
-						unblockStateChanges();
 						page.onResourceJointDragEnd(node);
 					},
 				});

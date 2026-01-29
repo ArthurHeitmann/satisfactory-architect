@@ -16,7 +16,7 @@
 		color,
 	}: Props = $props();
 
-	const preset = svgPresets[name];
+	const preset = $derived(svgPresets[name]);
 </script>
 
 {#if preset}

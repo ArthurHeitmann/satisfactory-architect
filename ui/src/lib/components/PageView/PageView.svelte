@@ -49,9 +49,17 @@
 		width: number;
 		height: number;
 	}
-	let dragType: "select" | "move" = $state("move");
-	let selectionAreaRaw: BBox|null = $state(null);
-	let selectionArea: BBox|null = $derived.by(() => {
+
+	// Drag handler abstraction for extensibility
+	interface DragHandler {
+		onStart?: () => void;
+		onDrag: (deltaX: number, deltaY: number, scale: number) => void;
+		onEnd?: () => void;
+	}
+
+	let activeDragHandler: DragHandler | null = $state(null);
+	let selectionAreaRaw: BBox | null = $state(null);
+	let selectionArea: BBox | null = $derived.by(() => {
 		if (!selectionAreaRaw) {
 			return null;
 		}
@@ -63,6 +71,73 @@
 		};
 	});
 	const initiallySelectedIds = new Set<Id>();
+
+	// --- Drag Handlers ---
+	// Each handler encapsulates behavior for a specific drag interaction.
+	// Add new handlers here for future tool modes or key combinations.
+
+	function createPanViewHandler(): DragHandler {
+		return {
+			onDrag: (deltaX, deltaY) => {
+				page.view.offset.x += deltaX;
+				page.view.offset.y += deltaY;
+			}
+		};
+	}
+
+	function createSelectionBoxHandler(startEvent: { clientX: number; clientY: number; hasShiftKey: boolean }): DragHandler {
+		const point = page.screenToPageCoords({ x: startEvent.clientX, y: startEvent.clientY });
+		
+		return {
+			onStart: () => {
+				selectionAreaRaw = {
+					x: point.x,
+					y: point.y,
+					width: 0,
+					height: 0
+				};
+				initiallySelectedIds.clear();
+				if (startEvent.hasShiftKey) {
+					const selectedSet = page.toolMode === "select-nodes" ? page.selectedNodes : page.selectedEdges;
+					for (const id of selectedSet) {
+						initiallySelectedIds.add(id);
+					}
+				} else {
+					page.clearAllSelection();
+				}
+			},
+			onDrag: (deltaX, deltaY, scale) => {
+				selectionAreaRaw!.width += deltaX / scale;
+				selectionAreaRaw!.height += deltaY / scale;
+				updateSelectedNodesOrEdges();
+			},
+			onEnd: () => {
+				selectionAreaRaw = null;
+			}
+		};
+	}
+
+	// Determines which drag handler to use based on current state
+	function getDragHandler(cursorEvent: CursorEvent): DragHandler | null {
+		// Middle mouse button or touch: always pan view
+		if (cursorEvent.isMiddleButton || cursorEvent.isTouchEvent) {
+			return createPanViewHandler();
+		}
+
+		// Drag-view mode: always pan regardless of button
+		if (page.toolMode === "drag-view") {
+			return createPanViewHandler();
+		}
+
+		// Left click on SVG background in select modes: selection box
+		if (cursorEvent.target === svg) {
+			if (page.toolMode === "select-nodes" || page.toolMode === "select-edges") {
+				return createSelectionBoxHandler(cursorEvent);
+			}
+		}
+
+		return null;
+	}
 
 	function onKeyDown(key: string, event: KeyboardEvent) {
 		if (event.ctrlKey && key === "z") {
@@ -89,7 +164,7 @@
 		if (event.target !== svg) {
 			return;
 		}
-		if (page.toolMode === "select-nodes" || page.toolMode === "select-edges") {
+		if (page.toolMode === "select-nodes" || page.toolMode === "select-edges" || page.toolMode === "drag-view") {
 			page.clearAllSelection();
 		} else if (page.toolMode === "add-note") {
 			const point = page.screenToPageCoords({x: event.clientX, y: event.clientY});
@@ -298,59 +373,27 @@
 	<UserEvents
 		id="Page {page.id}"
 		canStartDrag={enableUserEvents ? (e) => {
-			dragType = e.cursorEvent.isMiddleButton || e.cursorEvent.isTouchEvent ? "move" : "select";
-			if (dragType !== "select") {
-				return true;
-			}
-			return e.cursorEvent.target === svg;
+			return getDragHandler(e.cursorEvent) !== null;
 		} : null}
 		onDragStart={enableUserEvents ? (e) => {
-			dragType = e.cursorEvent.isMiddleButton || e.cursorEvent.isTouchEvent ? "move" : "select";
-			if (dragType === "select" && (page.toolMode === "select-nodes" || page.toolMode === "select-edges")) {
-				const point = page.screenToPageCoords({ x: e.cursorEvent.clientX, y: e.cursorEvent.clientY });
-				selectionAreaRaw = {
-					x: point.x,
-					y: point.y,
-					width: 0,
-					height: 0
-				};
-				initiallySelectedIds.clear();
-				if (e.cursorEvent.hasShiftKey) {
-					if (page.toolMode === "select-nodes") {
-						for (const node of page.selectedNodes) {
-							initiallySelectedIds.add(node);
-						}
-					} else if (page.toolMode === "select-edges") {
-						for (const node of page.selectedEdges) {
-							initiallySelectedIds.add(node);
-						}
-					}
-				} else {
-					page.clearAllSelection();
-				}
-			}
+			activeDragHandler = getDragHandler(e.cursorEvent);
+			activeDragHandler?.onStart?.();
 		} : null}
 		onDrag={enableUserEvents ? (e) => {
 			if (isNaN(e.deltaX) || isNaN(e.deltaY)) {
 				return;
 			}
-			if (dragType === "move") {
+			if (activeDragHandler) {
+				activeDragHandler.onDrag(e.deltaX, e.deltaY, page.view.scale);
+			} else {
+				// Fallback to pan view when no handler (e.g., scroll wheel events)
 				page.view.offset.x += e.deltaX;
 				page.view.offset.y += e.deltaY;
-			} else if (dragType === "select") {
-				if (page.toolMode === "select-nodes" || page.toolMode === "select-edges") {
-					const scale = page.view.scale;
-					selectionAreaRaw!.width += e.deltaX / scale;
-					selectionAreaRaw!.height += e.deltaY / scale;
-					updateSelectedNodesOrEdges();
-				}
-			} else {
-				assertUnreachable(dragType);
 			}
 		} : null}
 		onDragEnd={enableUserEvents ? () => {
-			selectionAreaRaw = null;
-			dragType = "move";
+			activeDragHandler?.onEnd?.();
+			activeDragHandler = null;
 		} : null}
 		onZoom={enableUserEvents ? (deltaFactor, cursorX, cursorY) => {
 			if (isNaN(deltaFactor) || isNaN(cursorX) || isNaN(cursorY) || deltaFactor === 0) {

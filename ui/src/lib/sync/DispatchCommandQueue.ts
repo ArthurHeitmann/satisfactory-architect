@@ -113,7 +113,7 @@ export class DispatchCommandQueue {
 			dependencies: () => getPage().toSyncJson(),
 			onChange: (json) => {
 				const page = getPage();
-				console.log(`Page ${page.id} changed, enqueueing page.modify command`);
+				// console.log(`Page ${page.id} changed, enqueueing page.modify command`);
 				const cmd: PageModifyCommand = {
 					type: "page.modify",
 					commandId: generateUUID(),
@@ -132,7 +132,7 @@ export class DispatchCommandQueue {
 			dependencies: () => getObj().asJson,
 			onChange: (json) => {
 				const obj = getObj();
-				console.log(`Object ${obj.id} changed, enqueueing object.modify command`);
+				// console.log(`Object ${obj.id} changed, enqueueing object.modify command`);
 				const cmd: ObjectModifyCommand = {
 					type: "object.modify",
 					commandId: generateUUID(),
@@ -185,7 +185,7 @@ export class DispatchCommandQueue {
 			getItems: getPages,
 			getId: (page) => page.id,
 			onItemAdded: (page) => {
-				console.log(`Page ${page.id} added, enqueueing page.add command`);
+				// console.log(`Page ${page.id} added, enqueueing page.add command`);
 				const cmd: PageAddCommand = {
 					type: "page.add",
 					commandId: generateUUID(),
@@ -197,7 +197,7 @@ export class DispatchCommandQueue {
 				this.enqueue(cmd);
 			},
 			onItemRemoved: (pageId) => {
-				console.log(`Page ${pageId} removed, enqueueing page.delete command`);
+				// console.log(`Page ${pageId} removed, enqueueing page.delete command`);
 				const cmd: PageDeleteCommand = {
 					type: "page.delete",
 					commandId: generateUUID(),
@@ -215,7 +215,7 @@ export class DispatchCommandQueue {
 			getItems: getNodes,
 			getId: (node) => node.id,
 			onItemAdded: (node) => {
-				console.log(`Node ${node.id} added on page ${pageId}, enqueueing object.add command`);
+				// console.log(`Node ${node.id} added on page ${pageId}, enqueueing object.add command`);
 				const cmd: ObjectAddCommand = {
 					type: "object.add",
 					commandId: generateUUID(),
@@ -229,7 +229,7 @@ export class DispatchCommandQueue {
 				this.enqueue(cmd);
 			},
 			onItemRemoved: (nodeId) => {
-				console.log(`Node ${nodeId} removed from page ${pageId}, enqueueing object.delete command`);
+				// console.log(`Node ${nodeId} removed from page ${pageId}, enqueueing object.delete command`);
 				const cmd: ObjectDeleteCommand = {
 					type: "object.delete",
 					commandId: generateUUID(),
@@ -249,7 +249,7 @@ export class DispatchCommandQueue {
 			getItems: getEdges,
 			getId: (edge) => edge.id,
 			onItemAdded: (edge) => {
-				console.log(`Edge ${edge.id} added on page ${pageId}, enqueueing object.add command`);
+				// console.log(`Edge ${edge.id} added on page ${pageId}, enqueueing object.add command`);
 				const cmd: ObjectAddCommand = {
 					type: "object.add",
 					commandId: generateUUID(),
@@ -263,7 +263,7 @@ export class DispatchCommandQueue {
 				this.enqueue(cmd);
 			},
 			onItemRemoved: (edgeId) => {
-				console.log(`Edge ${edgeId} removed from page ${pageId}, enqueueing object.delete command`);
+				// console.log(`Edge ${edgeId} removed from page ${pageId}, enqueueing object.delete command`);
 				const cmd: ObjectDeleteCommand = {
 					type: "object.delete",
 					commandId: generateUUID(),
@@ -298,12 +298,12 @@ export class DispatchCommandQueue {
 		});
 	}
 
-	watchPageOrder(getPages: () => GraphPage[]) {
+		watchPageOrder(getPages: () => GraphPage[]) {
 		this.watchOrderedList<GraphPage>({
 			getItems: getPages,
 			getId: (page) => page.id,
 			onOrderChanged: (newOrder) => {
-				console.log(`Page order changed, enqueueing page.reorder command`);
+				// console.log(`Page order changed, enqueueing page.reorder command`);
 				const cmd: Command = {
 					type: "page.reorder",
 					commandId: generateUUID(),
@@ -326,7 +326,7 @@ export class DispatchCommandQueue {
 			dependencies: getValue,
 			onChange: (newValue) => {
 				if (newValue !== previousValue) {
-					console.log(`State variable ${name} changed, enqueueing statevar.update command`);
+					// console.log(`State variable ${name} changed, enqueueing statevar.update command`);
 					this.enqueueStateVarUpdate(name, newValue);
 					previousValue = newValue;
 				}

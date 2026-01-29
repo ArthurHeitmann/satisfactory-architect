@@ -287,9 +287,9 @@
 					onClick: () => eventStream.emit({ type: "showConnectionOverlay" }),
 				},
 				{
-					label: $darkTheme ? "Use Light Theme" : "Use Dark Theme",
-					icon: $darkTheme ? "light-theme" : "dark-theme",
-					onClick: () => $darkTheme = !$darkTheme,
+					label: darkTheme.value ? "Use Light Theme" : "Use Dark Theme",
+					icon: darkTheme.value ? "light-theme" : "dark-theme",
+					onClick: () => darkTheme.value = !darkTheme.value,
 				},
 				{
 					label: "View on GitHub",

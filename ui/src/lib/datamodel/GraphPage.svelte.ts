@@ -23,7 +23,7 @@ const oppositeLayoutOrientation: Record<LayoutOrientation, LayoutOrientation> = 
 	"right": "left",
 };
 export type NodeHighlightType = "attachable" | "hovered";
-export type ToolMode = "select-nodes"|"select-edges"|"add-note";
+export type ToolMode = "select-nodes"|"select-edges"|"add-note"|"drag-view";
 export class GraphPage implements JsonSerializable<PageContext> {
 	readonly context: PageContext;
 	readonly idGen: IdGen;

@@ -1,5 +1,4 @@
 import { browser } from "$app/environment";
-import { writable, type Writable } from "svelte/store";
 
 const storage: any = browser ? localStorage : {};
 
@@ -29,8 +28,21 @@ export function writeToLocalStorage(key: string, value: any) {
 	storage["preferences"] = JSON.stringify(prefs);
 }
 
-export function localStorageState<T>(key: string, defaultValue: T): Writable<T> {
-	const store = writable<T>(loadFormLocalStorage(key, defaultValue));
-	store.subscribe((value) => writeToLocalStorage(key, value));
-	return store;
+export class LocalStorageState<T> {
+	private _value: T = $state()!;
+	private key: string;
+
+	constructor(key: string, defaultValue: T) {
+		this.key = key;
+		this._value = loadFormLocalStorage(key, defaultValue);
+	}
+
+	get value(): T {
+		return this._value;
+	}
+
+	set value(newValue: T) {
+		this._value = newValue;
+		writeToLocalStorage(this.key, newValue);
+	}
 }

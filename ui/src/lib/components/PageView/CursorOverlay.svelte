@@ -2,7 +2,8 @@
 	import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
 	import { ServerConnectionState, type ServerConnection } from "$lib/sync/ServerConnection.svelte";
 	import { getColorFromSeed } from "$lib/utilties";
-    import PresetSvg from "../icons/PresetSvg.svelte";
+	import PresetSvg from "../icons/PresetSvg.svelte";
+	import { globals } from "$lib/datamodel/globals.svelte";
 
 	interface Props {
 		page: GraphPage;
@@ -18,7 +19,7 @@
 	);
 </script>
 
-{#if isInRoom}
+{#if isInRoom && globals.showOtherCursors}
 	<g class="cursor-overlay">
 		{#each visibleClients as client (client.userId)}
 			{@const color = getColorFromSeed(client.userId)}

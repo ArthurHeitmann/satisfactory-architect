@@ -33,6 +33,7 @@
 	{/snippet}
 	{@render toolButton("select-nodes", "select-nodes", "Select Nodes")}
 	{@render toolButton("select-edges", "select-edges", "Select Edges")}
+	{@render toolButton("drag-view", "drag", "Drag View")}
 	{@render toolButton("add-note", "note", "Add Note")}
 </div>
 

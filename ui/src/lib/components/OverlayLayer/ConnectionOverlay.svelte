@@ -3,9 +3,11 @@
 	import type { ShowConnectionOverlayEvent, EventStream } from "$lib/EventStream.svelte";
 	import { getContext, onMount, untrack } from "svelte";
 	import type { AppState } from "$lib/datamodel/AppState.svelte";
-	import { localStorageState } from "$lib/localStorageState.svelte";
+	import { LocalStorageState } from "$lib/localStorageState.svelte";
 	import { assertUnreachable, copyText } from "$lib/utilties";
-    import { fade } from "svelte/transition";
+	import { fade } from "svelte/transition";
+	import { globals } from "$lib/datamodel/globals.svelte";
+	import PresetSvg from "$lib/components/icons/PresetSvg.svelte";
 
 	interface Props {
 		event: ShowConnectionOverlayEvent;
@@ -20,6 +22,7 @@
 	// Local UI state (only for things not driven by server state)
 	let activeTab: "join" | "create" = $state("join");
 	let showServerSettings = $state(false);
+	let roomToDelete: string | null = $state(null);
 
 	// Recent rooms (stored in localStorage)
 	interface RecentRoom {
@@ -30,18 +33,22 @@
 	}
 
 	// Persistent state via localStorage stores
-	const lastServerUrlStore = localStorageState("lastServerUrl", serverConnection.serverUrl);
-	const recentRoomsStore = localStorageState<RecentRoom[]>("recentRooms", []);
-	const recentRoomsSorted = $derived([...$recentRoomsStore].sort((a, b) => b.lastJoined - a.lastJoined));
+	const lastServerUrlStore = new LocalStorageState("lastServerUrl", serverConnection.serverUrl);
+	const recentRoomsStore = new LocalStorageState<RecentRoom[]>("recentRooms", []);
+	const recentRoomsSorted = $derived([...recentRoomsStore.value].sort((a, b) => b.lastJoined - a.lastJoined));
 
 	// Form state
 	let roomIdInput = $state("");
 	let newRoomName = $state("");
-	let serverUrlInput = $state($lastServerUrlStore);
+	let serverUrlInput = $state(lastServerUrlStore.value);
+
+	function resetTempState() {
+		roomToDelete = null;
+	}
 
 	// Save recent rooms to localStorage (only called on successful join)
 	function saveRecentRoom(roomId: string, serverUrl: string, name?: string) {
-		const rooms = [...$recentRoomsStore];
+		const rooms = [...recentRoomsStore.value];
 		const existing = rooms.findIndex(f => f.roomId === roomId && f.serverUrl === serverUrl);
 		if (existing >= 0) {
 			rooms[existing].lastJoined = Date.now();
@@ -49,11 +56,27 @@
 		} else {
 			rooms.unshift({ roomId, serverUrl, name, lastJoined: Date.now() });
 		}
-		$recentRoomsStore = rooms;
+		recentRoomsStore.value = rooms;
 	}
 
-	function clearRecentRooms() {
-		$recentRoomsStore = [];
+	function deleteRecentRoom(room: RecentRoom) {
+		const rooms = [...recentRoomsStore.value];
+		const index = rooms.findIndex(r => r.roomId === room.roomId && r.serverUrl === room.serverUrl);
+		if (index >= 0) {
+			rooms.splice(index, 1);
+			recentRoomsStore.value = rooms;
+		}
+		roomToDelete = null;
+	}
+
+	function handleDeleteClick(room: RecentRoom, event: MouseEvent) {
+		event.stopPropagation();
+		if (roomToDelete === room.roomId) {
+			deleteRecentRoom(room);
+			roomToDelete = null;
+		} else {
+			roomToDelete = room.roomId;
+		}
 	}
 
 	// update current room name in local storage
@@ -62,11 +85,11 @@
 			return;
 		}
 		const name = appState.name;
-		const rooms = untrack(() => [...$recentRoomsStore]);
+		const rooms = untrack(() => [...recentRoomsStore.value]);
 		const existing = rooms.findIndex(f => f.roomId === serverConnection.roomId && f.serverUrl === serverConnection.serverUrl);
 		if (existing >= 0) {
 			rooms[existing].name = name;
-			$recentRoomsStore = rooms;
+			recentRoomsStore.value = rooms;
 		}
 	});
 
@@ -124,6 +147,7 @@
 	});
 
 	async function joinRoom(roomId: string, serverUrl?: string) {
+		resetTempState();
 		if (serverUrl) {
 			serverConnection.setServerUrl(serverUrl);
 		}
@@ -190,7 +214,7 @@
 	}
 
 	function handleServerSettingsSave() {
-		$lastServerUrlStore = serverUrlInput;
+		lastServerUrlStore.value = serverUrlInput;
 		serverConnection.setServerUrl(serverUrlInput);
 		showServerSettings = false;
 	}
@@ -202,8 +226,9 @@
 	}
 
 	function openServerSettings() {
-		serverUrlInput = serverConnection.serverUrl || $lastServerUrlStore;
+		serverUrlInput = serverConnection.serverUrl || lastServerUrlStore.value;
 		showServerSettings = true;
+		resetTempState();
 	}
 
 	function closeServerSettings() {
@@ -217,7 +242,7 @@
 
 	// Initialize - load server URL from storage and auto-connect
 	onMount(() => {
-		const savedUrl = $lastServerUrlStore;
+		const savedUrl = lastServerUrlStore.value;
 		if (savedUrl && serverConnection.state === ServerConnectionState.Disconnected && !serverConnection.serverUrl) {
 			serverConnection.setServerUrl(savedUrl);
 		}
@@ -295,7 +320,7 @@
 					{/if}
 				</button>
 				<p class="warning-text">
-					Warning: This will overwrite any unsaved local changes.
+					Warning: Joining a room will overwrite any unsaved local changes.
 				</p>
 				{#if serverConnection.lastError}
 					<p class="error-text">{serverConnection.lastError}</p>
@@ -306,18 +331,29 @@
 					<div class="recent-rooms">
 						<div class="recent-header">
 							<h3>Recent Sessions</h3>
-							<button class="clear-btn" onclick={clearRecentRooms}>Clear</button>
 						</div>
 						<div class="room-list">
 							{#each recentRoomsSorted as room}
-								<button 
-									class="room-item"
-									onclick={() => handleJoinRecentRoom(room)}
-									disabled={isLoading}
-								>
-									<span class="room-name">{room.name || "Unnamed Room"}</span>
-									<span class="room-id">{room.roomId}</span>
-								</button>
+								{@const isDeleting = roomToDelete === room.roomId}
+								<div class="room-item-container">
+									<button 
+										class="room-item"
+										onclick={() => handleJoinRecentRoom(room)}
+										disabled={isLoading}
+									>
+										<span class="room-name">{room.name || "Unnamed Room"}</span>
+										<span class="room-id">{room.roomId}</span>
+									</button>
+									<button 
+										class="delete-btn"
+										class:confirm={isDeleting}
+										onclick={(e) => handleDeleteClick(room, e)}
+										disabled={isLoading}
+										title={isDeleting ? "Confirm delete" : "Delete"}
+									>
+									<PresetSvg name={isDeleting ? "check" : "delete"} size={14} color="currentColor" />
+									</button>
+								</div>
 							{/each}
 						</div>
 					</div>
@@ -388,6 +424,16 @@
 				</div>
 			</div>
 
+			<div class="checkbox-field">
+				<label>
+					<input 
+						type="checkbox" 
+						bind:checked={globals.showOtherCursors}
+					/>
+					Show users cursors
+				</label>
+			</div>
+
 			<div class="divider"></div>
 
 			<button class="btn danger" onclick={handleLeaveRoom}>
@@ -432,7 +478,7 @@
 					id="server-url"
 					type="text" 
 					bind:value={serverUrlInput}
-					placeholder="ws://localhost:8080"
+					placeholder="ws://..."
 				/>
 			</div>
 
@@ -623,6 +669,27 @@
 		}
 	}
 
+	.checkbox-field {
+		display: flex;
+		align-items: center;
+
+		label {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			font-size: 0.9rem;
+			cursor: pointer;
+			color: var(--text);
+		}
+
+		input[type="checkbox"] {
+			width: 16px;
+			height: 16px;
+			cursor: pointer;
+			accent-color: var(--primary);
+		}
+	}
+
 	.copy-field {
 		display: flex;
 		gap: 8px;
@@ -725,18 +792,6 @@
 				margin: 0;
 				color: var(--background-600);
 			}
-
-			.clear-btn {
-				font-size: 0.75rem;
-				color: var(--background-500);
-				padding: 2px 6px;
-				border-radius: var(--rounded-border-radius);
-
-				&:hover {
-					color: var(--danger-color);
-					background-color: var(--popup-button-hover-background-color);
-				}
-			}
 		}
 
 		.room-list {
@@ -753,6 +808,12 @@
 			}
 		}
 
+		.room-item-container {
+			display: flex;
+			gap: 4px;
+			align-items: stretch;
+		}
+
 		.room-item {
 			display: flex;
 			flex-direction: column;
@@ -761,6 +822,8 @@
 			border-radius: var(--rounded-border-radius);
 			text-align: left;
 			transition: background-color 0.15s ease;
+			flex: 1;
+			min-width: 0;
 
 			&:hover:not(:disabled) {
 				background-color: var(--popup-button-hover-background-color);
@@ -783,6 +846,38 @@
 				font-size: 0.8rem;
 				color: var(--background-500);
 				font-family: monospace;
+			}
+		}
+
+		.delete-btn {
+			width: 28px;
+			padding: 0;
+			border-radius: var(--rounded-border-radius);
+			color: var(--background-500);
+			transition: all 0.15s ease;
+			flex-shrink: 0;
+
+			&:hover:not(:disabled) {
+				background-color: var(--popup-button-hover-background-color);
+				color: var(--danger-color);
+			}
+
+			&:active:not(:disabled) {
+				background-color: var(--popup-button-active-background-color);
+			}
+
+			&:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			&.confirm {
+				color: var(--success-color);
+
+				&:hover:not(:disabled) {
+					color: var(--success-color);
+					filter: brightness(1.2);
+				}
 			}
 		}
 	}

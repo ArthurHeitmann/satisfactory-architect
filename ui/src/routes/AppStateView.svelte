@@ -11,28 +11,32 @@
 	import { loadFormLocalStorage } from "$lib/localStorageState.svelte";
 	import { onMount, setContext } from "svelte";
 
+	function applyTheme(isDark: boolean) {
+		if (isDark) {
+			document.documentElement.classList.add("dark-theme");
+			document.documentElement.classList.remove("light-theme");
+		} else {
+			document.documentElement.classList.add("light-theme");
+			document.documentElement.classList.remove("dark-theme");
+		}
+	}
+	
 	onMount(() => {
-		const applyTheme = (isDark: boolean) => {
-			if (isDark) {
-				document.documentElement.classList.add("dark-theme");
-				document.documentElement.classList.remove("light-theme");
-			} else {
-				document.documentElement.classList.add("light-theme");
-				document.documentElement.classList.remove("dark-theme");
-			}
-		};
-		applyTheme($darkTheme);
-		darkTheme.subscribe(applyTheme);
+		applyTheme(darkTheme.value);
 
 		// Check for version update and show changelog
-		if ($appVersion < latestAppVersion) {
+		if (appVersion.value < latestAppVersion) {
 			eventStream.emit({
 				type: "showChangelog",
 				changelog: changelog,
-				previousVersion: $appVersion,
+				previousVersion: appVersion.value,
 			});
-			$appVersion = latestAppVersion;
+			appVersion.value = latestAppVersion;
 		}
+	});
+
+	$effect(() => {
+		applyTheme(darkTheme.value);
 	});
 
 	const app = (() => {
