@@ -38,33 +38,38 @@ export class ServerConnection {
 		},
 	});
 	get state() { return this.stateMachine.currentState; }
+
 	private _serverUrl: string = $state("");
-	get serverUrl() { return this._serverUrl; }
+	public get serverUrl() { return this._serverUrl; }
 	private _availableRooms: RoomListItem[] = $state([]);
-	get availableRooms() { return this._availableRooms; }
+	public get availableRooms() { return this._availableRooms; }
 	private _roomId: string | null = $state(null);
-	get roomId() { return this._roomId; }
+	public get roomId() { return this._roomId; }
 	private _lastRoomId: string | null = null;
-	get lastRoomId() { return this._lastRoomId; }
+	public get lastRoomId() { return this._lastRoomId; }
 	private _ownUserId: string | null = null;
-	get ownUserId() { return this._ownUserId; }
+	public get ownUserId() { return this._ownUserId; }
+	private _lastError: string | null = $state(null);
+	public get lastError() { return this._lastError; }
+	private _otherClients: ClientPresence[] = $state([]);
+	public get otherClients() { return this._otherClients; }
+
 	private ws: WebSocket | null = null;
 	private wsCompressionMiddleware: WebSocketMessageMiddleware;
 	private taskTimeout: number | null = null;
+	private isExpectedDisconnect: boolean = false;
 	private uploadStateData: AppStateJson | null = null;
-	private _lastError: string | null = $state(null);
-	get lastError() { return this._lastError; }
-	private _isExpectedDisconnect: boolean = false;
-	private _pendingReconnectRoomId: string | null = null;
-	private heartbeatInterval: number | null = null;
-	private lastReceivedHeartbeat: number = Date.now();
-	private fastHeartbeatThrottled = new Throttler(() => this.sendHeartbeat(), 250);
-	private _otherClients: ClientPresence[] = $state([]);
-	get otherClients() { return this._otherClients; }
+	private pendingReconnectRoomId: string | null = null;
+
 	private idGen: IdGen;
 	readonly dispatchCommandQueue: DispatchCommandQueue;
 	private commandProcessor: CommandProcessor;
 	private isUpdatingState: boolean = false;
+
+	private heartbeatInterval: number | null = null;
+	private lastReceivedHeartbeat: number = Date.now();
+	private fastHeartbeatThrottled = new Throttler(() => this.sendHeartbeat(), 100);
+
 	onUnexpectedDisconnect: ((error: string | null) => void) | null = null;
 	onUserMessage: ((message: string) => void) | null = null;
 
@@ -74,9 +79,11 @@ export class ServerConnection {
 		private onStateDownloaded: (state: any) => void,
 	) {
 		this.idGen = appState.idGen;
+
 		const compressionService = new CompressionService();
 		compressionService.registerProvider(new ZstdCompressionProvider());
 		this.wsCompressionMiddleware = new WebSocketMessageMiddleware(compressionService);
+
 		this.dispatchCommandQueue = new DispatchCommandQueue(
 			this.sendCommands.bind(this),
 			() => this.stateMachine.currentState === ServerConnectionState.InRoom,
@@ -94,9 +101,9 @@ export class ServerConnection {
 
 		watchState({
 			dependencies: () => [
+				this.idGen.getCurrentId(),
 				globals.pageMousePosition?.x,
 				globals.pageMousePosition?.y,
-				this.idGen.getCurrentId(),
 				this.getCurrentPageId(),
 			],
 			guard: () => this.stateMachine.currentState === ServerConnectionState.InRoom,
@@ -116,7 +123,8 @@ export class ServerConnection {
 	connect() {
 		this.stateMachine.transitionTo(ServerConnectionState.Connecting);
 		this._lastError = null;
-		this._isExpectedDisconnect = false;
+		this.isExpectedDisconnect = false;
+
 		this.wsCompressionMiddleware.reset();
 		this.ws = new WebSocket(this._serverUrl);
 		this.ws.binaryType = "arraybuffer";
@@ -127,6 +135,7 @@ export class ServerConnection {
 			console.error("WebSocket error:", e);
 			this.disconnect();
 		};
+
 		this.startTaskTimeout(2500);
 	}
 
@@ -135,7 +144,7 @@ export class ServerConnection {
 	 * This marks the disconnect as expected, so no reconnection prompt will be shown.
 	 */
 	intentionalDisconnect() {
-		this._isExpectedDisconnect = true;
+		this.isExpectedDisconnect = true;
 		this.disconnect();
 	}
 
@@ -162,7 +171,7 @@ export class ServerConnection {
 		this.clearHeartbeat();
 		
 		// Notify about unexpected disconnect if we were in room and it wasn't intentional
-		if (wasInRoom && !this._isExpectedDisconnect && this._lastRoomId) {
+		if (wasInRoom && !this.isExpectedDisconnect && this._lastRoomId) {
 			this.onUnexpectedDisconnect?.(this._lastError);
 		}
 	}
@@ -177,7 +186,7 @@ export class ServerConnection {
 		}
 		this.connect();
 		// We'll join the room after connection is established
-		this._pendingReconnectRoomId = this._lastRoomId;
+		this.pendingReconnectRoomId = this._lastRoomId;
 		return true;
 	}
 
@@ -267,9 +276,9 @@ export class ServerConnection {
 		this.clearTaskTimeout();
 		
 		// Auto-join room if we're reconnecting
-		if (this._pendingReconnectRoomId) {
-			const roomId = this._pendingReconnectRoomId;
-			this._pendingReconnectRoomId = null;
+		if (this.pendingReconnectRoomId) {
+			const roomId = this.pendingReconnectRoomId;
+			this.pendingReconnectRoomId = null;
 			this.joinRoom(roomId); // Download intent (no upload data)
 		}
 	}
@@ -309,11 +318,16 @@ export class ServerConnection {
 	}
 
 	private handleCommandBatchMessage(message: CommandBatchMessage): void {
+		if (this.state !== ServerConnectionState.InRoom) {
+			console.warn("Received command batch while not in room, ignoring.");
+			return;
+		}
 		this.isUpdatingState = true;
 		try {
 			this.commandProcessor.applyCommands(message.commands);
 		} catch (error) {
 			console.error("Error applying command batch:", error);
+			this._lastError = "Error applying command";
 			this.disconnect();
 		}
 		tick().then(() => {

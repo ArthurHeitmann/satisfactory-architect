@@ -60,10 +60,10 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 	constructor(context: PageContext, id: Id, type: GraphEdgeType, startNodeId: Id, endNodeId: Id, properties: GraphEdgeProperties) {
 		this.context = context;
 		this.id = id;
-		this.type = $state(type);	// TODO sync
-		this._startNodeId = $state(startNodeId);	// TODO sync
-		this._endNodeId = $state(endNodeId);	// TODO sync
-		this.properties = $state(properties);	// TODO sync
+		this.type = $state(type);
+		this._startNodeId = $state(startNodeId);
+		this._endNodeId = $state(endNodeId);
+		this.properties = $state(properties);
 		this.pushThroughput = $state(0);
 		this.pullThroughput = $state(0);
 		this.asJson = $derived(this.toJSON());
@@ -213,8 +213,8 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 			let startControlPointVector = { x: 0, y: 0 };
 			let endControlPointVector = { x: 0, y: 0 };
 
-			const startNodeRadius = this.startNodeRadius!;
-			const endNodeRadius = this.endNodeRadius!;
+			const startNodeRadius = this.startNodeRadius;
+			const endNodeRadius = this.endNodeRadius;
 			if (this.properties.displayType === "straight") {
 				const unitVector = this.unitVector!;
 				startPoint = {
@@ -231,8 +231,8 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 				};
 			} else if (this.properties.displayType === "curved" || this.properties.displayType === "angled" || this.properties.displayType === "teleport") {
 				const { startOffset, endOffset } = this.orientationVectors!;
-				const startNodeRadius = this.startNodeRadius!;
-				const endNodeRadius = this.endNodeRadius!;
+				const startNodeRadius = this.startNodeRadius;
+				const endNodeRadius = this.endNodeRadius;
 				
 				startPoint = {
 					x: startPos.x + startOffset.x * startNodeRadius,
@@ -247,7 +247,7 @@ export class GraphEdge implements JsonSerializable<PageContext> {
 					y: endPoint.y + endOffset.y * edgeArrowLength,
 				};
 				if (this.properties.displayType === "curved") {
-					const ctrlPointLength = this.controlPointLength!;
+					const ctrlPointLength = this.controlPointLength;
 					startControlPointVector = {
 						x: startOffset.x * (startNodeRadius + ctrlPointLength),
 						y: startOffset.y * (startNodeRadius + ctrlPointLength),

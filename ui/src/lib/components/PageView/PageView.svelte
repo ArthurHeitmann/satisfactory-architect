@@ -41,7 +41,7 @@
 	let svg: SVGSVGElement;
 	let svgTopGroup: SVGGElement;
 
-	const eventStream = getContext("overlay-layer-event-stream") as EventStream;
+	const eventStream = getContext<EventStream>("overlay-layer-event-stream");
 
 	interface BBox {
 		x: number;
@@ -50,7 +50,6 @@
 		height: number;
 	}
 
-	// Drag handler abstraction for extensibility
 	interface DragHandler {
 		onStart?: () => void;
 		onDrag: (deltaX: number, deltaY: number, scale: number) => void;
@@ -71,10 +70,6 @@
 		};
 	});
 	const initiallySelectedIds = new Set<Id>();
-
-	// --- Drag Handlers ---
-	// Each handler encapsulates behavior for a specific drag interaction.
-	// Add new handlers here for future tool modes or key combinations.
 
 	function createPanViewHandler(): DragHandler {
 		return {
@@ -121,6 +116,11 @@
 	function getDragHandler(cursorEvent: CursorEvent): DragHandler | null {
 		// Middle mouse button or touch: always pan view
 		if (cursorEvent.isMiddleButton || cursorEvent.isTouchEvent) {
+			return createPanViewHandler();
+		}
+
+		// CTRL + left click: always pan view
+		if (cursorEvent.hasCtrlKey) {
 			return createPanViewHandler();
 		}
 

@@ -22,7 +22,7 @@ export class DispatchCommandQueue {
 	 * Apply deduplication logic to the queue for a given command.
 	 * Returns the filtered queue with outdated commands removed.
 	 */
-	private deduplicateQueue(command: Command): Command[] {
+	private deduplicateQueueForCommand(command: Command): Command[] {
 		switch (command.type) {
 			case "page.modify": // remove old page.modify for same page
 				return this.queue.filter(c => c.type !== "page.modify" || c.pageId !== command.pageId);
@@ -58,13 +58,8 @@ export class DispatchCommandQueue {
 		}
 	}
 
-	/**
-	 * Enqueue a command with optional flush scheduling.
-	 * @param command The command to enqueue
-	 * @param triggerFlush Whether to schedule a flush (default: true)
-	 */
 	enqueue(command: Command, triggerFlush: boolean = true): void {
-		this.queue = this.deduplicateQueue(command);
+		this.queue = this.deduplicateQueueForCommand(command);
 		this.queue.push(command);
 		if (triggerFlush) {
 			this.scheduleFlush();
@@ -102,6 +97,8 @@ export class DispatchCommandQueue {
 			onChange: (value) => {
 				if (!this.isUpdatingState()) {
 					options.onChange(value);
+				} else {
+					options.onInitialize?.(value);
 				}
 			},
 			onInitialize: options.onInitialize,
@@ -113,7 +110,6 @@ export class DispatchCommandQueue {
 			dependencies: () => getPage().toSyncJson(),
 			onChange: (json) => {
 				const page = getPage();
-				// console.log(`Page ${page.id} changed, enqueueing page.modify command`);
 				const cmd: PageModifyCommand = {
 					type: "page.modify",
 					commandId: generateUUID(),
@@ -132,7 +128,6 @@ export class DispatchCommandQueue {
 			dependencies: () => getObj().asJson,
 			onChange: (json) => {
 				const obj = getObj();
-				// console.log(`Object ${obj.id} changed, enqueueing object.modify command`);
 				const cmd: ObjectModifyCommand = {
 					type: "object.modify",
 					commandId: generateUUID(),
@@ -185,7 +180,6 @@ export class DispatchCommandQueue {
 			getItems: getPages,
 			getId: (page) => page.id,
 			onItemAdded: (page) => {
-				// console.log(`Page ${page.id} added, enqueueing page.add command`);
 				const cmd: PageAddCommand = {
 					type: "page.add",
 					commandId: generateUUID(),
@@ -197,7 +191,6 @@ export class DispatchCommandQueue {
 				this.enqueue(cmd);
 			},
 			onItemRemoved: (pageId) => {
-				// console.log(`Page ${pageId} removed, enqueueing page.delete command`);
 				const cmd: PageDeleteCommand = {
 					type: "page.delete",
 					commandId: generateUUID(),
@@ -215,7 +208,6 @@ export class DispatchCommandQueue {
 			getItems: getNodes,
 			getId: (node) => node.id,
 			onItemAdded: (node) => {
-				// console.log(`Node ${node.id} added on page ${pageId}, enqueueing object.add command`);
 				const cmd: ObjectAddCommand = {
 					type: "object.add",
 					commandId: generateUUID(),
@@ -229,7 +221,6 @@ export class DispatchCommandQueue {
 				this.enqueue(cmd);
 			},
 			onItemRemoved: (nodeId) => {
-				// console.log(`Node ${nodeId} removed from page ${pageId}, enqueueing object.delete command`);
 				const cmd: ObjectDeleteCommand = {
 					type: "object.delete",
 					commandId: generateUUID(),
@@ -249,7 +240,6 @@ export class DispatchCommandQueue {
 			getItems: getEdges,
 			getId: (edge) => edge.id,
 			onItemAdded: (edge) => {
-				// console.log(`Edge ${edge.id} added on page ${pageId}, enqueueing object.add command`);
 				const cmd: ObjectAddCommand = {
 					type: "object.add",
 					commandId: generateUUID(),
@@ -263,7 +253,6 @@ export class DispatchCommandQueue {
 				this.enqueue(cmd);
 			},
 			onItemRemoved: (edgeId) => {
-				// console.log(`Edge ${edgeId} removed from page ${pageId}, enqueueing object.delete command`);
 				const cmd: ObjectDeleteCommand = {
 					type: "object.delete",
 					commandId: generateUUID(),
@@ -298,12 +287,11 @@ export class DispatchCommandQueue {
 		});
 	}
 
-		watchPageOrder(getPages: () => GraphPage[]) {
+	watchPageOrder(getPages: () => GraphPage[]) {
 		this.watchOrderedList<GraphPage>({
 			getItems: getPages,
 			getId: (page) => page.id,
 			onOrderChanged: (newOrder) => {
-				// console.log(`Page order changed, enqueueing page.reorder command`);
 				const cmd: Command = {
 					type: "page.reorder",
 					commandId: generateUUID(),
@@ -316,17 +304,12 @@ export class DispatchCommandQueue {
 		});
 	}
 
-	/**
-	 * Watch a state variable for changes and enqueue statevar.update commands.
-	 * These commands are sent to the server for persistence but NOT applied on other clients.
-	 */
 	watchStateVar<T>(name: StateVarName, getValue: () => T) {
 		let previousValue = getValue();
 		this.watch({
 			dependencies: getValue,
 			onChange: (newValue) => {
 				if (newValue !== previousValue) {
-					// console.log(`State variable ${name} changed, enqueueing statevar.update command`);
 					this.enqueueStateVarUpdate(name, newValue);
 					previousValue = newValue;
 				}
@@ -337,10 +320,6 @@ export class DispatchCommandQueue {
 		});
 	}
 
-	/**
-	 * Enqueue a statevar.update command programmatically.
-	 * Use this when setting a state variable directly rather than through reactive watching.
-	 */
 	enqueueStateVarUpdate(name: StateVarName, value: unknown): void {
 		const cmd: StateVarUpdateCommand = {
 			type: "statevar.update",
@@ -353,11 +332,6 @@ export class DispatchCommandQueue {
 		this.enqueue(cmd);
 	}
 
-	/**
-	 * Watch a page's view for changes and enqueue view.update commands (low priority).
-	 * These commands are sent to the server for persistence but NOT applied on other clients.
-	 * They do not trigger a flush, so they piggyback on other commands.
-	 */
 	watchPageView(getPage: () => GraphPage) {
 		this.watch({
 			dependencies: () => getPage().view.toJSON(),

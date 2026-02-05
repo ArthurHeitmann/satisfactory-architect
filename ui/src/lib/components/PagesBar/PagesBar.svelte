@@ -2,6 +2,7 @@
 	import { browser } from "$app/environment";
 	import type { AppState } from "$lib/datamodel/AppState.svelte";
 	import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
+    import type { Id } from "$lib/datamodel/IdGen.svelte";
 	import PresetSvg from "../icons/PresetSvg.svelte";
 	import PageButton from "./PageButton.svelte";
 
@@ -12,42 +13,58 @@
 		appState,
 	}: Props = $props();
 
+	let isStartingDrag = $state(false);
+	let startCursorX = 0;
+
 	let isDragging = $state(false);
-	let currentDragPageIndex = $state(-1);
-	let draggedButtonX = $state(0);
+	let currentDragPageId: Id|null = $state(null);
+	let previousCursorX = 0;
 	let placeholderWidth = $state(0);
 	let placeholderHeight = $state(0);
+	let draggedButtonAbsoluteOffset = $state(0);
+	let initialCursorRelativeOffset = $state(0);
 	let pagesBarElement: HTMLDivElement | null = $state(null);
 	
-	let dragStartX = 0;
-	let dragStartPageIndex = -1;
-	let pageButtonBoundaries: Array<{ left: number; right: number; center: number }> = [];
-	let initialCursorOffset = 0;
-
-	function calculateButtonBoundaries() {
-		if (!pagesBarElement) return;
+	interface Boundary {
+		left: number;
+		right: number;
+		center: number;
+		width: number;
+	}
+	const pageButtonBoundaries = $derived.by(() => {
+		const boundaries = new Map<Id, Boundary>();
+		if (!pagesBarElement) return boundaries;
 		
-		const boundaries: Array<{ left: number; right: number; center: number }> = [];
-		const buttons = pagesBarElement.querySelectorAll(".page-button");
-		
-		for (const button of buttons) {
+		const _ = appState.pages;	// dependency
+		const buttons = pagesBarElement.querySelectorAll(".page-button:not(.dragging), .page-button-placeholder");
+		if (buttons.length !== appState.pages.length) {
+			console.warn("Button count does not match page count. Cannot calculate boundaries.");
+			return boundaries;
+		}
+		for (let i = 0; i < buttons.length; i++) {
+			const button = buttons[i] as HTMLElement;
+			const page = appState.pages[i];
 			const rect = button.getBoundingClientRect();
-			const containerRect = pagesBarElement!.getBoundingClientRect();
+			const containerRect = pagesBarElement.getBoundingClientRect();
 			const left = rect.left - containerRect.left;
 			const right = rect.right - containerRect.left;
-			boundaries.push({
-				left,
-				right,
-				center: left + (right - left) / 2
-			});
+			const width = right - left;
+			const center = left + width / 2;
+			boundaries.set(page.id, { left, right, center, width });
 		}
-		
-		pageButtonBoundaries = boundaries;
+		return boundaries;
+	});
+
+	function getEventXOffset(event: MouseEvent | TouchEvent): number {
+		if (event instanceof MouseEvent) {
+			return event.clientX;
+		} else if (event.touches.length > 0) {
+			return event.touches[0].clientX;
+		}
+		return 0;
 	}
 
-	function handleMouseDown(event: MouseEvent) {
-		if (event.button !== 0) return;
-		
+	function attemptStartDrag(event: MouseEvent | TouchEvent) {
 		const target = event.target as HTMLElement;
 		const pageButton = target.closest(".page-button");
 		if (!pageButton) return;
@@ -60,76 +77,140 @@
 		if (buttonIndex === -1) return;
 		
 		const buttonRect = pageButton.getBoundingClientRect();
-		initialCursorOffset = event.clientX - buttonRect.left;
+		startCursorX = getEventXOffset(event);
+		previousCursorX = startCursorX;
+		initialCursorRelativeOffset = startCursorX - buttonRect.left;
+		draggedButtonAbsoluteOffset = startCursorX - initialCursorRelativeOffset;
 		placeholderWidth = buttonRect.width;
 		placeholderHeight = buttonRect.height;
 		
-		isDragging = true;
-		dragStartX = event.clientX;
-		dragStartPageIndex = buttonIndex;
-		currentDragPageIndex = buttonIndex;
-		
-		draggedButtonX = event.clientX - initialCursorOffset;
-		
-		calculateButtonBoundaries();
+		isStartingDrag = true;
+		currentDragPageId = appState.pages[buttonIndex].id;
 		
 		event.preventDefault();
 	}
 
-	function handleMouseMove(event: MouseEvent) {
-		if (!isDragging || !pagesBarElement) return;
-		
-		draggedButtonX = event.clientX - initialCursorOffset;
-		
-		const containerRect = pagesBarElement.getBoundingClientRect();
-		const relativeX = event.clientX - containerRect.left;
-		
-		let newIndex = currentDragPageIndex;
-		for (let i = 0; i < pageButtonBoundaries.length; i++) {
-			if (i === currentDragPageIndex) continue;
-			const boundary = pageButtonBoundaries[i];
-
-			if (i < currentDragPageIndex && relativeX < boundary.center) {
-				newIndex = i;
-				break;
-			} else if (i > currentDragPageIndex && relativeX > boundary.center) {
-				newIndex = i;
-				break;
+	function onCursorMove(event: MouseEvent | TouchEvent) {
+		const currentX = getEventXOffset(event);
+		if (isStartingDrag) {
+			if (Math.abs(currentX - startCursorX) > 4) {
+				isDragging = true;
+				isStartingDrag = false;
 			}
 		}
-		
-		if (newIndex !== currentDragPageIndex && newIndex >= 0) {
-			appState.swapPages(currentDragPageIndex, newIndex);
-			currentDragPageIndex = newIndex;
-			
-			setTimeout(() => calculateButtonBoundaries(), 0);
+		if (isDragging) {
+			onDragUpdate(currentX);
 		}
 	}
 
-	function handleMouseUp() {
-		if (!isDragging) return;
+	function onDragUpdate(currentX: number) {
+		if (!pagesBarElement || !currentDragPageId) return;
+		if (currentX === previousCursorX) return;
+
+		draggedButtonAbsoluteOffset = currentX - initialCursorRelativeOffset;
 		
+		let index = appState.pages.findIndex(page => page.id === currentDragPageId);
+		if (index === -1) return;
+
+		const direction = currentX > previousCursorX ? 1 : -1;
+
+		while (index + direction >= 0 && index + direction < appState.pages.length) {
+			const nextPageId = appState.pages[index + direction].id;
+			const nextPageBoundary = pageButtonBoundaries.get(nextPageId);
+			if (!nextPageBoundary) continue;
+			if (direction === 1 && currentX < nextPageBoundary.center) break;
+			if (direction === -1 && currentX > nextPageBoundary.center) break;
+			const ownBoundary = pageButtonBoundaries.get(currentDragPageId);
+			if (!ownBoundary) continue;
+			
+			let leftId: Id;
+			let rightId: Id;
+			let leftBounds: Boundary;
+			let rightBounds: Boundary;
+			if (direction === 1) {
+				leftId = currentDragPageId;
+				rightId = nextPageId;
+				leftBounds = ownBoundary;
+				rightBounds = nextPageBoundary;
+			} else {
+				leftId = nextPageId;
+				rightId = currentDragPageId;
+				leftBounds = nextPageBoundary;
+				rightBounds = ownBoundary;
+			}
+			rightBounds.left = leftBounds.left;
+			rightBounds.right = rightBounds.left + rightBounds.width;
+			rightBounds.center = rightBounds.left + rightBounds.width / 2;
+			leftBounds.left = rightBounds.right;
+			leftBounds.right = leftBounds.left + leftBounds.width;
+			leftBounds.center = leftBounds.left + leftBounds.width / 2;
+
+			pageButtonBoundaries.set(leftId, leftBounds);
+			pageButtonBoundaries.set(rightId, rightBounds);
+			appState.swapPages(currentDragPageId, nextPageId);
+			index += direction;
+		}
+
+		previousCursorX = currentX;
+	}
+
+	function onDragEnd() {
+		if (!isStartingDrag && !isDragging) return;
+		isStartingDrag = false;
 		isDragging = false;
-		draggedButtonX = 0;
-		dragStartX = 0;
-		dragStartPageIndex = -1;
-		currentDragPageIndex = -1;
-		pageButtonBoundaries = [];
-		initialCursorOffset = 0;
+		currentDragPageId = null;
+		draggedButtonAbsoluteOffset = 0;
 		placeholderWidth = 0;
 		placeholderHeight = 0;
+		initialCursorRelativeOffset = 0;
+	}
+
+	function handleMouseDown(event: MouseEvent) {
+		if (event.button !== 0) return;
+		attemptStartDrag(event);
+	}
+
+	function handleTouchStart(event: TouchEvent) {
+		if (event.touches.length !== 1) return;
+		attemptStartDrag(event);
+	}
+
+	function handleMouseMove(event: MouseEvent) {
+		onCursorMove(event);
+	}
+
+	function handleTouchMove(event: TouchEvent) {
+		onCursorMove(event);
+	}
+
+	function handleMouseUp(event: MouseEvent) {
+		if (event.button !== 0) return;
+		onDragEnd();
+	}
+
+	function handleTouchEnd(event: TouchEvent) {
+		if (event.touches.length > 0) return;
+		onDragEnd();
 	}
 </script>
 
 <svelte:window
-	on:mousemove={handleMouseMove}
-	on:mouseup={handleMouseUp}
+	onmousemove={isStartingDrag || isDragging ? handleMouseMove : undefined}
+	onmouseup={isStartingDrag || isDragging ? handleMouseUp : undefined}
+	on:touchmove|nonpassive={isStartingDrag || isDragging ? handleTouchMove : undefined}
+	ontouchend={isStartingDrag || isDragging ? handleTouchEnd : undefined}
 />
 
-<div class="pages-bar" bind:this={pagesBarElement} onmousedown={handleMouseDown}>
+<div
+	class="pages-bar"
+	bind:this={pagesBarElement}
+	onmousedown={!isStartingDrag && !isDragging ? handleMouseDown : undefined}
+	ontouchstart={!isStartingDrag && !isDragging ? handleTouchStart : undefined}
+>
 	{#if browser}
-		{#each appState.pages as page, index (page.id)}
-			{#if isDragging && index === currentDragPageIndex}
+		{#each appState.pages as page (page.id)}
+			{@const isDragged = isDragging && page.id === currentDragPageId}
+			{#if isDragged}
 				<div 
 					class="page-button-placeholder"
 					style:width={`${placeholderWidth}px`}
@@ -141,9 +222,9 @@
 				onSelect={() => appState.setCurrentPage(page)}
 				onRemove={() => appState.removePage(page.id)}
 				canBeRemoved={appState.pages.length > 1}
-				activePageId={appState.currentPage.id}
-				isDraggedButton={isDragging && index === currentDragPageIndex}
-				absoluteX={isDragging && index === currentDragPageIndex ? draggedButtonX : 0}
+				activePageId={appState.currentPage?.id}
+				isDraggedButton={isDragged}
+				absoluteX={isDragged ? draggedButtonAbsoluteOffset : 0}
 			/>
 		{/each}
 		<button

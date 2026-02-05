@@ -14,46 +14,42 @@ export class CommandProcessor {
 	}
 
 	applyCommands(commands: Command[]): void {
+		const ownUserId = this.getUserId();
 		for (const command of commands) {
-			if (this.getUserId() === command.userId) {
+			if (ownUserId === command.userId) {
 				continue; // Skip own commands
 			}
-			try {
-				switch (command.type) {
-					case "page.add":
-						this.handlePageAddCommand(command);
-						break;
-					case "page.delete":
-						this.handlePageDeleteCommand(command);
-						break;
-					case "page.modify":
-						this.handlePageModifyCommand(command);
-						break;
-					case "page.reorder":
-						this.handlePageReorderCommand(command);
-						break;
-					case "object.add":
-						this.handleObjectAddCommand(command);
-						break;
-					case "object.delete":
-						this.handleObjectDeleteCommand(command);
-						break;
-					case "object.modify":
-						this.handleObjectModifyCommand(command);
-						break;
-					case "statevar.update":
-						this.handleStateVarUpdateCommand(command);
-						break;
-					case "view.update":
-						// View updates are intentionally NOT applied to other clients
-						// They are only stored on the server for persistence
-						break;
-					default:
-						assertUnreachable(command);
-				}
-			} catch (error) {
-				console.error(`Error applying command ${command.commandId} of type ${command.type}:}`);
-				console.error(error);
+			switch (command.type) {
+				case "page.add":
+					this.handlePageAddCommand(command);
+					break;
+				case "page.delete":
+					this.handlePageDeleteCommand(command);
+					break;
+				case "page.modify":
+					this.handlePageModifyCommand(command);
+					break;
+				case "page.reorder":
+					this.handlePageReorderCommand(command);
+					break;
+				case "object.add":
+					this.handleObjectAddCommand(command);
+					break;
+				case "object.delete":
+					this.handleObjectDeleteCommand(command);
+					break;
+				case "object.modify":
+					this.handleObjectModifyCommand(command);
+					break;
+				case "statevar.update":
+					this.handleStateVarUpdateCommand(command);
+					break;
+				case "view.update":
+					// View updates are intentionally NOT applied to other clients
+					// They are only stored on the server for persistence
+					break;
+				default:
+					assertUnreachable(command);
 			}
 		}
 	}
@@ -64,11 +60,7 @@ export class CommandProcessor {
 	}
 
 	private handlePageDeleteCommand(command: PageDeleteCommand): void {
-		try {
-			this.appState.removePage(command.pageId);
-		} catch (error) {
-			console.warn(`Failed to delete page ${command.pageId}: ${(error as Error).message}`);
-		}
+		this.appState.removePage(command.pageId);
 	}
 
 	private handlePageModifyCommand(command: PageModifyCommand): void {
@@ -104,12 +96,6 @@ export class CommandProcessor {
 			}
 			const node = GraphNode.fromJSON(command.data as GraphNodeJson, { appState: this.appState, page });
 			page.nodes.set(node.id, node);
-			// const node = GraphNode.fromJSON(command.data as GraphNodeJson, { appState: this.appState, page });
-			// if (page.nodes.has(node.id)) {
-			// 	console.warn(`Node with id ${node.id} already exists on page ${page.id}, skipping add.`);
-			// 	return;
-			// }
-			// page.addNodes(node);
 		}
 		else if (command.objectType === "edge") {
 			if (page.edges.has(command.objectId)) {
@@ -118,12 +104,6 @@ export class CommandProcessor {
 			}
 			const edge = GraphEdge.fromJSON(command.data as GraphEdgeJson, { appState: this.appState, page });
 			page.edges.set(edge.id, edge);
-			// const edge = GraphEdge.fromJSON(command.data as GraphEdgeJson, { appState: this.appState, page });
-			// if (page.edges.has(edge.id)) {
-			// 	console.warn(`Edge with id ${edge.id} already exists on page ${page.id}, skipping add.`);
-			// 	return;
-			// }
-			// page.addEdge(edge);
 		}
 		else {
 			assertUnreachable(command.objectType);
@@ -135,16 +115,10 @@ export class CommandProcessor {
 		if (!page) {
 			return;
 		}
-		try {
-			if (command.objectType === "node") {
-				page.nodes.delete(command.objectId);
-				// page.removeNode(command.objectId);
-			} else {
-				page.edges.delete(command.objectId);
-				// page.removeEdge(command.objectId);
-			}
-		} catch (error) {
-			console.warn(`Failed to delete ${command.objectType} ${command.objectId}: ${(error as Error).message}`);
+		if (command.objectType === "node") {
+			page.nodes.delete(command.objectId);
+		} else {
+			page.edges.delete(command.objectId);
 		}
 	}
 
@@ -179,7 +153,7 @@ export class CommandProcessor {
 				this.appState.name = command.value as string | undefined;
 				break;
 			default:
-				console.warn(`Unknown state variable name: ${command.name}`);
+				assertUnreachable(command.name);
 		}
 	}
 	

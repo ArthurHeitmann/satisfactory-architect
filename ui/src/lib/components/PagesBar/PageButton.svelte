@@ -9,7 +9,7 @@
 
 	interface Props {
 		page: GraphPage;
-		activePageId: Id;
+		activePageId: Id|undefined;
 		canBeRemoved: boolean;
 		onSelect: () => void;
 		onRemove: () => void;
@@ -27,8 +27,8 @@
 		absoluteX = 0,
 		...listeners
 	}: Props = $props();
-	const eventStream = getContext("overlay-layer-event-stream") as EventStream;
-	const appState = getContext("app-state") as AppState;
+	const eventStream = getContext<EventStream>("overlay-layer-event-stream");
+	const appState = getContext<AppState>("app-state");
 
 	const commandQueue = appState.serverConnection.dispatchCommandQueue;
 	commandQueue.watchPageChange(() => page);
@@ -45,10 +45,8 @@
 	);
 
 	let isRenaming = $state(false);
-	// svelte-ignore non_reactive_update
-	let button: HTMLElement | null = null;
-	// svelte-ignore non_reactive_update
-	let nameElement: HTMLElement | null = null;
+	let button: HTMLElement | null = $state(null);
+	let nameElement: HTMLElement | null = $state(null);
 	let lastName = "";
 
 	function onDoubleClick() {

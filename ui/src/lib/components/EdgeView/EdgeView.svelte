@@ -21,7 +21,7 @@
 	
 	let isRotating = $state(false);
 
-	const eventStream = getContext("event-stream") as EventStream;
+	const eventStream = getContext<EventStream>("event-stream");
 	const page = $derived(edge.context.page);
 	
 	const isSelected = $derived(page.selectedEdges.has(edge.id));

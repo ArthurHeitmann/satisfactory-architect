@@ -22,7 +22,7 @@
 	const commandQueue = serverConnection.dispatchCommandQueue;
 	commandQueue.watchNodeOrEdgeChange(() => node);
 
-	const eventStream = getContext("event-stream") as EventStream;
+	const eventStream = getContext<EventStream>("event-stream");
 	const page = $derived(node.context.page);
 	
 	const isSelectable = isNodeSelectable(node);
@@ -281,7 +281,6 @@
 	}
 
 	function startMoveResourceJoint(jointDragType: JointDragType, preferredJointType?: "input" | "output") {
-		// Only set owner if connected to server, otherwise null for local-only
 		const ownerUserId = serverConnection.ownUserId;
 		let newNode: GraphNode<GraphNodeResourceJointProperties>;
 		if (node.properties.type === "resource-joint") {
@@ -336,7 +335,11 @@
 			page.connectResourceJoints(node, targetNode);
 		}
 		else if (dragType === "moveNewResourceJoint") {
-			const originalNode = page.nodes.get(node.properties.dragStartNodeId!)!;
+			const originalNode = page.nodes.get(node.properties.dragStartNodeId!);
+			if (!originalNode) {
+				page.onResourceJointDragEnd(node);
+				return;
+			}
 			const dragStartPos = originalNode.getAbsolutePosition(page);
 			const dragEndPos = node.getAbsolutePosition(page);
 			const dragDistance = Math.sqrt(
@@ -377,7 +380,10 @@
 							destJoint = newNode;
 						}
 						for (const edgeId of node.edges) {
-							const edge = page.edges.get(edgeId)!;
+							const edge = page.edges.get(edgeId);
+							if (!edge) {
+								continue;
+							}
 							if (edge.startNodeId === node.id) {
 								edge.connectNode(destJoint, "start", page);
 							} else {

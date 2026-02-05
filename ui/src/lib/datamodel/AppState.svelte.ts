@@ -10,19 +10,19 @@ import { ServerConnection } from "$lib/sync/ServerConnection.svelte";
 export class AppState {
 	readonly idGen: IdGen;
 	private currentPageId: Id;
-	readonly currentPage: GraphPage;
+	readonly currentPage: GraphPage | undefined;
 	pages: GraphPage[];
-	/** Project name, synced with server via ServerConnection.name setter */
-	name: string | undefined = $state(undefined);
+	name: string | undefined;
 	readonly serverConnection: ServerConnection;
 	private debouncedSave: Debouncer<(json: any) => void>;
 	readonly asJson: any;
 
 	constructor(idGen: IdGen, currentPageId: Id, pages: GraphPage[]) {
-		this.idGen = idGen;	// TODO sync
+		this.idGen = idGen;
 		this.currentPageId = $state(currentPageId);
-		this.pages = $state.raw(pages);	// TODO sync
-		this.currentPage = $derived(this.pages.find((p) => p.id === this.currentPageId)!);
+		this.pages = $state.raw(pages);
+		this.currentPage = $derived(this.pages.find((p) => p.id === this.currentPageId) ?? this.pages[0]);
+		this.name = $state(undefined);
 
 		this.serverConnection = new ServerConnection(
 			this,
@@ -131,11 +131,12 @@ export class AppState {
 
 	removePage(pageId: Id): void {
 		if (this.pages.length === 1) {
-			throw new Error("Cannot remove the last this.");
+			console.warn("Cannot remove the last this.");
+			return;
 		}
 		const pageIndex = this.pages.findIndex((p) => p.id === pageId);
 		if (pageIndex === -1) {
-			throw new Error(`Page with id ${pageId} does not exist.`);
+			return;
 		}
 		this.pages = this.pages.filter((p) => p.id !== pageId);
 		if (this.currentPageId === pageId && this.pages.length > 0) {
@@ -163,17 +164,22 @@ export class AppState {
 		newPage.name = newName;
 	}
 
-	swapPages(fromIndex: number, toIndex: number): void {
-		if (fromIndex < 0 || fromIndex >= this.pages.length || toIndex < 0 || toIndex >= this.pages.length) {
-			throw new Error(`Invalid indices: fromIndex=${fromIndex}, toIndex=${toIndex}, pages.length=${this.pages.length}`);
+	swapPages(pageId1: Id, pageId2: Id): void {
+		const index1 = this.pages.findIndex((p) => p.id === pageId1);
+		const index2 = this.pages.findIndex((p) => p.id === pageId2);
+		
+		if (index1 === -1) {
+			throw new Error(`Page with id ${pageId1} does not exist.`);
 		}
-		if (fromIndex === toIndex) {
+		if (index2 === -1) {
+			throw new Error(`Page with id ${pageId2} does not exist.`);
+		}
+		if (index1 === index2) {
 			return;
 		}
 		
 		const newPages = [...this.pages];
-		const [movedPage] = newPages.splice(fromIndex, 1);
-		newPages.splice(toIndex, 0, movedPage);
+		[newPages[index1], newPages[index2]] = [newPages[index2], newPages[index1]];
 		this.pages = newPages;
 	}
 

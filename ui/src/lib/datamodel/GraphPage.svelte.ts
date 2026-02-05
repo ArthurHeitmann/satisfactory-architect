@@ -46,11 +46,11 @@ export class GraphPage implements JsonSerializable<PageContext> {
 		this.context = { appState, page: this };
 		this.idGen = appState.idGen;
 		this.id = id;
-		this.name = $state(name);	// TODO sync
-		this.icon = $state(icon);	// TODO sync
+		this.name = $state(name);
+		this.icon = $state(icon);
 		this.view = view;
-		this.nodes = new SvelteMap(nodes.map((n) => [n.id, n]));	// TODO sync
-		this.edges = new SvelteMap(edges.map((e) => [e.id, e]));	// TODO sync
+		this.nodes = new SvelteMap(nodes.map((n) => [n.id, n]));
+		this.edges = new SvelteMap(edges.map((e) => [e.id, e]));
 		this.toolMode = $state(toolMode);
 		this.selectedNodes = new SvelteSet();
 		this.selectedEdges = new SvelteSet();
@@ -149,7 +149,7 @@ export class GraphPage implements JsonSerializable<PageContext> {
 
 	removeNode(nodeId: Id): void {
 		if (!this.nodes.has(nodeId)) {
-			throw new Error(`Node with id ${nodeId} does not exist.`);
+			return;
 		}
 		const node = this.nodes.get(nodeId)!;
 		for (const childId of node.children) {
@@ -214,10 +214,10 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	}
 
 	removeEdge(edgeId: Id): void {
-		if (!this.edges.has(edgeId)) {
-			throw new Error(`Edge with id ${edgeId} does not exist.`);
+		const edge = this.edges.get(edgeId);
+		if (!edge) {
+			return;
 		}
-		const edge = this.edges.get(edgeId)!;
 		const startNode = this.nodes.get(edge.startNodeId);
 		const endNode = this.nodes.get(edge.endNodeId);
 		if (startNode) {
@@ -261,9 +261,9 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	}
 
 	getResourceJointAttachableNodes(movingNode: GraphNode<GraphNodeResourceJointProperties>): GraphNode[] {
-		const originalNode = this.nodes.get(movingNode.properties.dragStartNodeId!)!;
+		const originalNodeEdges = this.nodes.get(movingNode.properties.dragStartNodeId!)?.edges ?? [];
 		const ignoreNodeIds = new Set([movingNode.id]);
-		const ignoreEdges = [...movingNode.edges, ...originalNode.edges];
+		const ignoreEdges = [...movingNode.edges, ...originalNodeEdges];
 		if (movingNode.edges.size >= 1) {
 			const edge = this.edges.get(movingNode.edges.values().next().value!);
 			if (edge) {
@@ -384,7 +384,9 @@ export class GraphPage implements JsonSerializable<PageContext> {
 	connectResourceJoints(movingNode: GraphNode, destNode: GraphNode) {
 		const movingEdge = this.edges.get(movingNode.edges.values().next().value!);
 		if (!movingEdge) {
-			throw new Error("Moving node does not have an edge.");
+			console.error("Moving node does not have an edge.");
+			this.removeNode(movingNode.id);
+			return;
 		}
 		let otherNode: GraphNode|undefined;
 		if (movingEdge.startNodeId === movingNode.id) {
@@ -394,7 +396,9 @@ export class GraphPage implements JsonSerializable<PageContext> {
 			otherNode = this.nodes.get(movingEdge.startNodeId);
 			movingEdge.connectNode(destNode, "end", this);
 		} else {
-			throw new Error("Moving node is not connected to the edge.");
+			console.error("Moving node is not connected to the edge.");
+			this.removeNode(movingNode.id);
+			return;
 		}
 		movingNode.edges.delete(movingEdge.id);
 		if (movingNode.edges.size === 0) {

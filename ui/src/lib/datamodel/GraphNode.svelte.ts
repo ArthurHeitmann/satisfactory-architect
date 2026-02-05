@@ -64,7 +64,7 @@ export interface GraphNodeResourceJointProperties {
 	locked: boolean;
 	jointDragType?: JointDragType;
 	dragStartNodeId?: Id;
-	dragOwnerUserId?: string | null;	// userId of the user performing the drag (null = local only, not synced)
+	dragOwnerUserId?: string | null;
 }
 export interface GraphNodeSplitterMergerProperties {
 	type: "splitter" | "merger";
@@ -96,13 +96,13 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 	constructor(id: Id, context: PageContext, position: IVector2D, priority: number, edges: Id[], parentNode: Id|null, children: Id[], properties: T, size?: IVector2D) {
 		this.id = id;
 		this.context = context;
-		this.position = new Vector2D(position);	// TODO sync
+		this.position = new Vector2D(position);
 		this.dragStartPosition = { x: 0, y: 0 };
 		this.priority = priority;
-		this.edges = new SvelteSet(edges);	// TODO sync
-		this.parentNode = parentNode;	// TODO sync
-		this.children = new SvelteSet(children);	// TODO sync
-		this.properties = $state(properties);	// TODO sync
+		this.edges = new SvelteSet(edges);
+		this.parentNode = parentNode;
+		this.children = new SvelteSet(children);
+		this.properties = $state(properties);
 		if (!size) {
 			const radius = getNodeRadius(this);
 			size = {
@@ -110,7 +110,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 				y: radius,
 			};
 		}
-		this.size = $state(size);	// TODO sync
+		this.size = $state(size);
 		this.asJson = $derived(this.toJSON());
 	}
 
@@ -402,7 +402,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		}
 		
 		const centerPoint = recipeNode.getAbsolutePosition(page);
-		const layoutOrientation = (page.nodes.get(sameRowJoints[0].id)!.properties as GraphNodeResourceJointProperties).layoutOrientation;
+		const layoutOrientation = (page.nodes.get(sameRowJoints[0].id)?.properties as (GraphNodeResourceJointProperties|undefined))?.layoutOrientation ?? "left";
 		let zeroAxis: "x" | "y";
 		let reverseOrder: boolean;
 		switch (layoutOrientation) {
@@ -426,10 +426,10 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		
 		const jointTargets = sameRowJoints
 			.map(srcJoint => {
-				const jointNode = page.nodes.get(srcJoint.id) as GraphNode<GraphNodeResourceJointProperties>;
-				const edge = page.edges.get(jointNode.edges.values().next().value || "");
-				let refJoint: GraphNode<GraphNodeResourceJointProperties> | undefined;
-				if (edge) {
+				const jointNode = page.nodes.get(srcJoint.id) as GraphNode|undefined;
+				const edge = page.edges.get(jointNode?.edges.values().next().value || "");
+				let refJoint: GraphNode | undefined;
+				if (edge && jointNode) {
 					let refJointId: Id | undefined;
 					if (edge.startNodeId === jointNode.id) {
 						refJointId = edge.endNodeId;
@@ -437,11 +437,11 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 						refJointId = edge.startNodeId;
 					}
 					if (refJointId) {
-						refJoint = page.nodes.get(refJointId) as GraphNode<GraphNodeResourceJointProperties>;
+						refJoint = page.nodes.get(refJointId) as GraphNode|undefined;
 					}
 				}
 				if (!refJoint) {
-					refJoint = jointNode;
+					refJoint = jointNode ?? recipeNode;
 				}
 				const pos = refJoint.getAbsolutePosition(page);
 				const direction = {
@@ -454,11 +454,14 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 				} else if (angle > Math.PI) {
 					angle -= 2 * Math.PI;
 				}
-				return { node: jointNode, angle };
+				return { nodePos: jointNode?.position, angle };
 			})
 			.sort((a, b) => {
-				const aPosSum = a.node.position.x + a.node.position.y;
-				const bPosSum = b.node.position.x + b.node.position.y;
+				if (!a.nodePos || !b.nodePos) {
+					return 0;
+				}
+				const aPosSum = a.nodePos.x + a.nodePos.y;
+				const bPosSum = b.nodePos.x + b.nodePos.y;
 				return aPosSum - bPosSum;
 			});
 		
@@ -466,7 +469,7 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 			return;
 		}
 
-		const originalPositions = jointTargets.map(t => $state.snapshot(t.node.position));
+		const originalPositions = jointTargets.map(t => $state.snapshot(t.nodePos));
 
 		const sortedTargets = jointTargets
 			.toSorted((a, b) => {
@@ -482,8 +485,11 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		for (let i = 0; i < sortedTargets.length; i++) {
 			const target = sortedTargets[i];
 			const newPosition = originalPositions[i];
-			target.node.position.x = newPosition.x;
-			target.node.position.y = newPosition.y;
+			if (!target.nodePos || !newPosition) {
+				continue;
+			}
+			target.nodePos.x = newPosition.x;
+			target.nodePos.y = newPosition.y;
 		}
 	}
 
@@ -566,16 +572,19 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		if (this.properties.type !== "production") {
 			return;
 		}
-		function nodeCmp(a: GraphNode, b: GraphNode): number {
+		function nodeCmp(a: GraphNode|undefined, b: GraphNode|undefined): number {
+			if (!a || !b) {
+				return 0;
+			}
 			const aPosSum = a.position.x + a.position.y;
 			const bPosSum = b.position.x + b.position.y;
 			return aPosSum - bPosSum;
 		}
 		const inputs = this.properties.resourceJoints.filter(joint => joint.type === "input")
-			.map(joint => this.context.page.nodes.get(joint.id)!)
+			.map(joint => this.context.page.nodes.get(joint.id))
 			.sort(nodeCmp);
 		const outputs = this.properties.resourceJoints.filter(joint => joint.type === "output")
-			.map(joint => this.context.page.nodes.get(joint.id)!)
+			.map(joint => this.context.page.nodes.get(joint.id))
 			.sort(nodeCmp);
 		const maxNodeCount = Math.max(inputs.length, outputs.length);
 		this.size = GraphNode.calcSize(maxNodeCount);
@@ -586,11 +595,17 @@ export class GraphNode<T extends GraphNodeProperties = GraphNodeProperties> impl
 		const outputsYStart = -outputsGapSize/2 * (outputs.length - 1);
 		for (let i = 0; i < inputs.length; i++) {
 			const input = inputs[i];
+			if (!input) {
+				continue;
+			}
 			input.position.x = -this.size.x / 2;
 			input.position.y = inputsYStart + inputsGapSize * i;
 		}
 		for (let i = 0; i < outputs.length; i++) {
 			const output = outputs[i];
+			if (!output) {
+				continue;
+			}
 			output.position.x = this.size.x / 2;
 			output.position.y = outputsYStart + outputsGapSize * i;
 		}

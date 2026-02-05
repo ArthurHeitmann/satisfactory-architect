@@ -19,8 +19,8 @@
 		page,
 	}: Props = $props();
 
-	const appState = getContext("app-state") as AppState;
-	const eventStream = getContext("overlay-layer-event-stream") as EventStream;
+	const appState = getContext<AppState>("app-state");
+	const eventStream = getContext<EventStream>("overlay-layer-event-stream");
 
 	interface AggregateResult<T> {
 		hasValues: boolean;
@@ -456,7 +456,6 @@
 				class="click-button color-button"
 				style="--custom-color: {aggCustomColor.value ?? "--node-background-color"};"
 				onclick={(e) => {
-					console.log(aggCustomColor.value);
 					const target = (e.currentTarget as HTMLElement);
 					const rect = target.getBoundingClientRect();
 					eventStream.emit({

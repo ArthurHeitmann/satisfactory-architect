@@ -1,8 +1,5 @@
-import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
-import { assertUnreachable } from "$lib/utilties";
-import type { AppState } from "./AppState.svelte";
 import type { GraphEdge } from "./GraphEdge.svelte";
-import type { GraphNodeType, GraphNode, ProductionDetails } from "./GraphNode.svelte";
+import type { GraphNodeType, GraphNode } from "./GraphNode.svelte";
 import { resourceJointNodeRadius, splitterMergerNodeRadius } from "./constants";
 
 const draggableTypes: GraphNodeType[] = ["production", "splitter", "merger", "text-note"];

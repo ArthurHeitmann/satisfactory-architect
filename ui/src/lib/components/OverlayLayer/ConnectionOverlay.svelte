@@ -16,7 +16,7 @@
 	}
 	const { event, onclose }: Props = $props();
 
-	const appState = getContext("app-state") as AppState;
+	const appState = getContext<AppState>("app-state");
 	const serverConnection = appState.serverConnection;
 
 	// Local UI state (only for things not driven by server state)

@@ -124,9 +124,15 @@
 <OverlayLayer eventStream={eventStream}>
 	<div class="home">
 		<div class="page-view">
-			{#key app.currentPage.id}
-				<PageView page={app.currentPage} />
-			{/key}
+			{#if app.currentPage}
+				{#key app.currentPage?.id}
+					<PageView page={app.currentPage} />
+				{/key}
+			{:else}
+				<div class="no-page">
+					No page found. Please create a new page.
+				</div>
+			{/if}
 		</div>
 		<PagesBar appState={app} />
 	</div>
