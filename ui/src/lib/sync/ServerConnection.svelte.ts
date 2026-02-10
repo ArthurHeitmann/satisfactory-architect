@@ -69,6 +69,7 @@ export class ServerConnection {
 	private heartbeatInterval: number | null = null;
 	private lastReceivedHeartbeat: number = Date.now();
 	private fastHeartbeatThrottled = new Throttler(() => this.sendHeartbeat(), 100);
+	private heartbeatWatchInitialized = false;
 
 	onUnexpectedDisconnect: ((error: string | null) => void) | null = null;
 	onUserMessage: ((message: string) => void) | null = null;
@@ -99,6 +100,13 @@ export class ServerConnection {
 			this._serverUrl = location.origin.replace(/^http/, "ws");
 		}
 
+	}
+
+	watchHeartbeatDataChanges(): void {
+		if (this.heartbeatWatchInitialized) {
+			return;
+		}
+		this.heartbeatWatchInitialized = true;
 		watchState({
 			dependencies: () => [
 				this.idGen.getCurrentId(),

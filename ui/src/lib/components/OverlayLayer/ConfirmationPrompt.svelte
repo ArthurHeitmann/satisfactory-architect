@@ -63,8 +63,8 @@
 		background-color: var(--popup-background-color);
 		border: 1px solid var(--popup-border-color);
 		padding: 20px;
-		border-radius: 8px;
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		border-radius: var(--rounded-border-radius-big);
+		box-shadow: var(--shadow-low);
 		text-align: center;
 	}
 

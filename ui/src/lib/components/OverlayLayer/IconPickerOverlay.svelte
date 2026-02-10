@@ -63,7 +63,7 @@
 				bind:this={searchInputElement}
 			/>
 		</div>
-		<div class="icon-list" bind:this={iconListElement}>
+		<div class="icon-list scrollbar-thin" bind:this={iconListElement}>
 			{#each filteredIcons as iconName}
 				<button
 					class="icon-button"
@@ -113,12 +113,6 @@
 		gap: 4px;
 		padding: 8px;
 		overflow-y: auto;
-		scrollbar-width: thin;
-		scrollbar-color: var(--recipe-selector-scrollbar-color) transparent;
-		&::-webkit-scrollbar {
-			width: 8px;
-			background-color: transparent;
-		}
 	}
 
 	.icon-button {

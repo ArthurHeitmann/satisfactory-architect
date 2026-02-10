@@ -202,7 +202,7 @@
 />
 
 <div
-	class="pages-bar"
+	class="pages-bar scrollbar-hidden"
 	bind:this={pagesBarElement}
 	onmousedown={!isStartingDrag && !isDragging ? handleMouseDown : undefined}
 	ontouchstart={!isStartingDrag && !isDragging ? handleTouchStart : undefined}
@@ -249,10 +249,6 @@
 		display: flex;
 		align-items: center;
 		overflow-x: auto;
-		scrollbar-width: none;
-		&::-webkit-scrollbar {
-			display: none;
-		}
 		border-top: 1px solid var(--pages-bar-border-color);
 		padding-right: 8px;
 		user-select: none;
@@ -261,8 +257,8 @@
 	.page-button-placeholder {
 		flex-shrink: 0;
 		background-color: transparent;
-		border: 2px dashed rgba(255, 255, 255, 0.3);
-		border-radius: 4px;
+		border: 2px dashed var(--drop-target-border-color);
+		border-radius: var(--rounded-border-radius);
 	}
 
 	.add-page-button {

@@ -1,5 +1,7 @@
 <script lang="ts">
+    import { EventStream } from "$lib/EventStream.svelte";
 	import type { ServerConnection } from "$lib/sync/ServerConnection.svelte";
+    import { getContext } from "svelte";
 
 	interface Props {
 		serverConnection: ServerConnection;
@@ -7,12 +9,20 @@
 
 	const { serverConnection }: Props = $props();
 
+	const eventStream = getContext<EventStream>("event-stream");
+
 	const isConnected = $derived(serverConnection.state === "InRoom");
 	const userCount = $derived(serverConnection.otherClients.length);
+
+	function openConnectionOverlay() {
+		eventStream.emit({
+			type: "showConnectionOverlay",
+		})
+	}
 </script>
 
 {#if isConnected}
-	<div class="connection-status">
+	<div class="connection-status" onclick={openConnectionOverlay}>
 		<span class="status-dot"></span>
 		<span>{userCount} {userCount === 1 ? 'User' : 'Users'}</span>
 	</div>
@@ -32,7 +42,7 @@
 		border-radius: var(--rounded-border-radius);
 		font-size: 12px;
 		user-select: none;
-		pointer-events: none;
+		cursor: pointer;
 	}
 
 	.status-dot {

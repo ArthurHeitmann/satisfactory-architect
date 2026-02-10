@@ -31,14 +31,8 @@ export class TestServer {
 		}
 
 		const command = new Deno.Command("deno", {
-			args: ["run", "-P", "src/main.ts"],
+			args: ["run", "-P", "src/main.ts", `--port=${this.port}`, `--database-path=:memory:`, `--heartbeat-interval-ms=100`, `--heartbeat-timeout-ms=1000`],
 			cwd: cwd,
-			env: {
-				PORT: this.port.toString(),
-				DATABASE_PATH: ":memory:", // Use in-memory DB for tests
-				HEARTBEAT_INTERVAL_MS: "100", // Fast heartbeats for testing
-				HEARTBEAT_TIMEOUT_MS: "1000",
-			},
 			stdout: "piped",
 			stderr: "piped",
 		});

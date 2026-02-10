@@ -206,9 +206,12 @@ export class CollaborationRoom {
 	/**
 	 * Set room state (from upload)
 	 */
-	public setRoomState(socketId: string, stateData: AppStateJson): void {
+	public async setRoomState(
+		socketId: string,
+		stateData: AppStateJson,
+	): Promise<void> {
 		this.roomState.setState(stateData);
-		this.saveSnapshot();
+		await this.saveSnapshot();
 		const client = this.clients.get(socketId);
 		const identifier = client?.hasUserId() ? client.userId : socketId;
 		console.log(`Client ${identifier} uploaded state to room ${this.roomId}`);
@@ -278,9 +281,13 @@ export class CollaborationRoom {
 	/**
 	 * Clean up room resources
 	 */
-	public dispose(): void {
+	public async dispose(): Promise<void> {
 		this.clearSnapshotTimer();
 		this.clearHeartbeatTimer();
+		if (this.loadingSnapshot) {
+			await this.loadingSnapshot;
+		}
+		await this.saveSnapshot();
 		this.commandBuffer.dispose();
 
 		// Disconnect all clients
@@ -333,7 +340,7 @@ export class CollaborationRoom {
 	/**
 	 * Save room state snapshot to database
 	 */
-	private async saveSnapshot(): Promise<void> {
+	private async saveSnapshotIfChanged(): Promise<void> {
 		const { data: stateData, hasChanged } = this.roomState.consumeStateChanges();
 
 		// Skip saving if state hasn't changed or is null
@@ -341,7 +348,21 @@ export class CollaborationRoom {
 			return;
 		}
 
+		await this.saveSnapshot(stateData);
+	}
+
+	/**
+	 * Save room state snapshot to database
+	 */
+	private async saveSnapshot(stateData?: AppStateJson): Promise<void> {
 		try {
+			if (!stateData) {
+				if (!this.roomState.canGetState()) {
+					return;
+				}
+				stateData = this.roomState.getState();
+			}
+
 			const compressed = await this.compression.compressJSON(stateData);
 			const snapshot: RoomSnapshot = {
 				roomId: this.roomId,
@@ -389,7 +410,7 @@ export class CollaborationRoom {
 	private startSnapshotTimer(): void {
 		this.snapshotTimer = Scheduler.safeInterval(
 			`snapshot-${this.roomId}`,
-			() => this.saveSnapshot(),
+			() => this.saveSnapshotIfChanged(),
 			this.config.snapshotIntervalMs,
 		);
 

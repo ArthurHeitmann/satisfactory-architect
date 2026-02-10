@@ -29,6 +29,36 @@ export const saveDataType = "app-state";
 export const clipboardDataType = "factory-data";
 
 
-export const changelog: Record<number, string[]> = {
+export type ChangelogEntry = string | {
+	text: string;
+	items?: ChangelogEntry[];
+};
+
+export const changelog: Record<number, ChangelogEntry[]> = {
+	2: [
+		{
+			text: "Multi User Collaboration",
+			items: [
+				"Work together with your friends on one save file in real-time",
+				"To get started, click the new \"Multi-User Collaboration\" button in the top left dropdown menu",
+				"If you encounter any issues, please report them",
+				"If you want to host your own server, visit the GitHub repository for more information",
+			],
+		},
+		{
+			text: "Pages",
+			items: [
+				"Pages can now be reordered",
+				"You can also change their icon",
+			]
+		},
+		{
+			text: "More view moving options",
+			items: [
+				"CTRL + left-click",
+				"\"Drag View\" tool in left sidebar"
+			]
+		},
+	],
 	1: ["Initial release"],
 };

@@ -2,13 +2,12 @@
  * Environment configuration with defaults
  */
 
-import { CompressionMethod } from "../shared/CompressionService.ts";
+import { parseArgs } from "@std/cli/parse-args";
 
 
 export interface EnvironmentConfig {
 	// Server
 	port: number;
-	serverProtocolVersion: number;
 
 	// Timing
 	serverBufferMs: number;
@@ -27,7 +26,6 @@ export interface EnvironmentConfig {
 	databasePath: string;
 
 	// Compression
-	compressionMethod: CompressionMethod;
 	compressionThreshold: number;
 }
 
@@ -35,51 +33,50 @@ export interface EnvironmentConfig {
  * Load configuration from environment variables with defaults
  */
 export function loadEnvironmentConfig(): EnvironmentConfig {
+
+	const args = parseArgs(Deno.args, {
+		string: [
+			"port",
+			"server-buffer-ms",
+			"heartbeat-interval-ms",
+			"heartbeat-fast-delay-ms",
+			"heartbeat-timeout-ms",
+			"max-missed-heartbeats",
+			"snapshot-interval-ms",
+			"max-rooms-per-server",
+			"max-clients-per-room",
+			"max-command-batch-size",
+			"database-path",
+			"compression-threshold",
+		],
+		default: {
+			"port": "8080",
+			"server-buffer-ms": "50",
+			"heartbeat-interval-ms": "1000",
+			"heartbeat-fast-delay-ms": "50",
+			"heartbeat-timeout-ms": "5000",
+			"max-missed-heartbeats": "3",
+			"snapshot-interval-ms": "10000",
+			"max-rooms-per-server": "100",
+			"max-clients-per-room": "20",
+			"max-command-batch-size": "1000",
+			"database-path": ":memory:",
+			"compression-threshold": "200",
+		},
+	});
+
 	return {
-		// Server
-		port: getEnvNumber("PORT", 8080),
-		serverProtocolVersion: getEnvNumber("SERVER_PROTOCOL_VERSION", 1),
-
-		// Timing
-		serverBufferMs: getEnvNumber("SERVER_BUFFER_MS", 50),
-		heartbeatIntervalMs: getEnvNumber("HEARTBEAT_INTERVAL_MS", 1000),
-		heartbeatFastDelayMs: getEnvNumber("HEARTBEAT_FAST_DELAY_MS", 50),
-		heartbeatTimeoutMs: getEnvNumber("HEARTBEAT_TIMEOUT_MS", 5000),
-		maxMissedHeartbeats: getEnvNumber("MAX_MISSED_HEARTBEATS", 3),
-		snapshotIntervalMs: getEnvNumber("SNAPSHOT_INTERVAL_MS", 30000),
-
-		// Limits
-		maxRoomsPerServer: getEnvNumber("MAX_ROOMS_PER_SERVER", 100),
-		maxClientsPerRoom: getEnvNumber("MAX_CLIENTS_PER_ROOM", 10),
-		maxCommandBatchSize: getEnvNumber("MAX_COMMAND_BATCH_SIZE", 100),
-
-		// Database
-		databasePath: getEnvString("DATABASE_PATH", ":memory:"),
-
-		// Compression
-		compressionMethod: getEnvString(
-			"COMPRESSION_METHOD",
-			"none",
-		) as CompressionMethod,
-		compressionThreshold: getEnvNumber("COMPRESSION_THRESHOLD", 200),
+		port: Number(args["port"]),
+		serverBufferMs: Number(args["server-buffer-ms"]),
+		heartbeatIntervalMs: Number(args["heartbeat-interval-ms"]),
+		heartbeatFastDelayMs: Number(args["heartbeat-fast-delay-ms"]),
+		heartbeatTimeoutMs: Number(args["heartbeat-timeout-ms"]),
+		maxMissedHeartbeats: Number(args["max-missed-heartbeats"]),
+		snapshotIntervalMs: Number(args["snapshot-interval-ms"]),
+		maxRoomsPerServer: Number(args["max-rooms-per-server"]),
+		maxClientsPerRoom: Number(args["max-clients-per-room"]),
+		maxCommandBatchSize: Number(args["max-command-batch-size"]),
+		databasePath: args["database-path"],
+		compressionThreshold: Number(args["compression-threshold"]),
 	};
-}
-
-/**
- * Get environment variable as number with default
- */
-function getEnvNumber(key: string, defaultValue: number): number {
-	const value = Deno.env.get(key);
-	if (value === undefined) {
-		return defaultValue;
-	}
-	const parsed = parseInt(value, 10);
-	return isNaN(parsed) ? defaultValue : parsed;
-}
-
-/**
- * Get environment variable as string with default
- */
-function getEnvString(key: string, defaultValue: string): string {
-	return Deno.env.get(key) || defaultValue;
 }

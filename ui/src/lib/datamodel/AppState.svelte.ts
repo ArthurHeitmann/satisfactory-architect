@@ -1,5 +1,5 @@
 import { writeToLocalStorage } from "$lib/localStorageState.svelte";
-import { Debouncer, deepClone } from "$lib/utilties";
+import { deepClone } from "$lib/utilties";
 import { dataModelVersion, saveDataType, StorageKeys } from "./constants";
 import { globals, trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
@@ -14,7 +14,6 @@ export class AppState {
 	pages: GraphPage[];
 	name: string | undefined;
 	readonly serverConnection: ServerConnection;
-	private debouncedSave: Debouncer<(json: any) => void>;
 	readonly asJson: any;
 
 	constructor(idGen: IdGen, currentPageId: Id, pages: GraphPage[]) {
@@ -30,13 +29,7 @@ export class AppState {
 			(json) => this.replaceFromJSON(json),
 		);
 		
-		this.debouncedSave = new Debouncer(this.saveToLocalStorage.bind(this), 1500);
 		this.asJson = $derived(this.toJSON());
-
-		$effect(() => {
-			const json = this.toJSON();
-			this.debouncedSave.call(json);
-		});
 	}
 
 	static newDefault(): AppState {

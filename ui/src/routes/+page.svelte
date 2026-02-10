@@ -40,7 +40,7 @@
 		font-size: 2rem;
 		font-weight: bold;
 		text-align: center;
-		background-color: black;
-		color: rgb(224, 17, 17);
+		background-color: var(--error-background-color);
+		color: var(--error-text-color);
 	}
 </style>

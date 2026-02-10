@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowChangelogEvent, type ShowColorPickerEvent, type ShowConnectionOverlayEvent, type ShowContextMenuEvent, type ShowIconPickerEvent, type ShowProductionSelectorEvent } from "$lib/EventStream.svelte";
+	import { EventStream, type ConfirmationPromptEvent, type EventBase, type EventType, type ShowChangelogEvent, type ShowColorPickerEvent, type ShowConnectionOverlayEvent, type ShowContextMenuEvent, type ShowCorruptSaveOverlayEvent, type ShowIconPickerEvent, type ShowProductionSelectorEvent, type ShowReconnectOverlayEvent } from "$lib/EventStream.svelte";
 	import { onDestroy, onMount, setContext, type Snippet } from "svelte";
 	import ContextMenuOverlay from "./ContextMenuOverlay.svelte";
 	import RecipeSelectorOverlay from "./RecipeSelectorOverlay.svelte";
@@ -9,23 +9,29 @@
     import ColorPickerOverlay from "./ColorPickerOverlay.svelte";
     import IconPickerOverlay from "./IconPickerOverlay.svelte";
 	import ConnectionOverlay from "./ConnectionOverlay.svelte";
+	import ReconnectOverlay from "./ReconnectOverlay.svelte";
 	import ChangelogOverlay from "./ChangelogOverlay.svelte";
+	import CorruptSaveOverlay from "./CorruptSaveOverlay.svelte";
+    import type { AppState } from "$lib/datamodel/AppState.svelte";
 
 	interface Props {
 		children: Snippet;
 		eventStream: EventStream;
+		app: AppState | null;
 	}
 	const {
 		children,
-		eventStream
+		eventStream,
+		app,
 	}: Props = $props();
 	
 	setContext("event-stream", eventStream);
+	setContext("app-state", app);
 
 	let activeEvents: EventBase[] = $state([]);
 
+	const uniqueEventTypes: EventType[] = ["showContextMenu", "showProductionSelector", "showColorPicker", "showIconPicker", "showConnectionOverlay", "showReconnectOverlay", "showChangelog", "showCorruptSaveOverlay"];
 	function handleEvent(event: EventBase) {
-		const uniqueEventTypes: EventType[] = ["showContextMenu", "showProductionSelector", "showIconPicker"];
 		const isUniqueEvent = uniqueEventTypes.includes(event.type);
 		if (isUniqueEvent) {
 			activeEvents = activeEvents.filter(e => e.type !== event.type);
@@ -233,10 +239,20 @@
 					{dismissEventStream}
 					onclose={() => closeEvent(event)}
 				/>
+			{:else if event.type === "showReconnectOverlay"}
+				<ReconnectOverlay
+					event={event as ShowReconnectOverlayEvent}
+					onclose={() => closeEvent(event)}
+				/>
 			{:else if event.type === "showChangelog"}
 				<ChangelogOverlay
 					event={event as ShowChangelogEvent}
 					{dismissEventStream}
+					onclose={() => closeEvent(event)}
+				/>
+			{:else if event.type === "showCorruptSaveOverlay"}
+				<CorruptSaveOverlay
+					event={event as ShowCorruptSaveOverlayEvent}
 					onclose={() => closeEvent(event)}
 				/>
 			{/if}

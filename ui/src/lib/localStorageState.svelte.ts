@@ -2,11 +2,13 @@ import { browser } from "$app/environment";
 
 const storage: any = browser ? localStorage : {};
 
+export const preferencesStorageKey = "preferences";
+
 
 
 export function loadFormLocalStorage<T>(key: string, defaultValue: T) {
 	try {
-		const prefs = storage["preferences"] || "{}";
+		const prefs = storage[preferencesStorageKey] || "{}";
 		const stored = JSON.parse(prefs)[key];
 		if (stored !== undefined) {
 			return stored as T;
@@ -20,12 +22,12 @@ export function loadFormLocalStorage<T>(key: string, defaultValue: T) {
 export function writeToLocalStorage(key: string, value: any) {
 	let prefs: any = {};
 	try {
-		prefs = JSON.parse(storage["preferences"] || "{}");
+		prefs = JSON.parse(storage[preferencesStorageKey] || "{}");
 	} catch (e) {
 		console.error(e);
 	}
 	prefs[key] = value;
-	storage["preferences"] = JSON.stringify(prefs);
+	storage[preferencesStorageKey] = JSON.stringify(prefs);
 }
 
 export class LocalStorageState<T> {

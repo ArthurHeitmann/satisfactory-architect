@@ -110,7 +110,7 @@ export class CollaborationServer {
 					await this.handleJoinRoom(socket.socketId, message);
 					break;
 				case "get_room_info":
-					this.handleGetRoomInfo(socket.socketId, message);
+					await this.handleGetRoomInfo(socket.socketId, message);
 					break;
 				case "command_batch":
 					this.handleCommandBatch(socket.socketId, message);
@@ -119,7 +119,7 @@ export class CollaborationServer {
 					this.handleHeartbeat(socket.socketId, message);
 					break;
 				case "upload_state":
-					this.handleUploadState(socket.socketId, message);
+					await this.handleUploadState(socket.socketId, message);
 					break;
 				default: {
 					const unknownType = (message as { type: string }).type;
@@ -140,9 +140,9 @@ export class CollaborationServer {
 	/**
 	 * Handle WebSocket disconnection
 	 */
-	public handleDisconnection(socket: WebSocketAdapter): void {
+	public async handleDisconnection(socket: WebSocketAdapter): Promise<void> {
 		this.socketIdToSocket.delete(socket.socketId);
-		this.removeClient(socket.socketId);
+		await this.removeClient(socket.socketId);
 	}
 
 	/**
@@ -163,11 +163,12 @@ export class CollaborationServer {
 	/**
 	 * Clean up server resources
 	 */
-	public dispose(): void {
+	public async dispose(): Promise<void> {
 		// Dispose all rooms
-		for (const room of this.rooms.values()) {
-			room.dispose();
-		}
+		const disposeTasks = Array.from(this.rooms.values()).map((room) =>
+			room.dispose()
+		);
+		await Promise.all(disposeTasks);
 		this.rooms.clear();
 		this.clients.clear();
 		this.socketIdToRoomId.clear();
@@ -239,7 +240,7 @@ export class CollaborationServer {
 
 			client.sendMessage(joinResponse);
 		} catch (error) {
-			room.dispose();
+			await room.dispose();
 			throw error;
 		}
 	}
@@ -295,7 +296,7 @@ export class CollaborationServer {
 			client.sendMessage(joinResponse);
 		} catch (error) {
 			if (!this.rooms.has(message.roomId)) {
-				room.dispose();
+				await room.dispose();
 			}
 			throw error;
 		}
@@ -304,10 +305,10 @@ export class CollaborationServer {
 	/**
 	 * Handle get room info request
 	 */
-	private handleGetRoomInfo(
+	private async handleGetRoomInfo(
 		socketId: string,
 		message: GetRoomInfoMessage,
-	): void {
+	): Promise<void> {
 		const socket = this.socketIdToSocket.get(socketId);
 		if (!socket) {
 			return;
@@ -330,7 +331,7 @@ export class CollaborationServer {
 		socket.sendMessage(response);
 
 		if (isTemporary && room) {
-			room.dispose();
+			await room.dispose();
 		}
 	}
 
@@ -390,10 +391,10 @@ export class CollaborationServer {
 	/**
 	 * Handle state upload
 	 */
-	private handleUploadState(
+	private async handleUploadState(
 		socketId: string,
 		message: UploadStateMessage,
-	): void {
+	): Promise<void> {
 		const room = this.findClientRoom(socketId);
 		if (!room) {
 			throw new AppError(
@@ -404,7 +405,7 @@ export class CollaborationServer {
 			);
 		}
 
-		room.setRoomState(socketId, message.stateData);
+		await room.setRoomState(socketId, message.stateData);
 		const client = this.clients.get(socketId);
 		if (client) {
 			const confirmationMessage: UploadConfirmationMessage = {
@@ -481,7 +482,9 @@ export class CollaborationServer {
 				serverProtocolVersion,
 				socket,
 				clientConfig,
-				(client) => this.removeClient(client.socketId),
+				(client) => {
+					void this.removeClient(client.socketId);
+				},
 			);
 
 			this.clients.set(socketId, client);
@@ -503,7 +506,7 @@ export class CollaborationServer {
 	/**
 	 * Remove client from server
 	 */
-	private removeClient(socketId: string): void {
+	private async removeClient(socketId: string): Promise<void> {
 		const client = this.clients.get(socketId);
 		if (client) {
 			client.dispose();
@@ -519,7 +522,7 @@ export class CollaborationServer {
 			// Clean up empty rooms
 			if (room.isEmpty()) {
 				this.rooms.delete(room.roomId);
-				room.dispose();
+				await room.dispose();
 			}
 		}
 	}

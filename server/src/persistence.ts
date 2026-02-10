@@ -30,7 +30,6 @@ export interface IDatabaseManager {
 	listRooms(): RoomInfo[];
 	saveSnapshot(snapshot: RoomSnapshot): void;
 	loadSnapshot(roomId: string): RoomSnapshot | null;
-	cleanup(maxAgeMs: number): void;
 	close(): void;
 }
 
@@ -162,7 +161,7 @@ export class DatabaseManager implements IDatabaseManager {
 	}
 
 	/**
-	 * Load latest room state snapshot
+	 * Load room state snapshot
 	 */
 	public loadSnapshot(roomId: string): RoomSnapshot | null {
 		try {
@@ -175,9 +174,7 @@ export class DatabaseManager implements IDatabaseManager {
 				`
 				SELECT room_id, state_data, compression_method, timestamp 
 				FROM room_states 
-				WHERE room_id = ? 
-				ORDER BY timestamp DESC 
-				LIMIT 1
+				WHERE room_id = ?
 			`,
 				[roomId],
 			);
@@ -207,41 +204,6 @@ export class DatabaseManager implements IDatabaseManager {
 	}
 
 	/**
-	 * Clean up old data
-	 */
-	public cleanup(maxAgeMs: number): void {
-		try {
-			const cutoff = Date.now() - maxAgeMs;
-
-			// Remove old command history
-			this.db.execute(
-				`
-				DELETE FROM commands WHERE timestamp < ?
-			`,
-				[cutoff],
-			);
-
-			// Remove old snapshots (keep latest 3 per room)
-			this.db.execute(`
-				DELETE FROM room_states 
-				WHERE rowid NOT IN (
-					SELECT rowid FROM room_states rs1 
-					WHERE (
-						SELECT COUNT(*) FROM room_states rs2 
-						WHERE rs2.room_id = rs1.room_id 
-						AND rs2.timestamp > rs1.timestamp
-					) < 3
-				)
-			`);
-		} catch (error) {
-			throw AppError.wrap(error, ErrorCode.INTERNAL_ERROR, {
-				operation: "cleanup",
-				maxAgeMs,
-			}, "Failed to cleanup old database records");
-		}
-	}
-
-	/**
 	 * Close database connection
 	 */
 	public close(): void {
@@ -262,14 +224,13 @@ export class DatabaseManager implements IDatabaseManager {
 				) STRICT
 			`);
 
-			// Room state snapshots
+			// Room state snapshot
 			this.db.execute(`
 				CREATE TABLE IF NOT EXISTS room_states (
-					room_id TEXT NOT NULL,
+					room_id TEXT PRIMARY KEY,
 					state_data BLOB NOT NULL,
 					compression_method TEXT NOT NULL,
 					timestamp INTEGER NOT NULL,
-					PRIMARY KEY (room_id, timestamp),
 					FOREIGN KEY (room_id) REFERENCES rooms(room_id)
 				) STRICT
 			`);
@@ -277,9 +238,6 @@ export class DatabaseManager implements IDatabaseManager {
 			// Indexes for performance
 			this.db.execute(`
 				CREATE INDEX IF NOT EXISTS idx_rooms_updated ON rooms(last_updated)
-			`);
-			this.db.execute(`
-				CREATE INDEX IF NOT EXISTS idx_room_states_room_time ON room_states(room_id, timestamp DESC)
 			`);
 		} catch (error) {
 			throw AppError.wrap(error, ErrorCode.INTERNAL_ERROR, {

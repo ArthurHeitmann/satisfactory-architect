@@ -243,12 +243,12 @@
 	// Initialize - load server URL from storage and auto-connect
 	onMount(() => {
 		const savedUrl = lastServerUrlStore.value;
-		if (savedUrl && serverConnection.state === ServerConnectionState.Disconnected && !serverConnection.serverUrl) {
-			serverConnection.setServerUrl(savedUrl);
-		}
-		
-		if (serverConnection.state === ServerConnectionState.Disconnected && serverConnection.serverUrl) {
-			serverConnection.connect();
+		if (serverConnection.state === ServerConnectionState.Disconnected) {
+			if (savedUrl && serverConnection.serverUrl !== savedUrl) {
+				serverConnection.setServerUrl(savedUrl);
+			} else if (serverConnection.serverUrl) {
+				serverConnection.connect();
+			}
 		}
 	});
 
@@ -321,6 +321,8 @@
 				</button>
 				<p class="warning-text">
 					Warning: Joining a room will overwrite any unsaved local changes.
+					<br>
+					Old inactive rooms might be deleted by the server after some time.
 				</p>
 				{#if serverConnection.lastError}
 					<p class="error-text">{serverConnection.lastError}</p>
@@ -332,7 +334,7 @@
 						<div class="recent-header">
 							<h3>Recent Sessions</h3>
 						</div>
-						<div class="room-list">
+						<div class="room-list scrollbar-thin">
 							{#each recentRoomsSorted as room}
 								{@const isDeleting = roomToDelete === room.roomId}
 								<div class="room-item-container">
@@ -379,7 +381,7 @@
 					{#if isLoading}
 						Creating...
 					{:else}
-						Create & Host
+						Create
 					{/if}
 				</button>
 			</div>
@@ -449,7 +451,7 @@
 		</div>
 
 		<div class="overlay-content centered">
-			<div class="warning-icon">⚠</div>
+			<PresetSvg name="warning" size={50} color={"var(--warning-color)"} />
 			<h3>Could not connect to server.</h3>
 			<p class="subtitle">
 				{serverConnection.lastError || "Please check your internet connection."}
@@ -525,7 +527,7 @@
 		background-color: var(--popup-background-color);
 		border: 1px solid var(--popup-border-color);
 		border-radius: var(--rounded-border-radius-big);
-		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+		box-shadow: var(--popup-shadow);
 		width: 420px;
 		max-width: 90vw;
 		max-height: 80vh;
@@ -628,7 +630,7 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background-color: rgba(0, 0, 0, 0.4);
+		background-color: var(--blocking-overlay-background-color);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -717,7 +719,7 @@
 
 		&.primary {
 			background-color: var(--primary);
-			color: white;
+			color: var(--button-primary-text-color);
 
 			&:hover:not(:disabled) {
 				filter: brightness(1.1);
@@ -742,7 +744,7 @@
 
 		&.danger {
 			background-color: var(--danger-color);
-			color: white;
+			color: var(--button-primary-text-color);
 
 			&:hover:not(:disabled) {
 				background-color: var(--danger-hover-color);
@@ -800,12 +802,6 @@
 			gap: 4px;
 			max-height: 132px;
 			overflow-y: auto;
-			scrollbar-width: thin;
-			scrollbar-color: var(--recipe-selector-scrollbar-color) transparent;
-			&::-webkit-scrollbar {
-				width: 8px;
-				background-color: transparent;
-			}
 		}
 
 		.room-item-container {
@@ -925,11 +921,5 @@
 		to {
 			transform: rotate(360deg);
 		}
-	}
-
-	.warning-icon {
-		font-size: 3rem;
-		color: var(--warning-color);
-		margin-bottom: 8px;
 	}
 </style>

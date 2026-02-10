@@ -151,7 +151,6 @@ function createMockDatabase(roomsMap = new Map<string, MockRoomData>()): Databas
 		saveSnapshot: spy(),
 		loadSnapshot: spy(() => null),
 		saveCommand: spy(),
-		cleanup: spy(),
 		close: spy(),
 	} as unknown as DatabaseManager;
 }
@@ -203,8 +202,8 @@ describe("CollaborationServer", () => {
 		);
 	});
 
-	afterEach(() => {
-		server.dispose();
+	afterEach(async () => {
+		await server.dispose();
 		time.restore();
 	});
 
@@ -728,7 +727,7 @@ describe("CollaborationServer", () => {
 				serverProtocolVersion: 1,
 			});
 
-			server.handleDisconnection(socket);
+			await server.handleDisconnection(socket);
 
 			assertSpyCalls(mockClient.dispose as ReturnType<typeof spy>, 1);
 
@@ -746,7 +745,7 @@ describe("CollaborationServer", () => {
 				serverProtocolVersion: 1,
 			});
 
-			server.handleDisconnection(socket);
+			await server.handleDisconnection(socket);
 
 			assertSpyCalls(mockRoom.dispose as ReturnType<typeof spy>, 1);
 		});
@@ -781,7 +780,7 @@ describe("CollaborationServer", () => {
 				serverProtocolVersion: 1,
 			});
 
-			server.dispose();
+			await server.dispose();
 
 			assertSpyCalls(mockRoom.dispose as ReturnType<typeof spy>, 1);
 		});
@@ -794,7 +793,7 @@ describe("CollaborationServer", () => {
 				serverProtocolVersion: 1,
 			});
 
-			server.dispose();
+			await server.dispose();
 			dbRooms.clear(); // Clear DB too for this test
 
 			assertEquals(server.getAvailableRooms(), []);

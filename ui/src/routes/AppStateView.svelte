@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { browser } from "$app/environment";
+	import AppStateInitializedView from "./AppStateInitializedView.svelte";
 	import OverlayLayer from "$lib/components/OverlayLayer/OverlayLayer.svelte";
-	import PagesBar from "$lib/components/PagesBar/PagesBar.svelte";
-	import PageView from "$lib/components/PageView/PageView.svelte";
 	import { AppState } from "$lib/datamodel/AppState.svelte";
 	import { changelog, latestAppVersion, StorageKeys } from "$lib/datamodel/constants";
 	import { appVersion, darkTheme, globals } from "$lib/datamodel/globals.svelte";
@@ -20,12 +19,63 @@
 			document.documentElement.classList.remove("dark-theme");
 		}
 	}
-	
+
+	const eventStream = new EventStream();
+	setContext("overlay-layer-event-stream", eventStream);
+
+	interface LoadFailure {
+		errorMessage: string;
+		parsedJson: any | null;
+	}
+
+	function tryLoadAppState(): { app: AppState | null; failure: LoadFailure | null } {
+		const savedJson = loadFormLocalStorage(StorageKeys.appState, null);
+		if (savedJson !== null) {
+			try {
+				return { app: AppState.fromJSON(savedJson), failure: null };
+			} catch (e) {
+				const error = e instanceof Error ? e : new Error(String(e));
+				console.error("Failed to initialize app state from local storage:", error);
+				return {
+					app: null,
+					failure: {
+						errorMessage: `${error.message}\n\n${error.stack ?? ""}`,
+						parsedJson: savedJson,
+					},
+				};
+			}
+		}
+
+		// No saved data — load starter save
+		if (browser) {
+			return { app: loadStarterSave(), failure: null };
+		}
+		return { app: AppState.newDefault(), failure: null };
+	}
+
+	function loadStarterSave(): AppState {
+		const starterSave = JSON.parse(starterSaveJson);
+		return AppState.fromJSON(starterSave);
+	}
+
+	const loadResult = tryLoadAppState();
+	let app: AppState | null = $state(loadResult.app);
+
 	onMount(() => {
 		applyTheme(darkTheme.value);
 
-		// Check for version update and show changelog
-		if (appVersion.value < latestAppVersion) {
+		if (loadResult.failure) {
+			eventStream.emit({
+				type: "showCorruptSaveOverlay",
+				errorMessage: loadResult.failure.errorMessage,
+				parsedJson: loadResult.failure.parsedJson,
+				onStartNew: () => {
+					app = loadStarterSave();
+				},
+			});
+		}
+
+		if (app && appVersion.value < latestAppVersion) {
 			eventStream.emit({
 				type: "showChangelog",
 				changelog: changelog,
@@ -39,58 +89,6 @@
 		applyTheme(darkTheme.value);
 	});
 
-	const app = (() => {
-		try {
-			const savedJson = loadFormLocalStorage(StorageKeys.appState, null);
-			if (savedJson !== null) {
-				return AppState.fromJSON(savedJson);
-			}
-		} catch (e) {
-			console.error("Failed to load app state from local storage:", e);
-		}
-		if (browser) {
-			const starterSave = JSON.parse(starterSaveJson);
-			return AppState.fromJSON(starterSave);
-		} else {
-			return AppState.newDefault();
-		}
-	})();
-
-	const serverConnection = app.serverConnection;
-	const commandQueue = serverConnection.dispatchCommandQueue;
-	commandQueue.watchPageList(() => Array.from(app.pages.values()));
-	commandQueue.watchPageOrder(() => Array.from(app.pages.values()));
-	commandQueue.watchStateVar("currentPageId", () => app.currentPage?.id ?? null);
-	commandQueue.watchStateVar("name", () => app.name);
-
-	const eventStream = new EventStream();
-	setContext("overlay-layer-event-stream", eventStream);
-
-	serverConnection.onUserMessage = (message) => {
-		eventStream.emit({
-			type: "confirmationPrompt",
-			message: message,
-			confirmLabel: "OK",
-			hideCancelButton: true,
-			onAnswer: () => {},
-		});
-	};
-
-	// Handle unexpected disconnects by showing a reconnection prompt
-	serverConnection.onUnexpectedDisconnect = (error) => {
-		const message = error ?? "The connection to the server was lost unexpectedly.";
-		eventStream.emit({
-			type: "confirmationPrompt",
-			message: message + "\n\nWould you like to reconnect?",
-			confirmLabel: "Reconnect",
-			cancelLabel: "Dismiss",
-			onAnswer: (answer) => {
-				if (answer === true) {
-					app.serverConnection.reconnect();
-				}
-			},
-		});
-	};
 
 	function onMouseEvent(event: MouseEvent) {
 		globals.mousePosition.x = event.clientX;
@@ -102,54 +100,18 @@
 			globals.mousePosition.y = event.touches[0].clientY;
 		}
 	}
-	
-	setContext("app-state", app);
 
-
-	function onBeforeUnload() {
-		const json = app.toJSON({ forceToJson: true });
-		app.saveToLocalStorage(json);
-	}
 </script>
 
-<!-- maybe non passive touch handlers + prevent default -->
 <svelte:window
-	onbeforeunload={onBeforeUnload}
 	onmousedown={onMouseEvent}
 	onmousemove={onMouseEvent}
 	ontouchstart={onTouchEvent}
 	ontouchmove={onTouchEvent}
 />
 
-<OverlayLayer eventStream={eventStream}>
-	<div class="home">
-		<div class="page-view">
-			{#if app.currentPage}
-				{#key app.currentPage?.id}
-					<PageView page={app.currentPage} />
-				{/key}
-			{:else}
-				<div class="no-page">
-					No page found. Please create a new page.
-				</div>
-			{/if}
-		</div>
-		<PagesBar appState={app} />
-	</div>
+<OverlayLayer eventStream={eventStream} app={app}>
+	{#if app}
+		<AppStateInitializedView app={app} {eventStream} />
+	{/if}
 </OverlayLayer>
-
-<style lang="scss">
-	.home {
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		height: 100dvh;
-	}
-
-	.page-view {
-		flex: 1;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-</style>

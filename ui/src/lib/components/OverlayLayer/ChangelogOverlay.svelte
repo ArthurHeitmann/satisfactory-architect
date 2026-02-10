@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ShowChangelogEvent, EventStream } from "$lib/EventStream.svelte";
+	import ChangelogList from "./ChangelogList.svelte";
 	import { onDestroy, onMount } from "svelte";
 
 	interface Props {
@@ -33,20 +34,16 @@
 <div class="background"></div>
 <div class="changelog-overlay">
 	<div class="title">What's New</div>
-	<div class="content">
+	<div class="content scrollbar-thin">
 		{#each versions as version}
 			<div class="version-section">
 				<div class="version-header">
 					<span class="version-number">Version {version}</span>
-					{#if version > event.previousVersion}
+					{#if event.previousVersion !== undefined && version > event.previousVersion}
 						<span class="new-badge">new</span>
 					{/if}
 				</div>
-				<ul class="change-list">
-					{#each event.changelog[version] as change}
-						<li class="change-item">{change}</li>
-					{/each}
-				</ul>
+				<ChangelogList items={event.changelog[version]} />
 			</div>
 		{/each}
 	</div>
@@ -75,7 +72,7 @@
 		border: 1px solid var(--popup-border-color);
 		padding: 24px;
 		border-radius: var(--rounded-border-radius-big);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+		box-shadow: var(--shadow-high);
 		width: max-content;
 		min-width: min(400px, 95vw);
 		max-width: min(95vw, 600px);
@@ -97,14 +94,6 @@
 		overflow-y: auto;
 		margin-bottom: 20px;
 		padding-right: 8px;
-
-		&::-webkit-scrollbar {
-			width: 6px;
-		}
-		&::-webkit-scrollbar-thumb {
-			background-color: var(--popup-border-color);
-			border-radius: 3px;
-		}
 	}
 
 	.version-section {
@@ -135,18 +124,6 @@
 		border-radius: 4px;
 		text-transform: uppercase;
 		font-weight: bold;
-	}
-
-	.change-list {
-		margin: 0;
-		padding-left: 20px;
-		list-style-type: disc;
-	}
-
-	.change-item {
-		margin-bottom: 4px;
-		color: var(--text-muted);
-		line-height: 1.4;
 	}
 
 	.buttons {

@@ -193,7 +193,6 @@ function createMockDatabase(): IDatabaseManager {
 			snapshots.set(snapshot.roomId, snapshot);
 		}),
 		loadSnapshot: spy((roomId: string) => snapshots.get(roomId) ?? null),
-		cleanup: spy(),
 		close: spy(),
 	};
 }
@@ -233,8 +232,8 @@ describe("CollaborationRoom", () => {
 		);
 	});
 
-	afterEach(() => {
-		room.dispose();
+	afterEach(async () => {
+		await room.dispose();
 		time.restore();
 	});
 
@@ -265,7 +264,7 @@ describe("CollaborationRoom", () => {
 					createRoomState: () => mockRoomState,
 					createCommandBuffer: () => mockCommandBuffer,
 				};
-				room.dispose();
+				await room.dispose();
 				room = new CollaborationRoom(
 					"test-room",
 					config,
@@ -319,7 +318,7 @@ describe("CollaborationRoom", () => {
 
 			it("should throw UPLOAD_NOT_AUTHORIZED when state is initialized and room is not empty", async () => {
 				// Setup initialized state
-				room.setRoomState("socket-setup", createTestState());
+				await room.setRoomState("socket-setup", createTestState());
 
 				// Add first client (allowed because room is empty)
 				await room.addClient(createMockClient("socket-1"), "download");
@@ -335,7 +334,7 @@ describe("CollaborationRoom", () => {
 
 		it("should throw ROOM_FULL when max clients reached", async () => {
 			config = createTestConfig({ maxClients: 2 });
-			room.dispose();
+			await room.dispose();
 			room = new CollaborationRoom(
 				"test-room",
 				config,
@@ -376,15 +375,15 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("getAllowedIntents", () => {
-		it("should return both download and upload when state is initialized and no clients connected", () => {
-			room.setRoomState("socket-setup", createTestState());
+		it("should return both download and upload when state is initialized and no clients connected", async () => {
+			await room.setRoomState("socket-setup", createTestState());
 
 			const intents = room.getAllowedIntents();
 			assertEquals(intents.sort(), ["download", "upload"].sort());
 		});
 
 		it("should return only download when state is initialized and clients are connected", async () => {
-			room.setRoomState("socket-setup", createTestState());
+			await room.setRoomState("socket-setup", createTestState());
 
 			await room.addClient(createMockClient("socket-1"), "download");
 
@@ -427,10 +426,10 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("handleCommandBatch", () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			// Initialize state for command handling
 			mockRoomState = createMockRoomState(true);
-			room.dispose();
+			await room.dispose();
 			room = new CollaborationRoom(
 				"test-room",
 				config,
@@ -512,7 +511,7 @@ describe("CollaborationRoom", () => {
 
 			const failingCommandBuffer = createMockCommandBuffer();
 
-			room.dispose();
+			await room.dispose();
 			room = new CollaborationRoom(
 				"test-room",
 				config,
@@ -559,10 +558,10 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("setRoomState", () => {
-		it("should set state on room state manager", () => {
+		it("should set state on room state manager", async () => {
 			const stateData = createTestState();
 
-			room.setRoomState("socket-1", stateData);
+			await room.setRoomState("socket-1", stateData);
 
 			assertSpyCalls(mockRoomState.setState as ReturnType<typeof spy>, 1);
 			assertSpyCall(mockRoomState.setState as ReturnType<typeof spy>, 0, {
@@ -570,10 +569,10 @@ describe("CollaborationRoom", () => {
 			});
 		});
 
-		it("should save snapshot after setting state", () => {
+		it("should save snapshot after setting state", async () => {
 			const stateData = createTestState();
 
-			room.setRoomState("socket-1", stateData);
+			await room.setRoomState("socket-1", stateData);
 
 			// consumeStateChanges should be called as part of saveSnapshot
 			assertSpyCalls(mockRoomState.consumeStateChanges as ReturnType<typeof spy>, 1);
@@ -763,7 +762,7 @@ describe("CollaborationRoom", () => {
 					dispose: spy(),
 				};
 
-				room.dispose();
+				await room.dispose();
 				room = new CollaborationRoom(
 					"test-room",
 					config,
@@ -825,7 +824,7 @@ describe("CollaborationRoom", () => {
 					return result;
 				});
 
-				room.dispose();
+				await room.dispose();
 				room = new CollaborationRoom(
 					"test-room",
 					config,
@@ -859,14 +858,14 @@ describe("CollaborationRoom", () => {
 				assertSpyCalls(mockDatabase.saveSnapshot as ReturnType<typeof spy>, 2);
 			});
 
-			it("should not save snapshot when state has not changed", () => {
+			it("should not save snapshot when state has not changed", async () => {
 				// Ensure state reports no changes
 				mockRoomState.consumeStateChanges = spy(() => ({
 					data: null,
 					hasChanged: false,
 				}));
 
-				room.dispose();
+				await room.dispose();
 				room = new CollaborationRoom(
 					"test-room",
 					config,
@@ -891,10 +890,24 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("dispose", () => {
-		it("should dispose command buffer", () => {
-			room.dispose();
+		it("should dispose command buffer", async () => {
+			await room.dispose();
 
 			assertSpyCalls(mockCommandBuffer.dispose as ReturnType<typeof spy>, 1);
+		});
+
+		it("should save snapshot before disposing", async () => {
+			const client = createMockClient("socket-1", {
+				localIdCounter: "42",
+			});
+
+			await room.setRoomState("socket-setup", createTestState());
+			(mockDatabase.saveSnapshot as ReturnType<typeof spy>).calls.length = 0;
+
+			room.handleHeartbeat(client);
+			await room.dispose();
+
+			assertSpyCalls(mockDatabase.saveSnapshot as ReturnType<typeof spy>, 1);
 		});
 
 		it("should disconnect all clients", async () => {
@@ -903,7 +916,7 @@ describe("CollaborationRoom", () => {
 			await room.addClient(client1, "upload");
 			await room.addClient(client2, "upload");
 
-			room.dispose();
+			await room.dispose();
 
 			assertSpyCalls(client1.disconnect as ReturnType<typeof spy>, 1);
 			assertSpyCalls(client2.disconnect as ReturnType<typeof spy>, 1);
@@ -913,7 +926,7 @@ describe("CollaborationRoom", () => {
 			await room.addClient(createMockClient("socket-1"), "upload");
 			await room.addClient(createMockClient("socket-2"), "upload");
 
-			room.dispose();
+			await room.dispose();
 
 			assertEquals(room.getClientCount(), 0);
 			assertEquals(room.isEmpty(), true);
@@ -933,7 +946,7 @@ describe("CollaborationRoom", () => {
 				dispose: spy(),
 			};
 
-			room.dispose();
+			await room.dispose();
 			room = new CollaborationRoom(
 				"test-room",
 				config,
@@ -982,7 +995,7 @@ describe("CollaborationRoom", () => {
 		it("should not broadcast when flush has no commands", async () => {
 			let onFlushCallback: ((commands: Command[]) => void) | undefined;
 
-			room.dispose();
+			await room.dispose();
 			room = new CollaborationRoom(
 				"test-room",
 				config,
@@ -1009,7 +1022,7 @@ describe("CollaborationRoom", () => {
 	});
 
 	describe("snapshot persistence", () => {
-		it("should compress state data before saving", () => {
+		it("should compress state data before saving", async () => {
 			let hasChanged = true;
 			mockRoomState.consumeStateChanges = spy(() => {
 				const result = { data: createTestState(), hasChanged };
@@ -1017,7 +1030,7 @@ describe("CollaborationRoom", () => {
 				return result;
 			});
 
-			room.dispose();
+			await room.dispose();
 			room = new CollaborationRoom(
 				"test-room",
 				config,
@@ -1029,7 +1042,7 @@ describe("CollaborationRoom", () => {
 				},
 			);
 
-			room.setRoomState("socket-1", createTestState());
+			await room.setRoomState("socket-1", createTestState());
 
 			// Compression should have been called
 			assertSpyCalls(mockCompression.compressJSON as ReturnType<typeof spy>, 1);
@@ -1050,7 +1063,7 @@ describe("CollaborationRoom", () => {
 				clientCount: 0,
 			}));
 
-			room.dispose();
+			await room.dispose();
 			room = new CollaborationRoom(
 				"test-room",
 				config,

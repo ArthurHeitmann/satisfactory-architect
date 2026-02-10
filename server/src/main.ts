@@ -64,7 +64,7 @@ function startServer() {
 
 	const config: ServerConfig = {
 		port: envConfig.port,
-		serverProtocolVersion: envConfig.serverProtocolVersion,
+		serverProtocolVersion: 1,
 		serverBufferMs: envConfig.serverBufferMs,
 		heartbeatIntervalMs: envConfig.heartbeatIntervalMs,
 		heartbeatFastDelayMs: envConfig.heartbeatFastDelayMs,
@@ -80,7 +80,7 @@ function startServer() {
 
 	const dbAdapter = new SqliteDatabaseAdapter(envConfig.databasePath);
 	const database = new DatabaseManager(dbAdapter);
-	const server = new CollaborationServer(config, compression, database)
+	const server = new CollaborationServer(config, compression, database);
 
 	console.log(`🚀 Collaboration server starting on port ${envConfig.port}`);
 
@@ -103,7 +103,7 @@ function startServer() {
 				try {
 					const msg = await adapter.middleware.processIncomingMessage(event.data);
 					if (msg) {
-						server.handleMessage(adapter, msg as ClientMessage); 
+						await server.handleMessage(adapter, msg as ClientMessage);
 					}
 				} catch (error) {
 					ErrorHandler.handle(error, {
@@ -113,10 +113,10 @@ function startServer() {
 				}
 			};
 
-			socket.onclose = () => {
+			socket.onclose = async () => {
 				console.log("Client disconnected");
 				try {
-					server.handleDisconnection(adapter);
+					await server.handleDisconnection(adapter);
 				} catch (error) {
 					ErrorHandler.handle(error, {
 						source: "WebSocket.onclose",
@@ -164,7 +164,7 @@ function startServer() {
 		// Wait 1 second for clients to receive the message
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 
-		server.dispose();
+		await server.dispose();
 		Deno.exit(0);
 	});
 }

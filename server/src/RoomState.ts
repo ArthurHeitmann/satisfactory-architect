@@ -71,7 +71,7 @@ export class RoomState implements IRoomState {
 	 * @returns true if state has been initialized
 	 */
 	public canGetState(): boolean {
-		return this.isInitialized;
+		return this.isInitialized && Boolean(this.state);
 	}
 
 	/**

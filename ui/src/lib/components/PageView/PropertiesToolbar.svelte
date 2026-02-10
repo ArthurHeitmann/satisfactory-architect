@@ -11,6 +11,7 @@
 	import type { EventStream } from "$lib/EventStream.svelte";
 	import { darkTheme, globals } from "$lib/datamodel/globals.svelte";
 	import type { AppState } from "$lib/datamodel/AppState.svelte";
+    import { changelog } from "$lib/datamodel/constants";
 
 	interface Props {
 		page: GraphPage;
@@ -282,14 +283,22 @@
 					onClick: importFile,
 				},
 				{
-					label: "Collaboration / Server",
-					icon: "cloud",
+					label: "Multi-User Collaboration",
+					icon: "refresh",
 					onClick: () => eventStream.emit({ type: "showConnectionOverlay" }),
 				},
 				{
 					label: darkTheme.value ? "Use Light Theme" : "Use Dark Theme",
 					icon: darkTheme.value ? "light-theme" : "dark-theme",
 					onClick: () => darkTheme.value = !darkTheme.value,
+				},
+				{
+					label: "Show changelog",
+					icon: "note",
+					onClick: () => eventStream.emit({
+						type: "showChangelog",
+						changelog: changelog,
+					}),
 				},
 				{
 					label: "View on GitHub",
@@ -409,7 +418,7 @@
 		</div>
 	{/if}
 {/snippet}
-<div class="properties-toolbar">
+	<div class="properties-toolbar scrollbar-hidden">
 	<div class="option-group">
 		<button class="click-button" onclick={showMenu}>
 			<PresetSvg name={"hamburger-menu"} size={18} color="currentColor" />
@@ -537,10 +546,6 @@
 		display: flex;
 		align-items: center;
 		overflow-x: auto;
-		scrollbar-width: none;
-		&::-webkit-scrollbar {
-			display: none;
-		}
 	}
 
 	.option-group {

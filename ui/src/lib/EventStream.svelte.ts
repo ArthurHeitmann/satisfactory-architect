@@ -1,8 +1,9 @@
 import type { SvgPresetName } from "./components/icons/svgPresets";
 import type { NewNodeDetails } from "./datamodel/GraphNode.svelte";
 import type { GraphPage } from "./datamodel/GraphPage.svelte";
+import type { ChangelogEntry } from "./datamodel/constants";
 
-export type EventType = "" | "showContextMenu" | "showProductionSelector" | "confirmationPrompt" | "showColorPicker" | "showIconPicker" | "showConnectionOverlay" | "showChangelog";
+export type EventType = "" | "showContextMenu" | "showProductionSelector" | "confirmationPrompt" | "showColorPicker" | "showIconPicker" | "showConnectionOverlay" | "showReconnectOverlay" | "showChangelog" | "showCorruptSaveOverlay";
 
 export interface EventBase {
 	type: EventType;
@@ -100,12 +101,25 @@ export interface ShowConnectionOverlayEvent extends EventBase {
 
 export interface ShowChangelogEvent extends EventBase {
 	type: "showChangelog";
-	changelog: Record<number, string[]>;
-	previousVersion: number;
+	changelog: Record<number, ChangelogEntry[]>;
+	previousVersion?: number;
+}
+
+export interface ShowReconnectOverlayEvent extends EventBase {
+	type: "showReconnectOverlay";
+	errorMessage: string | null;
+}
+
+export interface ShowCorruptSaveOverlayEvent extends EventBase {
+	type: "showCorruptSaveOverlay";
+	errorMessage: string;
+	parsedJson: any | null;
+	onStartNew: () => void;
+	onRepair?: (() => boolean | Promise<boolean>);
 }
 
 export interface EmptyEvent extends EventBase {
 	type: "";
 }
 
-export type AllowedEventTypes = EmptyEvent | ShowContextMenuEvent | ShowProductionSelectorEvent | ConfirmationPromptEvent | ShowColorPickerEvent | ShowIconPickerEvent | ShowConnectionOverlayEvent | ShowChangelogEvent;
+export type AllowedEventTypes = EmptyEvent | ShowContextMenuEvent | ShowProductionSelectorEvent | ConfirmationPromptEvent | ShowColorPickerEvent | ShowIconPickerEvent | ShowConnectionOverlayEvent | ShowReconnectOverlayEvent | ShowChangelogEvent | ShowCorruptSaveOverlayEvent;

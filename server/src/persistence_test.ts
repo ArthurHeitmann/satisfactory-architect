@@ -166,16 +166,6 @@ describe("DatabaseManager", () => {
 		});
 	});
 
-	describe("cleanup", () => {
-		it("should delete old records", () => {
-			db.cleanup(86400000); // 24 hours
-
-			assertEquals(mock.executeCalls.length, 2);
-			assertEquals(mock.executeCalls[0].sql.includes("DELETE FROM commands"), true);
-			assertEquals(mock.executeCalls[1].sql.includes("DELETE FROM room_states"), true);
-		});
-	});
-
 	describe("close", () => {
 		it("should close the database adapter", () => {
 			db.close();

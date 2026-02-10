@@ -97,7 +97,7 @@
 	--tooltip-border-color: var(--background-200);
 
 	--popup-block-area-background-color: color-mix(in srgb, var(--background-500) 50%, transparent);
-	--popup-background-color: var(--background-100);
+	--popup-background-color: var(--background);
 	--popup-border-color: var(--background-500);
 	--popup-button-background-color: var(--background-200);
 	--popup-button-hover-background-color: var(--background-300);
@@ -117,6 +117,15 @@
 	--warning-color: #ffc107;
 
 	--color-button-selected-border-color: var(--text);
+
+	--shadow-low: 0 2px 8px rgba(0, 0, 0, 0.15);
+	--shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.2);
+	--shadow-high: 0 4px 24px rgba(0, 0, 0, 0.3);
+	--popup-shadow: var(--shadow-high);
+	--blocking-overlay-background-color: rgba(0, 0, 0, 0.4);
+	--button-primary-text-color: white;
+	--error-text-color: rgb(224, 17, 17);
+	--error-background-color: black;
 
 	--grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiNkNmQ2ZDYiLz4NCjwvc3ZnPg==");
 }
@@ -222,6 +231,15 @@
 
 	--color-button-selected-border-color: var(--text);
 
+	--shadow-low: 0 2px 8px rgba(0, 0, 0, 0.3);
+	--shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+	--shadow-high: 0 4px 24px rgba(0, 0, 0, 0.5);
+	--popup-shadow: var(--shadow-high);
+	--blocking-overlay-background-color: rgba(0, 0, 0, 0.5);
+	--button-primary-text-color: white;
+	--error-text-color: rgb(224, 17, 17);
+	--error-background-color: black;
+
 	--grid-background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjIiIGZpbGw9IiMyNDI0MjQiLz4NCjwvc3ZnPg==");
 }
 
@@ -254,6 +272,24 @@ text {
 button {
 	cursor: pointer;
 	user-select: none;
+}
+
+.scrollbar-thin {
+	scrollbar-width: thin;
+	scrollbar-color: var(--recipe-selector-scrollbar-color) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+	width: 8px;
+	background-color: transparent;
+}
+
+.scrollbar-hidden {
+	scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+	display: none;
 }
 
 :focus {
