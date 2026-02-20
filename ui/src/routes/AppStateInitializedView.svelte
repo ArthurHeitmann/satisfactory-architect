@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from "$app/environment";
 	import type { AppState } from "$lib/datamodel/AppState.svelte";
 	import type { EventStream } from "$lib/EventStream.svelte";
 	import { StorageKeys } from "$lib/datamodel/constants";
@@ -16,6 +17,11 @@
 	const { app, eventStream }: Props = $props();
 
 	setContext("app-state", app);
+
+	if (browser && new URLSearchParams(location.search).has("e2e")) {
+		(window as any).__appState = app;
+		(window as any).__serverConnection = app.serverConnection;
+	}
 
 	const serverConnection = app.serverConnection;
 	const commandQueue = serverConnection.dispatchCommandQueue;

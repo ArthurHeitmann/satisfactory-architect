@@ -27,3 +27,9 @@ game_extracted
 
 .github/copilot-instructions.md
 CLAUDE.md
+
+# E2E test artifacts
+e2e/failure-reports/
+e2e/recordings/
+/test-results/
+/playwright-report/

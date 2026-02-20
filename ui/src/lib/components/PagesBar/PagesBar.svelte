@@ -229,6 +229,7 @@
 		{/each}
 		<button
 			class="add-page-button"
+			data-testid="add-page-btn"
 			onclick={() => {
 				const newPage = GraphPage.newDefault(appState, `Page ${appState.pages.length + 1}`);
 				appState.addPage(newPage);

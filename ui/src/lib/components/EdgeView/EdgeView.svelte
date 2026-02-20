@@ -314,6 +314,7 @@
 	class="edge-view"
 	class:isRotating
 	class:selected={isSelected}
+	data-edge-id={edge.id}
 	oncontextmenu={(event) => {
 		event.preventDefault();
 		eventStream.emit({

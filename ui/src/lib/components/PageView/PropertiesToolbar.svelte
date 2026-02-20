@@ -11,7 +11,8 @@
 	import type { EventStream } from "$lib/EventStream.svelte";
 	import { darkTheme, globals } from "$lib/datamodel/globals.svelte";
 	import type { AppState } from "$lib/datamodel/AppState.svelte";
-    import { changelog } from "$lib/datamodel/constants";
+	import { changelog } from "$lib/datamodel/constants";
+	import { checkDataModelConsistency, repairDataModelConsistency } from "$lib/datamodel/consistencyTools";
 
 	interface Props {
 		page: GraphPage;
@@ -324,6 +325,14 @@
 							{
 								label: globals.debugShowEdgeIds ? "Hide Edge IDs" : "Show Edge IDs",
 								onClick: () => globals.debugShowEdgeIds = !globals.debugShowEdgeIds
+							},
+							{
+								label: "Check Consistency",
+								onClick: () => checkDataModelConsistency(appState)
+							},
+							{
+								label: "Repair Inconsistencies",
+								onClick: () => repairDataModelConsistency(appState)
 							},
 						],
 					}),

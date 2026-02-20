@@ -503,6 +503,8 @@
 		<g
 			{...listeners}
 			transform={`translate(${position.x}, ${position.y})`}
+			data-node-id={node.id}
+			data-node-type={node.properties.type}
 		>
 			{#if node.properties.type === "production"}
 				<ProductionNodeView node={node as GraphNode<GraphNodeProductionProperties>} />

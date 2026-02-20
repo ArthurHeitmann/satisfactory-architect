@@ -454,6 +454,7 @@
 					{#each category.recipes as recipe (recipe.key)}
 						<button
 							class="recipe-item button"
+							data-recipe-key={recipe.key}
 							onclick={() => onRecipeSelected(recipe.details)}
 							onpointerenter={() => hoveredRecipe = recipe}
 						>

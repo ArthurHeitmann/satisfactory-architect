@@ -144,6 +144,7 @@
 	class="page-button"
 	class:selected={page.id === activePageId}
 	class:dragging={isDraggedButton}
+	data-page-id={page.id}
 	style:position={isDraggedButton ? "absolute" : "relative"}
 	style:left={isDraggedButton ? `${absoluteX}px` : "auto"}
 	onclick={onSelect}
