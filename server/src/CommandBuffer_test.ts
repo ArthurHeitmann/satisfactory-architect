@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
 import { CommandBuffer } from "./CommandBuffer.ts";
-import type { Command, ObjectAddCommand, ObjectModifyCommand, PageAddCommand } from "../shared/messages.ts";
+import type { Command, ObjectAddCommand, ObjectDiffOperation, ObjectModifyCommand, PageAddCommand } from "../shared/messages.ts";
 import { GraphNodeJson, GraphPageJson } from "../shared/types_serialization.ts";
 
 // Command presets for reuse across tests
@@ -17,7 +17,7 @@ const createObjectAddCommand = (id: string, timestamp: number): ObjectAddCommand
 	data: { id: `node-${id}` } as GraphNodeJson,
 });
 
-const createObjectModifyCommand = (id: string, timestamp: number, data: Record<string, unknown>): ObjectModifyCommand => ({
+const createObjectModifyCommand = (id: string, timestamp: number, data: ObjectDiffOperation[]): ObjectModifyCommand => ({
 	commandId: id,
 	userId: "u1",
 	timestamp,
@@ -86,7 +86,7 @@ describe("CommandBuffer", () => {
 		it("buffers multiple commands", () => {
 			const commands = [
 				createObjectAddCommand("cmd-1", 1000),
-				createObjectModifyCommand("cmd-2", 1001, { name: "Updated" }),
+				createObjectModifyCommand("cmd-2", 1001, [{ op: "set", path: "name", value: "Updated" }]),
 			];
 
 			buffer.addCommands(commands);
@@ -364,7 +364,7 @@ describe("CommandBuffer", () => {
 			const commands: Command[] = [
 				createPageAddCommand("cmd-1", 1000),
 				createObjectAddCommand("cmd-2", 1001),
-				createObjectModifyCommand("cmd-3", 1002, { name: "Updated Node" }),
+				createObjectModifyCommand("cmd-3", 1002, [{ op: "set", path: "name", value: "Updated Node" }]),
 			];
 
 			buffer.addCommands(commands);

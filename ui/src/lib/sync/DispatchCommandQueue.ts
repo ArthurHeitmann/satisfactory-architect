@@ -2,8 +2,10 @@ import { GraphEdge } from "$lib/datamodel/GraphEdge.svelte";
 import { GraphNode } from "$lib/datamodel/GraphNode.svelte";
 import type { GraphPage } from "$lib/datamodel/GraphPage.svelte";
 import { watchState } from "$lib/utilities.svelte";
-import { arraysEqual, assertUnreachable, generateUUID } from "$lib/utilties";
+import { arraysEqual, assertUnreachable, deepClone, generateUUID } from "$lib/utilties";
 import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, ObjectType, StateVarUpdateCommand, StateVarName, ViewUpdateCommand } from "../../../../server/shared/messages";
+import type { GraphEdgeJson, GraphNodeJson } from "../../../../server/shared/types_serialization";
+import { computeEdgeDiff, computeNodeDiff } from "./objectDiff";
 
 export class DispatchCommandQueue {
 	private queue: Command[] = [];
@@ -36,8 +38,8 @@ export class DispatchCommandQueue {
 					}
 					return true;
 				});
-			case "object.modify": // remove old object.modify for same object
-				return this.queue.filter(c => c.type !== "object.modify" || c.objectId !== command.objectId || c.objectType !== command.objectType);
+		case "object.modify": // diffs are sequential and must not be dropped
+			return this.queue;
 			case "page.delete": // remove old page.*, object.*, view.update for same page
 				return this.queue.filter(c => {
 					if ((c.type.startsWith("page.") || c.type.startsWith("object.") || c.type === "view.update") && "pageId" in c && c.pageId === command.pageId) {
@@ -124,10 +126,23 @@ export class DispatchCommandQueue {
 	}
 
 	watchNodeOrEdgeChange(getObj: () => GraphNode | GraphEdge) {
+		let lastSentJson: GraphNodeJson | GraphEdgeJson | null = null;
 		this.watch({
 			dependencies: () => getObj().asJson,
+			onInitialize: (json) => {
+				lastSentJson = deepClone(json) as GraphNodeJson | GraphEdgeJson;
+			},
 			onChange: (json) => {
 				const obj = getObj();
+				if (!lastSentJson) {
+					lastSentJson = deepClone(json) as GraphNodeJson | GraphEdgeJson;
+					return;
+				}
+				const ops = obj instanceof GraphNode
+					? computeNodeDiff(lastSentJson as GraphNodeJson, json as GraphNodeJson)
+					: computeEdgeDiff(lastSentJson as GraphEdgeJson, json as GraphEdgeJson);
+				lastSentJson = deepClone(json) as GraphNodeJson | GraphEdgeJson;
+				if (ops.length === 0) return;
 				const cmd: ObjectModifyCommand = {
 					type: "object.modify",
 					commandId: generateUUID(),
@@ -136,7 +151,7 @@ export class DispatchCommandQueue {
 					pageId: obj.context.page.id,
 					objectType: obj instanceof GraphNode ? "node" : "edge",
 					objectId: obj.id,
-					data: json,
+					data: ops,
 				};
 				this.enqueue(cmd);
 			}

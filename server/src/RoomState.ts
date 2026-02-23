@@ -22,6 +22,7 @@ import type {
 	GraphNodeJson,
 	GraphPageJson,
 } from "../shared/types_serialization.ts";
+import { applyDiffToJson } from "../shared/objectDiff.ts";
 
 /**
  * Room state interface for dependency injection
@@ -349,9 +350,15 @@ export class RoomState implements IRoomState {
 		}
 
 		if (command.objectType === "node") {
-			page.nodes[command.objectId] = command.data as GraphNodeJson;
+			const node = page.nodes[command.objectId];
+			if (node) {
+				applyDiffToJson(node as unknown as Record<string, unknown>, command.data);
+			}
 		} else if (command.objectType === "edge") {
-			page.edges[command.objectId] = command.data as GraphEdgeJson;
+			const edge = page.edges[command.objectId];
+			if (edge) {
+				applyDiffToJson(edge as unknown as Record<string, unknown>, command.data);
+			}
 		} else {
 			throw new AppError(
 				ErrorCode.INVALID_MESSAGE,

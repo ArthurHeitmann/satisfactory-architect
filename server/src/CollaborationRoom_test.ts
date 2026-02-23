@@ -574,8 +574,7 @@ describe("CollaborationRoom", () => {
 
 			await room.setRoomState("socket-1", stateData);
 
-			// consumeStateChanges should be called as part of saveSnapshot
-			assertSpyCalls(mockRoomState.consumeStateChanges as ReturnType<typeof spy>, 1);
+			assertSpyCalls(mockRoomState.setState as ReturnType<typeof spy>, 1);
 		});
 	});
 

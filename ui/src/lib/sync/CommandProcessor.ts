@@ -2,9 +2,10 @@ import type { AppState } from "$lib/datamodel/AppState.svelte";
 import { GraphEdge } from "$lib/datamodel/GraphEdge.svelte";
 import { GraphNode } from "$lib/datamodel/GraphNode.svelte";
 import { GraphPage } from "$lib/datamodel/GraphPage.svelte";
-import { assertUnreachable } from "$lib/utilties";
+import { assertUnreachable, deepClone } from "$lib/utilties";
 import type { GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../../../../server/shared/types_serialization";
 import type { Command, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, ObjectAddCommand, ObjectDeleteCommand, PageReorderCommand, StateVarUpdateCommand } from "../../../../server/shared/messages";
+import { applyDiffToJson } from "../../../../server/shared/objectDiff";
 
 export class CommandProcessor {
 	constructor(
@@ -130,14 +131,18 @@ export class CommandProcessor {
 		if (command.objectType === "node") {
 			const node = page.nodes.get(command.objectId);
 			if (node) {
-				node.applyJson(command.data);
+				const json = deepClone(node.asJson) as GraphNodeJson;
+				applyDiffToJson(json as unknown as Record<string, unknown>, command.data);
+				node.applyJson(json);
 			} else {
 				console.warn(`Cannot modify node ${command.objectId}: not found on page ${page.id}`);
 			}
 		} else {
 			const edge = page.edges.get(command.objectId);
 			if (edge) {
-				edge.applyJson(command.data);
+				const json = deepClone(edge.asJson) as GraphEdgeJson;
+				applyDiffToJson(json as unknown as Record<string, unknown>, command.data);
+				edge.applyJson(json);
 			} else {
 				console.warn(`Cannot modify edge ${command.objectId}: not found on page ${page.id}`);
 			}

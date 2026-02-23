@@ -39,6 +39,13 @@ export interface PageReorderCommand extends CommandBase {
 
 export type ObjectType = "node" | "edge";
 
+export type ObjectDiffOperation =
+	| { op: "set";        path: string; value: unknown }
+	| { op: "set_add";    path: string; value: string }
+	| { op: "set_remove"; path: string; value: string }
+	| { op: "map_put";    path: string; key: string; value: unknown }
+	| { op: "map_delete"; path: string; key: string };
+
 export interface ObjectAddCommand extends CommandBase {
 	type: "object.add";
 	pageId: string;
@@ -59,7 +66,7 @@ export interface ObjectModifyCommand extends CommandBase {
 	pageId: string;
 	objectType: ObjectType;
 	objectId: string;
-	data: Partial<GraphNodeJson> | Partial<GraphEdgeJson>;
+	data: ObjectDiffOperation[];
 }
 
 export type StateVarName = "currentPageId" | "name";

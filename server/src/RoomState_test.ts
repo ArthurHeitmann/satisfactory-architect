@@ -6,7 +6,7 @@ import { assertEquals, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { RoomState } from "./RoomState.ts";
 import type { AppStateJson, GraphEdgeJson, GraphNodeJson, GraphPageJson } from "../shared/types_serialization.ts";
-import type { Command, ObjectAddCommand, ObjectDeleteCommand, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, PageReorderCommand, StateVarUpdateCommand, ViewUpdateCommand } from "../shared/messages.ts";
+import type { Command, ObjectAddCommand, ObjectDeleteCommand, ObjectDiffOperation, ObjectModifyCommand, PageAddCommand, PageDeleteCommand, PageModifyCommand, PageReorderCommand, StateVarUpdateCommand, ViewUpdateCommand } from "../shared/messages.ts";
 
 // ============================================================================
 // Test Helpers
@@ -122,7 +122,7 @@ const commands = {
 		objectId,
 	} as ObjectDeleteCommand),
 
-	objectModify: (pageId: string, objectType: "node" | "edge", objectId: string, data: unknown) => ({
+	objectModify: (pageId: string, objectType: "node" | "edge", objectId: string, data: ObjectDiffOperation[]) => ({
 		...cmd(),
 		type: "object.modify" as const,
 		pageId,
@@ -358,15 +358,132 @@ describe("RoomState", () => {
 			assertEquals("node-1" in state.getState().pages[0].nodes, false);
 		});
 
-		it("object.modify updates a node", () => {
+		it("object.modify applies a set op to a node field", () => {
 			state.setState(createTestState({
 				pages: [createPage("page-1", { nodes: { "node-1": createNode("node-1") } })],
 			}));
 
-			state.applyCommands([commands.objectModify("page-1", "node", "node-1", { id: "node-1", position: { x: 500, y: 600 } })]);
+			state.applyCommands([commands.objectModify("page-1", "node", "node-1", [
+				{ op: "set", path: "position", value: { x: 500, y: 600 } },
+			])]);
 
 			const node = state.getState().pages[0].nodes["node-1"];
 			assertEquals(node.position, { x: 500, y: 600 });
+		});
+
+		it("object.modify set_add adds an entry to a string array field", () => {
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": createNode("node-1", { edges: ["e1"] }) } })],
+			}));
+
+			state.applyCommands([commands.objectModify("page-1", "node", "node-1", [
+				{ op: "set_add", path: "edges", value: "e2" },
+			])]);
+
+			const node = state.getState().pages[0].nodes["node-1"];
+			assertEquals(node.edges, ["e1", "e2"]);
+		});
+
+		it("object.modify set_add is idempotent for duplicates", () => {
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": createNode("node-1", { edges: ["e1"] }) } })],
+			}));
+
+			state.applyCommands([commands.objectModify("page-1", "node", "node-1", [
+				{ op: "set_add", path: "edges", value: "e1" },
+			])]);
+
+			const node = state.getState().pages[0].nodes["node-1"];
+			assertEquals(node.edges, ["e1"]);
+		});
+
+		it("object.modify set_remove removes an entry from a string array field", () => {
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": createNode("node-1", { edges: ["e1", "e2"] }) } })],
+			}));
+
+			state.applyCommands([commands.objectModify("page-1", "node", "node-1", [
+				{ op: "set_remove", path: "edges", value: "e1" },
+			])]);
+
+			const node = state.getState().pages[0].nodes["node-1"];
+			assertEquals(node.edges, ["e2"]);
+		});
+
+		it("object.modify map_put inserts a key into a nested record", () => {
+			const nodeWithMap = createNode("node-1", {
+				properties: { type: "factory-reference", factoryId: "page-2", jointsToExternalNodes: { "j1": "ext-1" } },
+			});
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": nodeWithMap } })],
+			}));
+
+			state.applyCommands([commands.objectModify("page-1", "node", "node-1", [
+				{ op: "map_put", path: "properties.jointsToExternalNodes", key: "j2", value: "ext-2" },
+			])]);
+
+			const props = state.getState().pages[0].nodes["node-1"].properties as Record<string, unknown>;
+			assertEquals(props.jointsToExternalNodes, { "j1": "ext-1", "j2": "ext-2" });
+		});
+
+		it("object.modify map_delete removes a key from a nested record", () => {
+			const nodeWithMap = createNode("node-1", {
+				properties: { type: "factory-reference", factoryId: "page-2", jointsToExternalNodes: { "j1": "ext-1", "j2": "ext-2" } },
+			});
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": nodeWithMap } })],
+			}));
+
+			state.applyCommands([commands.objectModify("page-1", "node", "node-1", [
+				{ op: "map_delete", path: "properties.jointsToExternalNodes", key: "j1" },
+			])]);
+
+			const props = state.getState().pages[0].nodes["node-1"].properties as Record<string, unknown>;
+			assertEquals(props.jointsToExternalNodes, { "j2": "ext-2" });
+		});
+
+		it("object.modify with multiple ops applies all in order", () => {
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": createNode("node-1", { edges: ["e1"] }) } })],
+			}));
+
+			state.applyCommands([commands.objectModify("page-1", "node", "node-1", [
+				{ op: "set", path: "position", value: { x: 10, y: 20 } },
+				{ op: "set_add", path: "edges", value: "e2" },
+				{ op: "set_remove", path: "edges", value: "e1" },
+			])]);
+
+			const node = state.getState().pages[0].nodes["node-1"];
+			assertEquals(node.position, { x: 10, y: 20 });
+			assertEquals(node.edges, ["e2"]);
+		});
+
+		it("object.modify is a no-op when the object does not exist", () => {
+			state.setState(createTestState({
+				pages: [createPage("page-1", { nodes: { "node-1": createNode("node-1") } })],
+			}));
+
+			// Applying to a non-existent node should not throw
+			state.applyCommands([commands.objectModify("page-1", "node", "node-missing", [
+				{ op: "set", path: "position", value: { x: 1, y: 2 } },
+			])]);
+
+			// Existing node is untouched
+			const node = state.getState().pages[0].nodes["node-1"];
+			assertEquals(node.position, { x: 0, y: 0 });
+		});
+
+		it("object.modify applies a set op to an edge field", () => {
+			state.setState(createTestState({
+				pages: [createPage("page-1", { edges: { "edge-1": createEdge("edge-1") } })],
+			}));
+
+			state.applyCommands([commands.objectModify("page-1", "edge", "edge-1", [
+				{ op: "set", path: "startNodeId", value: "node-99" },
+			])]);
+
+			const edge = state.getState().pages[0].edges["edge-1"];
+			assertEquals(edge.startNodeId, "node-99");
 		});
 	});
 
@@ -475,8 +592,11 @@ describe("RoomState", () => {
 				commands.objectAdd("page-2", "node", "node-2", createNode("node-2", { position: { x: 300, y: 0 }, priority: 2, properties: { recipeId: "Recipe_IronIngot_C" } })),
 				// 4. Add an edge connecting the nodes
 				commands.objectAdd("page-2", "edge", "edge-1", createEdge("edge-1", { properties: { portFrom: "out-0", portTo: "in-0" } })),
-				// 5. Modify node-1
-				commands.objectModify("page-2", "node", "node-1", createNode("node-1", { position: { x: 50, y: 50 }, properties: { recipeId: "Recipe_IronOre_C", overclock: 2.0 } })),
+				// 5. Modify node-1 with diff ops
+				commands.objectModify("page-2", "node", "node-1", [
+					{ op: "set", path: "position", value: { x: 50, y: 50 } },
+					{ op: "set", path: "properties", value: { recipeId: "Recipe_IronOre_C", overclock: 2.0 } },
+				]),
 				// 6. Reorder pages
 				commands.pageReorder(["page-2", "page-1"]),
 				// 7. Add a third page that will be deleted
