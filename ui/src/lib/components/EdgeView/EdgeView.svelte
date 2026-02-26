@@ -10,13 +10,14 @@
 	import UserEvents, { type DragEvent } from "../UserEvents.svelte";
 	import type { LayoutOrientation } from "../../datamodel/GraphNode.svelte";
 	import { edgeArrowLength, gridSize } from "$lib/datamodel/constants";
-
+	
 	interface Props {
 		edge: GraphEdge;
 	}
 	const { edge }: Props = $props();
 	
-	const commandQueue = edge.context.appState.serverConnection.dispatchCommandQueue;
+	const serverConnection = edge.context.appState.serverConnection;
+	const commandQueue = serverConnection.dispatchCommandQueue;
 	commandQueue.watchNodeOrEdgeChange(() => edge);
 	
 	let isRotating = $state(false);

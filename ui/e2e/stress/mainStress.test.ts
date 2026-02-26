@@ -114,6 +114,8 @@ test.describe.serial("stress: collaborative sync", () => {
 				convergenceIntervalMs,
 				preConvergenceWaitMs,
 				quiescenceMs,
+			}, {
+				step: (name, fn) => test.step(name, fn),
 			});
 
 			const phaseOrder = [

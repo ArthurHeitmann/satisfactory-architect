@@ -71,6 +71,8 @@ export interface RunnerDependencies {
 	checkConvergence(states: AppStateJson[], epsilon: number): ConvergenceResult;
 	formatConvergenceResult(result: ConvergenceResult): string;
 	getAppState(agent: RunnerAgent): Promise<AppStateJson>;
+	/** Wrap a block in a named step for test reporters. Defaults to a passthrough. */
+	step<T>(name: string, fn: () => Promise<T>): Promise<T>;
 }
 
 const DEFAULT_DEPS: RunnerDependencies = {
@@ -82,6 +84,7 @@ const DEFAULT_DEPS: RunnerDependencies = {
 	checkConvergence,
 	formatConvergenceResult,
 	getAppState: (agent) => agent.getAppState(),
+	step: (_name, fn) => fn(),
 };
 
 export interface TestRunnerOptions {
@@ -188,7 +191,10 @@ export class TestRunner {
 			}
 
 			const tickRecords = await Promise.all(
-				plannedTicks.map((planned) => this.executePlannedTick(planned)),
+				plannedTicks.map(async (planned, i) => {
+					await new Promise((resolve) => setTimeout(resolve, i * 80));
+					return this.executePlannedTick(planned);
+				}),
 			);
 			tickCount += 1;
 
@@ -297,9 +303,12 @@ export class TestRunner {
 			};
 		}
 
+		const stepName = `[A${planned.agent.index}] ${planned.actionType}`;
 		let result: ActionResult;
 		try {
-			result = await this.deps.executeAction(planned.action, planned.agent);
+			result = await this.deps.step(stepName, () =>
+				this.deps.executeAction(planned.action!, planned.agent)
+			);
 		} catch (error) {
 			return {
 				timestamp: planned.timestamp,

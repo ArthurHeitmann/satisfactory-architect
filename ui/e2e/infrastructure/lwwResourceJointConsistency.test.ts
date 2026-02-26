@@ -163,4 +163,74 @@ test.describe.serial("infrastructure: LWW joint edge consistency", () => {
 			await Promise.all(contexts.map((ctx) => ctx.close()));
 		}
 	});
+
+	test("concurrent multiplier changes on same node converge to one value", async ({ browser }) => {
+		const contexts = [await browser.newContext(), await browser.newContext()];
+		const agents = await createAgents(contexts, {
+			appUrl: APP_URL,
+			wsUrl: WS_URL,
+			rng: new SeededRandom(20260223),
+		});
+
+		try {
+			await setupCollaborativeSession(agents, 50, EMPTY_SAVE);
+			await expect.poll(async () => Promise.all(agents.map((agent) => agent.getConnectionState()))).toEqual(["InRoom", "InRoom"]);
+
+			const leader = agents[0];
+			const canvas = await leader.getCanvasBounds();
+			await createRecipeNode(leader, "Recipe_IngotIron_C", canvas.x + canvas.width * 0.5, canvas.y + canvas.height * 0.5);
+
+			// Wait until both agents see the node
+			await expect.poll(async () => {
+				const states = await Promise.all(agents.map((agent) => agent.getAppState()));
+				return states.map((state) => Object.keys(getCurrentPage(state).nodes).length);
+			}, { timeout: 10_000 }).toEqual([3, 3]); // parent + 1 input joint + 1 output joint
+
+			// Get the production node id on each agent
+			const getProductionNodeId = async (agent: Agent): Promise<string> => {
+				return agent.page.evaluate(() => {
+					const app = (window as any).__appState;
+					const page = app.currentPage;
+					for (const node of page.nodes.values()) {
+						if (node.parentNode !== null) continue;
+						if (node.properties.type === "production") return node.id;
+					}
+					throw new Error("No production node found");
+				});
+			};
+
+			const nodeIdA = await getProductionNodeId(agents[0]);
+			const nodeIdB = await getProductionNodeId(agents[1]);
+			expect(nodeIdA).toBe(nodeIdB);
+
+			// Both agents set a different multiplier value simultaneously
+			await Promise.all([
+				agents[0].page.evaluate((id: string) => {
+					const app = (window as any).__appState;
+					const node = app.currentPage.nodes.get(id);
+					node.properties.multiplier = 2.5;
+				}, nodeIdA),
+				agents[1].page.evaluate((id: string) => {
+					const app = (window as any).__appState;
+					const node = app.currentPage.nodes.get(id);
+					node.properties.multiplier = 7.0;
+				}, nodeIdB),
+			]);
+
+			await Promise.all(agents.map((agent) => agent.wait(500)));
+
+			const finalStates = await Promise.all(agents.map((agent) => agent.getAppState()));
+			assertConverged(finalStates, 1e-6, "LWW concurrent multiplier change did not converge consistently");
+
+			// Verify the multiplier settled on one of the two written values
+			const finalMultiplier = (getCurrentPage(finalStates[0]).nodes[nodeIdA].properties as any).multiplier as number;
+			expect([2.5, 7.0], `multiplier ${finalMultiplier} is not one of the expected values`).toContain(finalMultiplier);
+
+			for (const agent of agents) {
+				expect(agent.hasErrors(), `Agent ${agent.index} has page errors: ${agent.formatErrors()}`).toBe(false);
+			}
+		} finally {
+			await Promise.all(contexts.map((ctx) => ctx.close()));
+		}
+	});
 });

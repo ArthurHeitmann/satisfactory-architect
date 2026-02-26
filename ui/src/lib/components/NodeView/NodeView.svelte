@@ -11,8 +11,8 @@
 	import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties, GraphNodeSplitterMergerProperties, GraphNodeTextNoteProperties, JointDragType } from "../../datamodel/GraphNode.svelte";
 	import { blockStateChanges, globals, unblockStateChanges } from "../../datamodel/globals.svelte";
 	import TextNoteNodeView from "./TextNoteNodeView.svelte";
-	import type { ServerConnection } from "$lib/sync/ServerConnection.svelte";
-
+	import { type ServerConnection } from "$lib/sync/ServerConnection.svelte";
+	
 	interface Props {
 		node: GraphNode;
 	}
@@ -483,8 +483,6 @@
 			items: contextMenuItems,
 		});
 	}
-
-
 </script>
 
 <UserEvents

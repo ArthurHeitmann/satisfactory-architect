@@ -2,6 +2,7 @@ import type { AppState } from "./AppState.svelte";
 import { GraphPage } from "./GraphPage.svelte";
 import type { GraphNode, GraphNodeProductionProperties, GraphNodeResourceJointProperties } from "./GraphNode.svelte";
 import type { GraphEdge } from "./GraphEdge.svelte";
+import type { Id } from "./IdGen.svelte";
 
 export type ConsistencySeverity = "error" | "warning";
 
@@ -9,9 +10,9 @@ export interface ConsistencyIssue {
 	severity: ConsistencySeverity;
 	code: string;
 	message: string;
-	pageId?: string;
-	nodeId?: string;
-	edgeId?: string;
+	pageId?: Id;
+	nodeId?: Id;
+	edgeId?: Id;
 }
 
 export interface ConsistencyReport {
@@ -22,10 +23,12 @@ export interface ConsistencyReport {
 }
 
 export interface RepairReport {
-	before: ConsistencyReport;
-	after: ConsistencyReport;
 	appliedFixes: number;
 	fixes: string[];
+}
+
+function logFix(desc: string): void {
+	console.info(`[Consistency][repair] ${desc}`);
 }
 
 export function checkDataModelConsistency(appState: AppState): ConsistencyReport {
@@ -35,13 +38,15 @@ export function checkDataModelConsistency(appState: AppState): ConsistencyReport
 }
 
 export function repairDataModelConsistency(appState: AppState): RepairReport {
-	const before = buildConsistencyReport(appState);
+	// console.time("Data model consistency repair");
 	const fixes: string[] = [];
-	let appliedFixes = 0;
 
-	const markFixed = (description: string) => {
-		appliedFixes += 1;
-		fixes.push(description);
+	const collectFix = (desc: string) => {
+		fixes.push(desc);
+	};
+	const markFixed = (desc: string) => {
+		logFix(desc);
+		collectFix(desc);
 	};
 
 	if (appState.pages.length === 0) {
@@ -50,6 +55,12 @@ export function repairDataModelConsistency(appState: AppState): RepairReport {
 		appState.setCurrentPage(page);
 		markFixed("Created a default page because app state had no pages.");
 	}
+
+	if (!appState.currentPage && appState.pages.length > 0) {
+		appState.setCurrentPage(appState.pages[0]);
+	}
+
+	removeDuplicatePages(appState, markFixed);
 
 	for (const page of appState.pages) {
 		normalizeNodeMapKeys(page, markFixed);
@@ -68,160 +79,142 @@ export function repairDataModelConsistency(appState: AppState): RepairReport {
 			}
 		}
 
-		for (const [edgeId, edge] of [...page.edges.entries()]) {
-			if (edge.startNodeId === edge.endNodeId || !page.nodes.has(edge.startNodeId) || !page.nodes.has(edge.endNodeId)) {
-				removeEdgeDirect(page, edgeId);
-				markFixed(`Removed invalid edge '${edgeId}' on page '${page.id}'.`);
-			}
-		}
-
-		for (const node of page.nodes.values()) {
-			if (node.parentNode !== null && (!page.nodes.has(node.parentNode) || node.parentNode === node.id)) {
-				node.parentNode = null;
-				markFixed(`Cleared invalid parent link on node '${node.id}' (page '${page.id}').`);
-			}
-		}
-
-		for (const node of page.nodes.values()) {
-			for (const childId of [...node.children]) {
-				if (!page.nodes.has(childId) || childId === node.id) {
-					node.children.delete(childId);
-					markFixed(`Removed invalid child '${childId}' from node '${node.id}' (page '${page.id}').`);
-					continue;
-				}
-				const child = page.nodes.get(childId)!;
-				if (child.parentNode !== node.id) {
-					child.parentNode = node.id;
-					markFixed(`Repaired parent pointer '${child.id}' -> '${node.id}' (page '${page.id}').`);
-				}
-			}
-		}
-
-		for (const node of page.nodes.values()) {
-			if (node.parentNode === null) continue;
-			const parent = page.nodes.get(node.parentNode);
-			if (parent && !parent.children.has(node.id)) {
-				parent.children.add(node.id);
-				markFixed(`Repaired parent children set '${parent.id}' to include '${node.id}' (page '${page.id}').`);
-			}
-		}
-
 		for (const node of [...page.nodes.values()]) {
-			if (node.properties.type === "resource-joint") {
-				const parent = node.parentNode ? page.nodes.get(node.parentNode) : undefined;
-				if (!parent || parent.properties.type !== "production") {
-					removeNodeDeep(page, node.id);
-					markFixed(`Removed orphan/non-production resource-joint '${node.id}' (page '${page.id}').`);
-				}
-			}
+			repairNodeConsistency(page, node, collectFix, appState);
 		}
 
-		for (const node of page.nodes.values()) {
-			if (node.properties.type !== "production") {
-				if (node.children.size > 0) {
-					for (const childId of [...node.children]) {
-						const child = page.nodes.get(childId);
-						if (child && child.parentNode === node.id) {
-							child.parentNode = null;
-						}
-						node.children.delete(childId);
-					}
-					markFixed(`Cleared non-production children on node '${node.id}' (page '${page.id}').`);
-				}
-				continue;
-			}
-
-			const production = node as GraphNode<GraphNodeProductionProperties>;
-			for (const childId of [...production.children]) {
-				const child = page.nodes.get(childId);
-				if (!child || child.properties.type !== "resource-joint") {
-					production.children.delete(childId);
-					if (child && child.parentNode === production.id) {
-						child.parentNode = null;
-					}
-					markFixed(`Removed non-resource-joint child '${childId}' from production node '${production.id}' (page '${page.id}').`);
-				}
-			}
-
-			const jointIds = new Set(production.properties.resourceJoints.map((joint) => joint.id));
-			production.properties.resourceJoints = production.properties.resourceJoints.filter((joint) => {
-				const jointNode = page.nodes.get(joint.id);
-				if (!jointNode || jointNode.properties.type !== "resource-joint") {
-					markFixed(`Removed invalid resource joint reference '${joint.id}' from production node '${production.id}' (page '${page.id}').`);
-					return false;
-				}
-				if (!production.children.has(joint.id)) {
-					production.children.add(joint.id);
-					markFixed(`Added missing child '${joint.id}' to production node '${production.id}' (page '${page.id}').`);
-				}
-				if (jointNode.parentNode !== production.id) {
-					jointNode.parentNode = production.id;
-					markFixed(`Repaired parent link for joint '${joint.id}' to production node '${production.id}' (page '${page.id}').`);
-				}
-				return true;
-			});
-
-			for (const childId of production.children) {
-				if (jointIds.has(childId)) continue;
-				const child = page.nodes.get(childId);
-				if (!child || child.properties.type !== "resource-joint") continue;
-				const childProps = child.properties as GraphNodeResourceJointProperties;
-				production.properties.resourceJoints.push({ id: child.id, type: childProps.jointType });
-				markFixed(`Added missing resourceJoints entry '${child.id}' on production node '${production.id}' (page '${page.id}').`);
-			}
-
-			if (production.properties.details.type === "factory-reference") {
-				const details = production.properties.details;
-				const externalPage = appState.pages.find((p) => p.id === details.factoryId);
-				if (!externalPage) {
-					removeNodeDeep(page, production.id);
-					markFixed(`Removed factory-reference node '${production.id}' with missing external page '${details.factoryId}' (page '${page.id}').`);
-					continue;
-				}
-				const validJointIds = new Set(production.properties.resourceJoints.map((joint) => joint.id));
-				const validExternalNodeIds = new Set([...externalPage.nodes.keys()]);
-				const repairedMap: Record<string, string> = {};
-				for (const [jointId, externalNodeId] of Object.entries(details.jointsToExternalNodes)) {
-					if (!validJointIds.has(jointId)) {
-						markFixed(`Removed invalid external map entry joint '${jointId}' from factory-reference node '${production.id}'.`);
-						continue;
-					}
-					if (!validExternalNodeIds.has(externalNodeId)) {
-						markFixed(`Removed invalid external map entry external node '${externalNodeId}' from factory-reference node '${production.id}'.`);
-						continue;
-					}
-					repairedMap[jointId] = externalNodeId;
-				}
-				details.jointsToExternalNodes = repairedMap;
-			}
-		}
-
-		for (const node of page.nodes.values()) {
-			node.edges.clear();
-		}
-		for (const [edgeId, edge] of page.edges.entries()) {
-			const start = page.nodes.get(edge.startNodeId);
-			const end = page.nodes.get(edge.endNodeId);
-			if (!start || !end || start.id === end.id) {
-				removeEdgeDirect(page, edgeId);
-				markFixed(`Removed invalid edge '${edgeId}' during edge set rebuild (page '${page.id}').`);
-				continue;
-			}
-			start.edges.add(edge.id);
-			end.edges.add(edge.id);
+		for (const edge of [...page.edges.values()]) {
+			repairEdgeConsistency(page, edge, collectFix);
 		}
 	}
 
-	if (appState.currentPage) {
-		appState.setCurrentPage(appState.currentPage);
+	logRepairReport(fixes);
+	// console.timeEnd("Data model consistency repair");
+	return { appliedFixes: fixes.length, fixes };
+}
+
+export function repairNodeConsistency(page: GraphPage, node: GraphNode, onFix?: (desc: string) => void, appState?: AppState): void {
+	const markFixed = (desc: string) => {
+		logFix(desc);
+		onFix?.(desc);
+	};
+
+	if (node.parentNode !== null && (!page.nodes.has(node.parentNode) || node.parentNode === node.id)) {
+		page.removeNode(node.id);
+		markFixed(`Removed node '${node.id}' with invalid parent '${node.parentNode}'.`);
+		return;
 	}
 
-	const after = buildConsistencyReport(appState);
-	logRepairReport(before, after, appliedFixes, fixes);
-	return { before, after, appliedFixes, fixes };
+	if (node.parentNode !== null) {
+		const parent = page.nodes.get(node.parentNode)!;
+		if (!parent.children.has(node.id)) {
+			parent.children.add(node.id);
+			markFixed(`Repaired parent children set '${parent.id}' to include '${node.id}'.`);
+		}
+	}
+
+	for (const childId of [...node.children]) {
+		if (!page.nodes.has(childId) || childId === node.id) {
+			node.children.delete(childId);
+			markFixed(`Removed invalid child '${childId}' from node '${node.id}'.`);
+			continue;
+		}
+		const child = page.nodes.get(childId)!;
+		if (child.parentNode !== node.id) {
+			child.parentNode = node.id;
+			markFixed(`Repaired parent pointer '${child.id}' -> '${node.id}'.`);
+		}
+	}
+
+	for (const edgeId of [...node.edges]) {
+		const edge = page.edges.get(edgeId);
+		if (!edge || (edge.startNodeId !== node.id && edge.endNodeId !== node.id)) {
+			node.edges.delete(edgeId);
+			markFixed(`Removed stale edge ref '${edgeId}' from node '${node.id}'.`);
+		}
+	}
+
+	if (node.properties.type === "resource-joint") {
+		const parent = node.parentNode ? page.nodes.get(node.parentNode) : undefined;
+		if (!parent || parent.properties.type !== "production") {
+			page.removeNode(node.id);
+			markFixed(`Removed orphan resource-joint '${node.id}'.`);
+			return;
+		}
+	}
+	else if (node.properties.type !== "production") {
+		if (node.children.size > 0) {
+			for (const childId of [...node.children]) {
+				const child = page.nodes.get(childId);
+				if (child && child.parentNode === node.id) {
+					child.parentNode = null;
+				}
+				node.children.delete(childId);
+			}
+			markFixed(`Cleared non-production children on node '${node.id}'.`);
+		}
+	}
+	else if (node.properties.type === "production") {
+		const production = node as GraphNode<GraphNodeProductionProperties>;
+
+		const jointIdsToRemove: Id[] = [];	
+		for (const joint of [...production.properties.resourceJoints]) {
+			const jointNode = page.nodes.get(joint.id);
+			if (!jointNode || jointNode.properties.type !== "resource-joint") {
+				jointIdsToRemove.push(joint.id);
+				markFixed(`Removed invalid resource joint '${joint.id}' from production node '${production.id}'.`);
+				continue;
+			}
+			if (!production.children.has(joint.id)) {
+				production.children.add(joint.id);
+				markFixed(`Added missing child '${joint.id}' to production node '${production.id}'.`);
+			}
+			if (jointNode.parentNode !== production.id) {
+				jointNode.parentNode = production.id;
+				markFixed(`Repaired parent link for joint '${joint.id}' -> '${production.id}'.`);
+			}
+		}
+		if (jointIdsToRemove.length > 0) {
+			production.properties.resourceJoints = production.properties.resourceJoints.filter((joint) => !jointIdsToRemove.includes(joint.id));
+		}
+
+		const jointIds = new Set(production.properties.resourceJoints.map((joint) => joint.id));
+		for (const childId of production.children) {
+			const child = page.nodes.get(childId);
+			if (!child || child.properties.type !== "resource-joint") continue;
+			if (jointIds.has(childId)) continue;
+			production.properties.resourceJoints.push({ id: child.id, type: child.properties.jointType });
+			markFixed(`Added missing resourceJoints entry '${child.id}' on production node '${production.id}'.`);
+		}
+	}
+}
+
+export function repairEdgeConsistency(page: GraphPage, edge: GraphEdge, onFix?: (desc: string) => void): void {
+	const markFixed = (desc: string) => {
+		logFix(desc);
+		onFix?.(desc);
+	};
+
+	if (edge.startNodeId === edge.endNodeId || !page.nodes.has(edge.startNodeId) || !page.nodes.has(edge.endNodeId)) {
+		page.removeEdge(edge.id)
+		markFixed(`Removed invalid edge '${edge.id}'.`);
+		return;
+	}
+
+	const start = page.nodes.get(edge.startNodeId)!;
+	const end = page.nodes.get(edge.endNodeId)!;
+	if (!start.edges.has(edge.id)) {
+		start.edges.add(edge.id);
+		markFixed(`Added missing edge ref '${edge.id}' to start node '${start.id}'.`);
+	}
+	if (!end.edges.has(edge.id)) {
+		end.edges.add(edge.id);
+		markFixed(`Added missing edge ref '${edge.id}' to end node '${end.id}'.`);
+	}
 }
 
 function buildConsistencyReport(appState: AppState): ConsistencyReport {
+	// console.time("Building consistency report");
 	const issues: ConsistencyIssue[] = [];
 
 	const issue = (next: ConsistencyIssue) => {
@@ -232,7 +225,7 @@ function buildConsistencyReport(appState: AppState): ConsistencyReport {
 		issue({ severity: "error", code: "no-pages", message: "AppState has no pages." });
 	}
 
-	const seenPageIds = new Set<string>();
+	const seenPageIds = new Set<Id>();
 	for (const page of appState.pages) {
 		if (seenPageIds.has(page.id)) {
 			issue({ severity: "error", code: "duplicate-page-id", pageId: page.id, message: `Duplicate page id '${page.id}'.` });
@@ -372,6 +365,8 @@ function buildConsistencyReport(appState: AppState): ConsistencyReport {
 	const errorCount = issues.filter((entry) => entry.severity === "error").length;
 	const warningCount = issues.filter((entry) => entry.severity === "warning").length;
 
+	// console.timeEnd("Building consistency report");
+
 	return {
 		ok: errorCount === 0,
 		errorCount,
@@ -402,36 +397,21 @@ function normalizeEdgeMapKeys(page: GraphPage, onFix: (description: string) => v
 	}
 }
 
-function removeEdgeDirect(page: GraphPage, edgeId: string): void {
-	const edge = page.edges.get(edgeId);
-	if (!edge) return;
-	const start = page.nodes.get(edge.startNodeId);
-	const end = page.nodes.get(edge.endNodeId);
-	start?.edges.delete(edge.id);
-	end?.edges.delete(edge.id);
-	page.edges.delete(edgeId);
-	page.selectedEdges.delete(edgeId);
+function removeDuplicatePages(appState: AppState, onFix: (description: string) => void): void {
+	const seen = new Set<Id>();
+	for (const page of [...appState.pages]) {
+		if (seen.has(page.id)) {
+			appState.removePage(page.id);
+			onFix(`Removed duplicate page '${page.id}'.`);
+		} else {
+			seen.add(page.id);
+		}
+	}
 }
 
-function removeNodeDeep(page: GraphPage, nodeId: string): void {
-	const node = page.nodes.get(nodeId);
-	if (!node) return;
-	for (const childId of [...node.children]) {
-		removeNodeDeep(page, childId);
-	}
-	for (const edgeId of [...node.edges]) {
-		removeEdgeDirect(page, edgeId);
-	}
-	if (node.parentNode) {
-		page.nodes.get(node.parentNode)?.children.delete(node.id);
-	}
-	page.nodes.delete(node.id);
-	page.selectedNodes.delete(node.id);
-}
-
-function hasParentCycle(page: GraphPage, nodeId: string): boolean {
-	const seen = new Set<string>();
-	let currentId: string | null = nodeId;
+function hasParentCycle(page: GraphPage, nodeId: Id): boolean {
+	const seen = new Set<Id>();
+	let currentId: Id | null = nodeId;
 	while (currentId) {
 		if (seen.has(currentId)) {
 			return true;
@@ -470,8 +450,8 @@ function logConsistencyReport(report: ConsistencyReport, title: string): void {
 	console.groupEnd();
 }
 
-function logRepairReport(before: ConsistencyReport, after: ConsistencyReport, appliedFixes: number, fixes: string[]): void {
-	console.group(`[Consistency] Repair complete (${appliedFixes} fix${appliedFixes === 1 ? "" : "es"})`);
+function logRepairReport(fixes: string[]): void {
+	console.group(`[Consistency] Repair complete (${fixes.length} fix${fixes.length === 1 ? "" : "es"})`);
 	if (fixes.length > 0) {
 		console.groupCollapsed("Applied fixes");
 		for (const fix of fixes) {
@@ -479,9 +459,6 @@ function logRepairReport(before: ConsistencyReport, after: ConsistencyReport, ap
 		}
 		console.groupEnd();
 	}
-	console.info(`Before: ${before.errorCount} errors, ${before.warningCount} warnings.`);
-	console.info(`After: ${after.errorCount} errors, ${after.warningCount} warnings.`);
-	logConsistencyReport(after, "Post-repair consistency check");
 	console.groupEnd();
 }
 

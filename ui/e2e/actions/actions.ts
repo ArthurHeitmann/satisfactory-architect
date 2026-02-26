@@ -137,31 +137,45 @@ export async function executeAction(
 	action: Action,
 	agent: Agent,
 ): Promise<ActionResult> {
+	console.log(`Executing action: ${action.type} on ${agent.index}`);
+	let result: ActionResult;
 	switch (action.type) {
-		case "createNode":            return executeCreateNode(action, agent);
-		case "createSplitterMerger":  return executeCreateSplitterMerger(action, agent);
-		case "createTextNote":        return executeCreateTextNote(action, agent);
-		case "connectNodes":          return executeConnectNodes(action, agent);
-		case "connectViaOverlay":     return executeConnectViaOverlay(action, agent);
-		case "attemptInvalidConnection": return executeAttemptInvalidConnection(action, agent);
-		case "moveNode":              return executeMoveNode(action, agent);
-		case "moveSelectedNodes":     return executeMoveSelectedNodes(action, agent);
-		case "modifyNodeProperty":    return executeModifyNodeProperty(action, agent);
-		case "modifyEdgeProperty":    return executeModifyEdgeProperty(action, agent);
-		case "deleteNode":            return executeDeleteNode(action, agent);
-		case "deleteEdge":            return executeDeleteEdge(action, agent);
-		case "deleteSelected":        return executeDeleteSelected(action, agent);
-		case "addPage":               return executeAddPage(action, agent);
-		case "deletePage":            return executeDeletePage(action, agent);
-		case "renamePage":            return executeRenamePage(action, agent);
-		case "reorderPages":          return executeReorderPages(action, agent);
-		case "switchPage":            return executeSwitchPage(action, agent);
-		case "undoRedo":              return executeUndoRedo(action, agent);
-		case "panView":               return executePanView(action, agent);
-		case "zoomView":              return executeZoomView(action, agent);
-		case "disconnectAndReconnect": return executeDisconnectAndReconnect(action, agent);
-		case "selectRandom":          return executeSelectRandom(action, agent);
+		case "createNode":            result = await executeCreateNode(action, agent); break;
+		case "createSplitterMerger":  result = await executeCreateSplitterMerger(action, agent); break;
+		case "createTextNote":        result = await executeCreateTextNote(action, agent); break;
+		case "connectNodes":          result = await executeConnectNodes(action, agent); break;
+		case "connectViaOverlay":     result = await executeConnectViaOverlay(action, agent); break;
+		case "attemptInvalidConnection": result = await executeAttemptInvalidConnection(action, agent); break;
+		case "moveNode":              result = await executeMoveNode(action, agent); break;
+		case "moveSelectedNodes":     result = await executeMoveSelectedNodes(action, agent); break;
+		case "modifyNodeProperty":    result = await executeModifyNodeProperty(action, agent); break;
+		case "modifyEdgeProperty":    result = await executeModifyEdgeProperty(action, agent); break;
+		case "deleteNode":            result = await executeDeleteNode(action, agent); break;
+		case "deleteEdge":            result = await executeDeleteEdge(action, agent); break;
+		case "deleteSelected":        result = await executeDeleteSelected(action, agent); break;
+		case "addPage":               result = await executeAddPage(action, agent); break;
+		case "deletePage":            result = await executeDeletePage(action, agent); break;
+		case "renamePage":            result = await executeRenamePage(action, agent); break;
+		case "reorderPages":          result = await executeReorderPages(action, agent); break;
+		case "switchPage":            result = await executeSwitchPage(action, agent); break;
+		case "undoRedo":              result = await executeUndoRedo(action, agent); break;
+		case "panView":               result = await executePanView(action, agent); break;
+		case "zoomView":              result = await executeZoomView(action, agent); break;
+		case "disconnectAndReconnect": result = await executeDisconnectAndReconnect(action, agent); break;
+		case "selectRandom":          result = await executeSelectRandom(action, agent); break;
 	}
+	// Guard: if the recipe selector is still open after any action, close it.
+	// Actions that intentionally use the selector already wait for it to detach
+	// before returning, so this only fires when a drag accidentally opened it.
+	const selector = agent.page.locator(".recipe-selector");
+	if (await selector.isVisible()) {
+		await agent.page.keyboard.press("Escape");
+		await selector.waitFor({ state: "detached", timeout: 1_200 });
+		if (result!.executed) {
+			return { executed: false, skippedReason: "recipe-selector-closed-after-action" };
+		}
+	}
+	return result!;
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -215,7 +229,7 @@ async function executeCreateNode(
 	}
 
 	// try {
-		await selector.waitFor({ state: "hidden", timeout: 1_200 });
+		await selector.waitFor({ state: "detached", timeout: 1_200 });
 	// } catch {
 	// 	return { executed: false, skippedReason: "recipe-selector-did-not-close" };
 	// }
@@ -257,22 +271,24 @@ async function executeCreateSplitterMerger(
 
 	await page.mouse.move(sourcePos.x, sourcePos.y);
 	await page.mouse.down();
-	const steps = 12;
+	const steps = 5;
 	for (let i = 1; i <= steps; i++) {
 		const t = i / steps;
 		await page.mouse.move(
 			sourcePos.x + (dropX - sourcePos.x) * t,
 			sourcePos.y + (dropY - sourcePos.y) * t,
 		);
+		await new Promise((resolve) => setTimeout(resolve, 20));
 	}
+	await new Promise((resolve) => setTimeout(resolve, 100));
 	await page.mouse.up();
 
 	const selector = page.locator(".recipe-selector");
-	try {
+	// try {
 		await selector.waitFor({ state: "visible", timeout: 1_200 });
-	} catch {
-		return { executed: false, skippedReason: "recipe-selector-not-visible" };
-	}
+	// } catch {
+	// 	return { executed: false, skippedReason: "recipe-selector-not-visible" };
+	// }
 
 	// Splitter/Merger are under the "Special" section in the recipe selector.
 	// Look for special recipe keys
@@ -282,9 +298,9 @@ async function executeCreateSplitterMerger(
 
 	const specialItem = page.locator(`[data-recipe-key="${targetKey}"]`);
 	if (await specialItem.count() > 0) {
-		await specialItem.click();
+		await specialItem.click({ force: true });
 		// try {
-			await selector.waitFor({ state: "hidden", timeout: 1_200 });
+			await selector.waitFor({ state: "detached", timeout: 1_200 });
 		// } catch {
 		// 	return { executed: false, skippedReason: "recipe-selector-did-not-close" };
 		// }
@@ -375,14 +391,16 @@ async function executeConnectNodes(
 	await page.mouse.down();
 
 	// Move in steps to simulate real drag
-	const steps = 10;
+	const steps = 5;
 	for (let i = 1; i <= steps; i++) {
 		const t = i / steps;
 		await page.mouse.move(
 			sourcePos.x + (destPos.x - sourcePos.x) * t,
 			sourcePos.y + (destPos.y - sourcePos.y) * t,
 		);
+		await new Promise((resolve) => setTimeout(resolve, 20));
 	}
+	await new Promise((resolve) => setTimeout(resolve, 100));
 
 	await page.mouse.up();
 
@@ -437,24 +455,26 @@ async function executeConnectViaOverlay(
 	await page.mouse.move(sourcePos.x, sourcePos.y);
 	await page.mouse.down();
 
-	const steps = 15;
+	const steps = 5;
 	for (let i = 1; i <= steps; i++) {
 		const t = i / steps;
 		await page.mouse.move(
 			sourcePos.x + (dropX - sourcePos.x) * t,
 			sourcePos.y + (dropY - sourcePos.y) * t,
 		);
+		await new Promise((resolve) => setTimeout(resolve, 20));
 	}
+	await new Promise((resolve) => setTimeout(resolve, 100));
 
 	await page.mouse.up();
 
 	// Recipe selector should appear
 	const selector = page.locator(".recipe-selector");
-	try {
+	// try {
 		await selector.waitFor({ state: "visible", timeout: 1_200 });
-	} catch {
-		return { executed: false, skippedReason: "recipe-selector-not-visible" };
-	}
+	// } catch {
+	// 	return { executed: false, skippedReason: "recipe-selector-not-visible" };
+	// }
 
 	const picked = await pickRandomRecipe(agent, action.params.recipeKey);
 	// if (!picked) {
@@ -465,7 +485,7 @@ async function executeConnectViaOverlay(
 	}
 
 	// try {
-		await selector.waitFor({ state: "hidden", timeout: 1_200 });
+		await selector.waitFor({ state: "detached", timeout: 1_200 });
 	// } catch {
 	// 	return { executed: false, skippedReason: "recipe-selector-did-not-close" };
 	// }
@@ -1430,7 +1450,7 @@ async function pickRandomRecipe(
 	if (preferredKey && preferredKey !== "__random__") {
 		const item = page.locator(`[data-recipe-key="${preferredKey}"]`);
 		if (await item.count() > 0) {
-			await item.click();
+			await item.click({ force: true });
 			return true;
 		}
 	}
@@ -1441,7 +1461,7 @@ async function pickRandomRecipe(
 	if (count === 0) return false;
 
 	const idx = agent.rng.nextInt(0, count - 1);
-	await items.nth(idx).click();
+	await items.nth(idx).click({ force: true });
 	return true;
 }
 

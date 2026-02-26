@@ -1,6 +1,7 @@
 import { writeToLocalStorage } from "$lib/localStorageState.svelte";
 import { deepClone } from "$lib/utilties";
 import { dataModelVersion, saveDataType, StorageKeys } from "./constants";
+import { repairDataModelConsistency } from "./consistencyTools";
 import { globals, trackStateChanges } from "./globals.svelte";
 import { GraphPage } from "./GraphPage.svelte";
 import { IdGen, IdMapper, type Id, type PasteSource } from "./IdGen.svelte";
@@ -52,6 +53,7 @@ export class AppState {
 		for (const page of pages) {
 			state.addPage(page);
 		}
+		repairDataModelConsistency(state);
 		return state;
 	}
 
@@ -66,6 +68,7 @@ export class AppState {
 		this.name = json.name;
 		this.currentPageId = json.currentPageId;
 		this.pages = json.pages.map((p: any) => GraphPage.fromJSON(this, p));
+		repairDataModelConsistency(this);
 	}
 
 	insertPagesFromJSON(json: any, pasteSource: PasteSource, index: number|null = null): GraphPage[] {

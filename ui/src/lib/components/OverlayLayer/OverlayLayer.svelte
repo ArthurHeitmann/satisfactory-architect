@@ -51,9 +51,18 @@
 		if (event.target !== event.currentTarget) {
 			return;
 		}
+		dismissAll();
+	}
+
+	function dismissAll() {
 		dismissEventStream.emit({type: ""});
-		const autoDismissEventTypes: EventType[] = ["showContextMenu", "showColorPicker", "showIconPicker"];
-		activeEvents = activeEvents.filter(e => !autoDismissEventTypes.includes(e.type));
+		activeEvents = [];
+	}
+
+	function onKeyDown(event: KeyboardEvent) {
+		if (event.key === "Escape" && activeEvents.length > 0) {
+			dismissAll();
+		}
 	}
 
 	function closeEvent(event: EventBase) {
@@ -186,7 +195,7 @@
 	}
 </script>
 
-<svelte:window onmouseover={onElementMouseOver} />
+<svelte:window onmouseover={onElementMouseOver} onkeydown={onKeyDown} />
 
 <div
 	class="overlay-layer"

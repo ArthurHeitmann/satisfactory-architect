@@ -66,18 +66,41 @@ export async function extractAppState(page: Page): Promise<AppStateJson> {
 }
 
 /**
+ * Normalize a single node's JSON for comparison.
+ * Arrays that carry set semantics (edges, children) are sorted so that
+ * order differences between clients do not produce spurious diffs.
+ */
+function normalizeNode(node: unknown): unknown {
+	if (typeof node !== "object" || node === null) return node;
+	const n = node as Record<string, unknown>;
+	const result: Record<string, unknown> = { ...n };
+	if (Array.isArray(result.edges)) {
+		result.edges = [...result.edges].sort();
+	}
+	if (Array.isArray(result.children)) {
+		result.children = [...result.children].sort();
+	}
+	return result;
+}
+
+/**
  * Normalize a serialized AppState for convergence comparison by:
  * 1. Stripping local-only fields (view, selected, toolMode, currentPageId)
  * 2. Sorting pages by ID for canonical ordering
+ * 3. Sorting set-semantics arrays (node.edges, node.children) for stable comparison
  */
 export function normalizeState(state: AppStateJson): NormalizedAppState {
 	const pages: NormalizedPage[] = state.pages
 		.map((page): NormalizedPage => {
+			const nodes: Record<string, unknown> = {};
+			for (const [id, node] of Object.entries(page.nodes)) {
+				nodes[id] = normalizeNode(node);
+			}
 			return {
 				id: page.id,
 				name: page.name,
 				icon: page.icon,
-				nodes: page.nodes,
+				nodes,
 				edges: page.edges,
 			};
 		})

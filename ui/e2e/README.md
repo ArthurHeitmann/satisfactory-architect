@@ -1,5 +1,7 @@
 # E2E Tests
 
+## Just a vibe coded testing playground. Don't treat these tests seriously!
+
 This folder contains Playwright-based end-to-end tests for collaboration and sync behavior.
 
 ## What they cover
