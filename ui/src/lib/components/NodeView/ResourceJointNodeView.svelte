@@ -2,6 +2,7 @@
 	import { satisfactoryDatabase } from "$lib/satisfactoryDatabase";
 	import type { SFPowerFuel, SFRecipe } from "$lib/satisfactoryDatabaseTypes";
 	import SfIconView from "../SFIconView.svelte";
+	import EdgeAnnotation from "../EdgeAnnotation.svelte";
 	import { getNodeRadius, isNodeSelectable } from "../../datamodel/nodeTypeProperties.svelte";
 	import { globals } from "../../datamodel/globals.svelte";
 	import SvgInput from "../SvgInput.svelte";
@@ -145,16 +146,17 @@
 	const innerRadius = outerRadius - 4;
 	const inputWidth = outerRadius * 2.2;
 	
-	const [suggestionAbsOffset, suggestionRelOffset] = (() => {
+	const suggestionX = $derived.by(() => {
 		const offset = outerRadius - 3;
 		if (node.properties.jointType === "input") {
-			return [-offset, "-100%"];
+			return -offset;
 		} else if (node.properties.jointType === "output") {
-			return [offset, "-0%"];
+			return offset;
 		} else {
 			assertUnreachable(node.properties.jointType);
 		}
-	})();
+	});
+	const suggestionAlign = $derived(node.properties.jointType === "input" ? "right" : "left");
 
 	
 	function onProductionRateChange(value: string, isEnter: boolean) {
@@ -196,29 +198,14 @@
 		/>
 	{/if}
 	{#if setProductionRate && suggestedThroughput !== 0}
-			<foreignObject
-				x={suggestionAbsOffset}
-				y={-outerRadius/2}
-				width="50"
-				height="13"
-			>
-				<div
-					class="rate-suggestion"
-					style="--throughput-color: {throughputColor}; transform: translate({suggestionRelOffset}, -100%);"
-					onmousedown={(e) => {
-						if (e.button !== 0)
-							return;
-						e.stopPropagation();
-						setProductionRate(suggestedThroughput);
-					}}
-					ontouchstart={(e) => {
-						e.stopPropagation();
-						setProductionRate(suggestedThroughput);
-					}}
-				>
-					{floatToString(suggestedThroughput, 3)}
-				</div>
-			</foreignObject>
+		<EdgeAnnotation
+			x={suggestionX}
+			y={-outerRadius/2 - 6.5}
+			text={floatToString(suggestedThroughput, 3)}
+			color={throughputColor}
+			align={suggestionAlign}
+			onClick={() => setProductionRate(suggestedThroughput)}
+		/>
 	{/if}
 	{#if globals.debugShowNodeIds}
 		<text
@@ -264,25 +251,5 @@
 		}
 	}
 
-	foreignObject {
-		pointer-events: none;
-	}
-
-	.rate-suggestion {
-		cursor: pointer;
-		pointer-events: all;
-		width: max-content;
-		background: var(--throughput-color);
-		color: var(--edge-background-color-text);
-		font-size: 9px;
-		font-weight: 500;
-		padding: 2px 4px;
-		height: 13px;
-		line-height: 9px;
-		border-radius: 5px;
-
-		&:hover {
-			filter: brightness(1.1);
-		}
-	}
+	
 </style>

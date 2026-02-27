@@ -10,7 +10,8 @@
 	import UserEvents, { type DragEvent } from "../UserEvents.svelte";
 	import type { LayoutOrientation } from "../../datamodel/GraphNode.svelte";
 	import { edgeArrowLength, gridSize } from "$lib/datamodel/constants";
-	
+	import EdgeAnnotation from "../EdgeAnnotation.svelte";
+
 	interface Props {
 		edge: GraphEdge;
 	}
@@ -392,20 +393,15 @@
 		{/if}
 	{/each}
 	{#if midPoint && (edge.pushThroughput !== 0 || edge.pullThroughput !== 0)}
-		<foreignObject
+		<EdgeAnnotation
 			x={midPoint.x}
 			y={midPoint.y}
-			width="100"
-			height="13"
-		>
-			<div class="edge-throughput-text">
-				{#if isBalanced}
-					{floatToString(edge.pushThroughput)}
-				{:else}
-					{floatToString(edge.pushThroughput)} / {floatToString(edge.pullThroughput)}
-				{/if}
-			</div>
-		</foreignObject>
+			text={isBalanced
+				? floatToString(edge.pushThroughput)
+				: `${floatToString(edge.pushThroughput)} / ${floatToString(edge.pullThroughput)}`}
+			color={color}
+			align="center"
+		/>
 	{/if}
 	{#if globals.debugShowEdgeIds && midPoint}
 		<text
@@ -491,21 +487,5 @@
 		font-size: 10px;
 	}
 
-	foreignObject {
-		pointer-events: none;
-	}
-
-	.edge-throughput-text {
-		pointer-events: all;
-		width: max-content;
-		transform: translateX(-50%) translateY(-50%);
-		background: var(--edge-color);
-		color: var(--edge-background-color-text);
-		font-size: 9px;
-		font-weight: 500;
-		padding: 2px 4px;
-		height: 13px;
-		line-height: 9px;
-		border-radius: 5px;
-	}
+	
 </style>
