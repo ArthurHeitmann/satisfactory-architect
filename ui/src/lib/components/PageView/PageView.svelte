@@ -531,4 +531,11 @@
 		stroke-width: 1;
 		pointer-events: none;
 	}
+
+	:global(#arrow), :global(#arrow-wide) {
+		path {
+			fill: var(--edge-stroke-color);	// fallback for Safari which doesn't support context-stroke
+			fill: context-stroke;
+		}
+	}
 </style>

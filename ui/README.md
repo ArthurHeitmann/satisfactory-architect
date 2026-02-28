@@ -43,13 +43,13 @@ Open `FactoryGame-Windows.pak`. From `FactoryGame\Content\Localization\AllString
 ### Optional: Update categories list
 
 ```bash
-npx tsx scripts\GameJsonDumpProcessor.ts --extracted-files="path\to\extracted\files\FactoryGame\Content" --ts-save="path\to\this\repo\scripts\categories.ts"
+npx tsx scripts\GameJsonDumpProcessor.ts --extracted-files="path\to\extracted\files\FactoryGame\Content" --ts-save="path\to\this\repo\ui\scripts\categories.ts"
 ```
 
 ### Update database and icons
 
 ```bash
-npx tsx scripts\DocsJsonProcessor.ts --json="C:\Program Files (x86)\Steam\steamapps\common\Satisfactory\CommunityResources\Docs\en-US.json" --extracted-files="path\to\extracted\files\FactoryGame\Content\FactoryGame" --img-save="path\where\to\save\raw\images" --ts-save="path\to\this\repo\src\lib\satisfactoryDatabase.ts"
+npx tsx scripts\DocsJsonProcessor.ts --json="C:\Program Files (x86)\Steam\steamapps\common\Satisfactory\CommunityResources\Docs\en-US.json" --extracted-files="path\to\extracted\files\FactoryGame\Content\FactoryGame" --img-save="path\where\to\save\raw\images" --ts-save="path\to\this\repo\ui\src\lib\satisfactoryDatabase.ts"
 ```
 
 For the following steps I use [XnConvert](https://www.xnview.com/en/xnconvert).
@@ -61,5 +61,5 @@ In a separate folder, convert, downscale to 48px, and save extracted images as `
 Update in-memory image previews:
 
 ```bash
-npx tsx scripts\ImagePreprocessor.ts --folder="path\to\48x48\images" --save="path\to\this\repo\src\lib\iconPreviews.ts"
+npx tsx scripts\ImagePreprocessor.ts --folder="path\to\48x48\images" --save="path\to\this\repo\ui\src\lib\iconPreviews.ts"
 ```
