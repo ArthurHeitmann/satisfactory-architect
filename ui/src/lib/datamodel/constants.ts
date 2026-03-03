@@ -1,4 +1,4 @@
-export const latestAppVersion = 1;
+export const latestAppVersion = 2;
 export const dataModelVersion = 1;
 
 export const gridSize = 50;
