@@ -97,7 +97,7 @@ export class ServerConnection {
 		);
 
 		if (browser && !location.origin.includes("localhost:")) {
-			this._serverUrl = location.origin.replace(/^http/, "ws");
+			this._serverUrl = location.origin.replace(/^http/, "ws") + "/ws";
 		}
 
 	}
