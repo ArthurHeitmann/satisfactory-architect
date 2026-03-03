@@ -125,11 +125,21 @@ function startServer() {
 				}
 			};
 
-			socket.onerror = (error) => {
-				ErrorHandler.handle(error, {
-					source: "WebSocket.onerror",
-					socketId: adapter.socketId,
-				});
+			socket.onerror = (event) => {
+				const errorDetail = event instanceof ErrorEvent
+					? { message: event.message, filename: event.filename, lineno: event.lineno, colno: event.colno, error: event.error }
+					: { type: event.type };
+				console.error("WebSocket error event:", errorDetail);
+				ErrorHandler.handle(
+					event instanceof ErrorEvent && event.error instanceof Error
+						? event.error
+						: new Error(`WebSocket error: ${event instanceof ErrorEvent ? event.message : event.type}`),
+					{
+						source: "WebSocket.onerror",
+						socketId: adapter.socketId,
+						readyState: socket.readyState,
+					},
+				);
 			};
 
 			return response;

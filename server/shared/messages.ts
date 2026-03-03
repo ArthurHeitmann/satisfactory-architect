@@ -101,6 +101,7 @@ export type ClientMessage =
 	| JoinRoomMessage
 	| CommandBatchMessage
 	| HeartbeatMessage
+	| KeepAliveMessage
 	| UploadStateMessage
 	| GetRoomInfoMessage;
 
@@ -133,6 +134,10 @@ export interface HeartbeatMessage {
 	localIdCounter: string;
 }
 
+export interface KeepAliveMessage {
+	type: "keep_alive";
+}
+
 export interface UploadStateMessage {
 	type: "upload_state";
 	stateData: AppStateJson;
@@ -146,6 +151,7 @@ export type ServerMessage =
 	| HeartbeatResponseMessage
 	| RoomInfoMessage
 	| UserMessage
+	| KeepAliveMessage
 	| ErrorMessage;
 
 export interface WelcomeMessage extends VersionInfo {

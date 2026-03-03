@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ServerConnectionState } from "$lib/sync/ServerConnection.svelte";
 	import type { ShowConnectionOverlayEvent, EventStream } from "$lib/EventStream.svelte";
-	import { getContext, onMount, untrack } from "svelte";
+	import { getContext, onMount, onDestroy, untrack } from "svelte";
 	import type { AppState } from "$lib/datamodel/AppState.svelte";
 	import { LocalStorageState } from "$lib/localStorageState.svelte";
 	import { assertUnreachable, copyText } from "$lib/utilties";
@@ -242,6 +242,7 @@
 
 	// Initialize - load server URL from storage and auto-connect
 	onMount(() => {
+		serverConnection.startKeepAlive();
 		const savedUrl = lastServerUrlStore.value;
 		if (serverConnection.state === ServerConnectionState.Disconnected) {
 			if (savedUrl && serverConnection.serverUrl !== savedUrl) {
@@ -250,6 +251,10 @@
 				serverConnection.connect();
 			}
 		}
+	});
+
+	onDestroy(() => {
+		serverConnection.stopKeepAlive();
 	});
 
 	// Save room to recent only when successfully joined

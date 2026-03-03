@@ -118,6 +118,9 @@ export class CollaborationServer {
 				case "heartbeat":
 					this.handleHeartbeat(socket.socketId, message);
 					break;
+				case "keep_alive":
+					// No-op: keep_alive exists only to prevent idle socket closure
+					break;
 				case "upload_state":
 					await this.handleUploadState(socket.socketId, message);
 					break;

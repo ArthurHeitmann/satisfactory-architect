@@ -70,6 +70,7 @@ export class ServerConnection {
 	private lastReceivedHeartbeat: number = Date.now();
 	private fastHeartbeatThrottled = new Throttler(() => this.sendHeartbeat(), 100);
 	private heartbeatWatchInitialized = false;
+	private keepAliveInterval: number | null = null;
 
 	onUnexpectedDisconnect: ((error: string | null) => void) | null = null;
 	onUserMessage: ((message: string) => void) | null = null;
@@ -258,6 +259,9 @@ export class ServerConnection {
 			case "room_info":
 				// TODO
 				break;
+			case "keep_alive":
+				// Placeholder: server-to-client keep_alive (no action needed)
+				break;
 			case "error":
 				this.handleErrorMessage(message);
 				break;
@@ -421,6 +425,31 @@ export class ServerConnection {
 		if (this.heartbeatInterval !== null) {
 			window.clearInterval(this.heartbeatInterval);
 			this.heartbeatInterval = null;
+		}
+	}
+
+	/**
+	 * Start sending keep_alive messages to prevent idle socket closure.
+	 * Only sends while in the Connected state.
+	 * Should be called when the connection overlay is opened.
+	 */
+	startKeepAlive(): void {
+		this.stopKeepAlive();
+		this.keepAliveInterval = window.setInterval(() => {
+			if (this.stateMachine.currentState === ServerConnectionState.Connected) {
+				void this.sendMessage({ type: "keep_alive" });
+			}
+		}, 1500);
+	}
+
+	/**
+	 * Stop sending keep_alive messages.
+	 * Should be called when the connection overlay is closed.
+	 */
+	stopKeepAlive(): void {
+		if (this.keepAliveInterval !== null) {
+			window.clearInterval(this.keepAliveInterval);
+			this.keepAliveInterval = null;
 		}
 	}
 
