@@ -126,6 +126,11 @@ function startServer() {
 			};
 
 			socket.onerror = (event) => {
+				const errorMessage = event instanceof ErrorEvent ? event.message : event.type;
+				// "Unexpected EOF" is a normal occurrence when a client disconnects abruptly — suppress it
+				if (errorMessage === "Unexpected EOF") {
+					return;
+				}
 				const errorDetail = event instanceof ErrorEvent
 					? { message: event.message, filename: event.filename, lineno: event.lineno, colno: event.colno, error: event.error }
 					: { type: event.type };
@@ -133,7 +138,7 @@ function startServer() {
 				ErrorHandler.handle(
 					event instanceof ErrorEvent && event.error instanceof Error
 						? event.error
-						: new Error(`WebSocket error: ${event instanceof ErrorEvent ? event.message : event.type}`),
+						: new Error(`WebSocket error: ${errorMessage}`),
 					{
 						source: "WebSocket.onerror",
 						socketId: adapter.socketId,
