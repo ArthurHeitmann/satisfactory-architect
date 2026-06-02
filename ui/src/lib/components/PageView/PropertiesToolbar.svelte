@@ -191,6 +191,7 @@
 		displayName: string;
 		icon: string;
 		count: number;
+		consumptionCount: number;
 		variablePowerRecipes: number[];
 	}
 	const usedBuildings: UsedBuilding[] = $derived.by(() => {
@@ -227,6 +228,7 @@
 						displayName: building.displayName,
 						icon: building.icon,
 						count: 0,
+						consumptionCount: 0,
 						variablePowerRecipes: [],
 					};
 				}
@@ -234,6 +236,7 @@
 					used[buildingClassName].variablePowerRecipes.push(variablePower);
 				}
 				used[buildingClassName].count += count;
+				used[buildingClassName].consumptionCount += count ** 1.321928;
 			}
 		}
 		return Object.values(used).toReversed();
@@ -245,7 +248,7 @@
 			if (usedBuilding.variablePowerRecipes.length === 0) {
 				const building = satisfactoryDatabase.buildings[usedBuilding.buildingClassName];
 				if (building) {
-					powerConsumed += building.powerConsumption * usedBuilding.count;
+					powerConsumed += building.powerConsumption * usedBuilding.consumptionCount;
 					powerProduced += building.powerProduction * usedBuilding.count;
 				}
 			} else {
